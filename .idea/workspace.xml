@@ -53,13 +53,18 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/TransactionXid.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="225">
               <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tyloo-core/src/main/java/io/tyloo/CancellingException.java">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -92,37 +97,58 @@
             <path>
               <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
               <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-api" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
               <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-api" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
               <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-api" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-api" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
               <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-api" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
               <item name="tyloo" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="io" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="io" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="io" type="462c0819:PsiDirectoryNode" />
+              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
+              <item name="recover" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -160,12 +186,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1555742296952</updated>
-      <workItem from="1555742302908" duration="1431000" />
+      <workItem from="1555742302908" duration="2035000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1431000" />
+    <option name="totallyTimeSpent" value="2035000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="319" y="1" width="1140" height="832" extended-state="1" />
@@ -247,6 +273,9 @@
           <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tyloo-core/src/main/java/io/tyloo/CancellingException.java">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
   <component name="masterDetails">
