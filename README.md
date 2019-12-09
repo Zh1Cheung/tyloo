@@ -1,6 +1,6 @@
 # Tyloo：Distributed transaction framework——TCC
 
-![tyloo](image\tyloo.jpg)
+![tyloo](tyloo\image\tyloo.jpg)
 
 
 
