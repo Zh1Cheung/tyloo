@@ -1,6 +1,13 @@
-# Tyloo：Distributed transaction framework——TCC
 
 ![tyloo](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/tyloo.jpg)
+
+
+
+# Tyloo：Distributed transaction framework——TCC 
+
+![Build Status](https://travis-ci.org/seata/seata.svg?branch=develop)         ![正常大小的圆角矩形](https://img.shields.io/badge/language-java-green.svg)    ![正常大小的圆角矩形](https://img.shields.io/badge/mozilla%20add--on-v1.2.7-blue)          ![codecov](https://codecov.io/gh/seata/seata/branch/develop/graph/badge.svg)         ![正常大小的圆角矩形](https://img.shields.io/badge/Stars-100-lightgrey?logo=github&style=social)
+
+
 
 
 
@@ -65,7 +72,6 @@ tyloo有两个拦截器**，**通过对 @Compensable AOP 切面( 参与者 try �
 
 ## **下单支付流程**ppp
 
-j
 
 
 ![3](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/3.jpg)
