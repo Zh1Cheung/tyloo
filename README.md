@@ -1,6 +1,6 @@
 # Tyloo：Distributed transaction framework——TCC
 
-![tyloo](tyloo\image\tyloo.jpg)
+![tyloo](tyloo/image/tyloo.jpg)
 
 
 
@@ -47,7 +47,7 @@ tyloo有两个拦截器**，**通过对 @Compensable AOP 切面( 参与者 try �
 
 
 
-![1](image\1.jpg)
+![1](image/1.jpg)
 
 
 
