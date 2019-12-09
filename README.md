@@ -1,6 +1,6 @@
 # Tyloo：Distributed transaction framework——TCC
 
-![tyloo](https://github.com/Zh1Cheung/tyloo/image/tyloo.jpg)
+![tyloo](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/tyloo.jpg)
 
 
 
@@ -57,7 +57,7 @@ tyloo有两个拦截器**，**通过对 @Compensable AOP 切面( 参与者 try �
 
 
 
-![2](https://github.com/Zh1Cheung/tyloo/image/2.jpg)
+![2](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/2.jpg)
 
 
 
@@ -68,7 +68,7 @@ tyloo有两个拦截器**，**通过对 @Compensable AOP 切面( 参与者 try �
 j
 
 
-![3](https://github.com/Zh1Cheung/tyloo/image/3.jpg)
+![3](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/3.jpg)
 
 
 
