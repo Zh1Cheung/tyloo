@@ -47,7 +47,7 @@ tyloo有两个拦截器**，**通过对 @Compensable AOP 切面( 参与者 try �
 
 
 
-![1](https://github.com/Zh1Cheung/tyloo/image/1.jpg)
+![1](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/1.jpg)
 
 
 
