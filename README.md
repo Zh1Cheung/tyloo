@@ -17,7 +17,7 @@
 
 参与者需要声明 try / confirm / cancel 三个类型的方法，和 TCC 的操作一一对应。在程序里，通过 @Compensable 注解标记在 try 方法上，并填写对应的 confirm / cancel 方法，
 
-tyloo有两个拦截器**，**通过对 @Compensable AOP 切面( 参与者 try 方法 )进行拦截，透明化对参与者 confirm / cancel 方法调用，从而实现 TCC。
+tyloo有两个拦截器，通过对 @Compensable AOP 切面( 参与者 try 方法 )进行拦截，透明化对参与者 confirm / cancel 方法调用，从而实现 TCC。
 
 第一个拦截器，可补偿事务拦截器，实现如下功能：
 
