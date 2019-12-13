@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://code.alibabatech.com/schema/dubbo        http://code.alibabatech.com/schema/dubbo/dubbo.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="sample-dubbo-capital"/>
+    <!-- 读入配置属性文件 -->
+    <context:property-placeholder location="classpath:sample-dubbo-capital.properties"
+                                  ignore-unresolvable="true"/>
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
+    <!--<dubbo:registry id="capitalRpcZk" address="multicast://224.5.6.7:1234?unicast=false"/>-->
+    <dubbo:registry id="capitalRpcZk" protocol="zookeeper" register="true" subscribe="false"
+                    address="${zookeeper.address}" session="${zookeeper.session.timeout}"
+                    timeout="${zookeeper.connect.timeout}" file="./.dubbo/rpc-cache"/>
+
+    <!--<dubbo:monitor protocol="registry" />-->
+
+    <!--<dubbo:registry protocol="mulitcast" address="224.5.6.7:1234" />-->
+
+    <!--<dubbo:registry address="N/A" />-->
+    <!-- 用dubbo协议在${dubbo.port}端口暴露服务 ;payload:请求及响应数据包大小限制,单位：字节,默认值88388608(=8M)-->
+    <dubbo:protocol name="dubbo" port="${dubbo.port}" payload="52428800"/>
+    <!-- 声明需要暴露的服务接口 -->
+    <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalTradeOrderService"
+                   registry="capitalRpcZk"
+                   ref="capitalTradeOrderService" timeout="60000" retries="0"/>
+    <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalAccountService"
+                   registry="capitalRpcZk"
+                   ref="capitalAccountService" timeout="60000" retries="0"/>
+
+    <!--<bean id="capitalTradeOrderService"-->
+          <!--class="CapitalTradeOrderServiceImpl"/>-->
+
+</beans>
