@@ -14,7 +14,7 @@ public enum Propagation {
      * 支持当前事务，如果当前没有事务，就新建一个事务
      */
     REQUIRED(0),
-    /**
+     /**
      * 支持当前事务，如果当前没有事务，就以非事务方式执行
      */
     SUPPORTS(1),

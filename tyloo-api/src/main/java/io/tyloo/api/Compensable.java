@@ -42,6 +42,13 @@ public @interface Compensable {
      */
     public Class<? extends TransactionContextEditor> transactionContextEditor() default DefaultTransactionContextEditor.class;
 
+    /**
+     * 超时异常
+     * delayCancelExceptions()表示系统发生了设置的异常时，主事务不立即rollbac，而是由恢复job来执行事务恢复。k
+     * 通常需要将超时异常设置为delayCancelExceptions，这样可以避免因为服务调用时发生了超时异常，主事务如果立刻rollback, 但是从事务还没执行完，从而造成主事务rollback失败
+     *
+     * @return
+     */
     public Class<? extends Exception>[] delayCancelExceptions() default {};
 
     public boolean asyncConfirm() default false;

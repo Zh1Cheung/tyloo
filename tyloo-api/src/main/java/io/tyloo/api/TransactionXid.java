@@ -30,14 +30,17 @@ public class TransactionXid implements Xid, Serializable {
     private static final long serialVersionUID = -6817267250789142043L;
     /**
      * XID 的格式标识符
+     * 是一个数字，用于标识由globalTransactionId和branchQualifier值使用的格式，默认值是1。
      */
     private int formatId = 1;
     /**
      * 全局事务ID.
+     * 相同的分布式事务应该使用相同的globalTransactionId，这样可以明确知道XA事务属于哪个分布式任务
      */
     private byte[] globalTransactionId;
     /**
      * 分支限定符.
+     * 默认值是空串；对于一个分布式事务中的每个分支事务，bqual的值必须唯一
      */
     private byte[] branchQualifier;
 
