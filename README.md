@@ -35,15 +35,15 @@ tyloo有两个拦截器，通过对 @Compensable AOP 切面( 参与者 try 方�
 
 ## 项目结构
 
-- tcc-transaction-api
+- tyloo-api
   这个模块放的是一些相关的API
-- tcc-transaction-core
+- tyloo-core
   主要存放一些事务核心的类，比如两个AoP的拦截器，Repository库等
-- tcc-transaction-spring
+- tyloo-spring
   Spring框架和事务通过继承整合在这里
-- tcc-transaction-tutorial-sample
+- tyloo-tutorial-sample
   业务模块
-- tcc-transaction-unit-test
+- tyloo-unit-test
   测试以及工具模块
 
 
@@ -80,35 +80,35 @@ tyloo有两个拦截器，通过对 @Compensable AOP 切面( 参与者 try 方�
 
 
 
-## 配置tcc-transaction
+## 配置tyloo
 
-1 引用tcc-transaction
+1 引用tyloo
 
-在服务调用方和提供方项目中需要引用tcc-transaction-spring jar包，如使用maven依赖：
+在服务调用方和提供方项目中需要引用tyloo-spring jar包，如使用maven依赖：
 
 ```
     <dependency>
         <groupId>io.tyloo</groupId>
-        <artifactId>tcc-transaction-spring</artifactId>
+        <artifactId>tyloo-spring</artifactId>
         <version>${project.version}</version>
     </dependency>
 ```
 
-2 加载tcc-transaction.xml配置
+2 加载tyloo.xml配置
 
-启动应用时，需要将tcc-transaction-spring jar中的tcc-transaction.xml加入到classpath中。如在web.xml中配置：
+启动应用时，需要将tyloo-spring jar中的tyloo.xml加入到classpath中。如在web.xml中配置：
 
 ```
 <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:tcc-transaction.xml
+    <param-value>classpath:tyloo.xml
     </param-value>
 </context-param>
 ```
 
 3 设置TransactionRepository
 
-需要为参与事务的应用项目配置一个TransactionRepository，tcc-transaction框架使用transactionRepository持久化事务日志。可以选择FileSystemTransactionRepository、SpringJdbcTransactionRepository、RedisTransactionRepository或ZooKeeperTransactionRepository。
+需要为参与事务的应用项目配置一个TransactionRepository，tyloo框架使用transactionRepository持久化事务日志。可以选择FileSystemTransactionRepository、SpringJdbcTransactionRepository、RedisTransactionRepository或ZooKeeperTransactionRepository。
 
 使用SpringJdbcTransactionRepository配置示例如下：
 
@@ -201,7 +201,7 @@ class="ZooKeeperTransactionRepository">
 3. 服务方法的入参能被序列化(默认使用jdk序列化机制，需要参数实现Serializable接口，可以设置repository的serializer属性自定义序列化实现)
 4. try方法、confirm方法和cancel方法入参类型须一样
 
-## 在tcc-transaction-http-capital中发布Tcc服务示例：
+## 在tyloo-http-capital中发布Tcc服务示例：
 
 try接口方法：
 
@@ -228,7 +228,7 @@ cancel方法：
 public void cancelRecord(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
 ```
 
-### 在tcc-transaction-http-redpacket中发布Tcc服务示例：
+### 在tyloo-http-redpacket中发布Tcc服务示例：
 
 try接口方法：
 
@@ -275,7 +275,7 @@ public void cancelRecord(TransactionContext transactionContext, RedPacketTradeOr
 
 其中propagation = Propagation.SUPPORTS表示该方法支持参与到TCC事务中。 如果tcc服务的client为框架自动生成实现（比如代理机制实现）不能添加注解，可为该client实现一个代理类，在代理类的方法上加上注解。
 
-### 在tcc-transaction-http-order中调用远程Tcc服务示例：
+### 在tyloo-http-order中调用远程Tcc服务示例：
 
 try方法：
 
@@ -318,28 +318,28 @@ rpc框架为dubbo时支持以隐式传参方式配置TCC事务。
 
 
 
-## 配置tcc-transaction
+## 配置tyloo
 
-与上面配置tcc-transaction一样，此外，还需要如下步骤：
+与上面配置tyloo一样，此外，还需要如下步骤：
 
-1. 引用tcc-transaction-dubbo 在项目中需要引用tcc-transaction-dubbo jar包，如使用maven依赖：
+1. 引用tyloo-dubbo 在项目中需要引用tyloo-dubbo jar包，如使用maven依赖：
 
    ```xml
     <dependency>
         <groupId>io.tyloo</groupId>
-        <artifactId>tcc-transaction-dubbo</artifactId>
+        <artifactId>tyloo-dubbo</artifactId>
         <version>${project.version}</version>
     </dependency>
    ```
 
-2. 加载tcc-transaction-dubbo.xml配置
+2. 加载tyloo-dubbo.xml配置
 
-**需要将tcc-transaction-dubbo jar中的tcc-transaction-dubbo.xml加入到classpath中。**如在web.xml中配置改为：
+**需要将tyloo-dubbo jar中的tyloo-dubbo.xml加入到classpath中。**如在web.xml中配置改为：
 
 ```xml
 <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:tcc-transaction.xml,classpath:tcc-transaction-dubbo.xml
+    <param-value>classpath:tyloo.xml,classpath:tyloo-dubbo.xml
     </param-value>
  </context-param>
 ```
@@ -357,7 +357,7 @@ rpc框架为dubbo时支持以隐式传参方式配置TCC事务。
 
 Compensable的属性包括propagation、confirmMethod、cancelMethod、transactionContextEditor。propagation可不用设置，框架使用缺省值；设置confirmMethod指定CONFIRM阶段的调用方法；设置cancelMethod指定CANCEL阶段的调用方法；设置transactionContextEditor为DubboTransactionContextEditor.class。
 
-### 在tcc-transaction-dubbo-capital中发布Tcc服务示例：
+### 在tyloo-dubbo-capital中发布Tcc服务示例：
 
 try接口方法：
 
@@ -385,7 +385,7 @@ cancel方法：
 public void cancelRecord(CapitalTradeOrderDto tradeOrderDto) {
 ```
 
-## 在tcc-transaction-dubbo-redpacket中发布Tcc服务示例：
+## 在tyloo-dubbo-redpacket中发布Tcc服务示例：
 
 try接口方法：
 
@@ -427,7 +427,7 @@ public void cancelRecord(RedPacketTradeOrderDto tradeOrderDto) {
 
 
 
-### 在tcc-transaction-dubbo-order中调用远程Tcc服务示例：
+### 在tyloo-dubbo-order中调用远程Tcc服务示例：
 
 try方法：
 
