@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 
 /*
  *
- * TCC 调用处理器，
+ * TCC 调用处理器
  * 在调用 Dubbo Service 服务时，使用 ResourceCoordinatorInterceptor 拦截处理
  *
  * @Author:Zh1Cheung 945503088@qq.com
@@ -38,17 +38,19 @@ public class TccInvokerInvocationHandler extends InvokerInvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         Compensable compensable = method.getAnnotation(Compensable.class);
-        // 设置 @Compensable 属性
-        if (compensable != null) {
 
+        if (compensable != null) {
+            // 设置 @Compensable 属性
             if (StringUtils.isEmpty(compensable.confirmMethod())) {
                 ReflectionUtils.changeAnnotationValue(compensable, "confirmMethod", method.getName());
                 ReflectionUtils.changeAnnotationValue(compensable, "cancelMethod", method.getName());
                 ReflectionUtils.changeAnnotationValue(compensable, "transactionContextEditor", DubboTransactionContextEditor.class);
                 ReflectionUtils.changeAnnotationValue(compensable, "propagation", Propagation.SUPPORTS);
             }
+
             /**
-             * 调用 `ResourceCoordinatorAspect#interceptTransactionContextMethod(...)` 方法，对方法切面拦截处理。
+             * 生成方法切面
+             * 调用 ResourceCoordinatorAspect#interceptTransactionContextMethod 方法，对方法切面拦截处理。
              * 为什么无需调用 CompensableTransactionAspect 切面？
              * 因为传播级别为 Propagation.SUPPORTS，不会发起事务。
              */

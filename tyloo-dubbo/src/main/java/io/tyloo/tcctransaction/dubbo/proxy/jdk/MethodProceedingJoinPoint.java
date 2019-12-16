@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 /*
  *
  * 生成方法切面
+ *
  * 该类参考 [`org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint`](https://github.com/spring-projects/spring-framework/blob/master/spring-aop/src/main/java/org/springframework/aop/aspectj/MethodInvocationProceedingJoinPoint.java) 实现。
  * 在切面处理完成后，调用 `#proceed(...)` 方法，进行远程 Dubbo Service 服务调用。
  * @Author:Zh1Cheung 945503088@qq.com
@@ -39,11 +40,10 @@ public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint
     private SourceLocation sourceLocation;
 
     /**
-     *
-     * @param proxy 代理对象
+     * @param proxy  代理对象
      * @param target 目标对象
      * @param method 方法
-     * @param args  参数
+     * @param args   参数
      */
     public MethodProceedingJoinPoint(Object proxy, Object target, Method method, Object[] args) {
         this.proxy = proxy;
@@ -57,11 +57,18 @@ public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * 远程 Dubbo Service 服务调用
+     *
+     * @return
+     * @throws Throwable
+     */
     @Override
     public Object proceed() throws Throwable {
 
-        // Use reflection to invoke the method.
+        // 反射 目标对象的 method
         try {
+            // 使 method 变为可访问
             ReflectionUtils.makeAccessible(method);
             return method.invoke(target, args);
         } catch (InvocationTargetException ex) {

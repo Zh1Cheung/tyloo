@@ -20,7 +20,7 @@ public class TccJdkProxyFactory extends JdkProxyFactory {
 
     /**
      * - 项目启动时，调用 `TccJavassistProxyFactory#getProxy(...)` 方法，生成 Dubbo Service 调用 Proxy。
-     * - 第一次调用 `Proxy#newProxyInstance(...)` 方法，创建调用 Dubbo Service 服务的 Proxy。`com.alibaba.dubbo.rpc.proxy.InvokerInvocationHandler`，Dubbo 调用处理器，点击[连接](https://github.com/alibaba/dubbo/blob/17619dfa974457b00fe27cf68ae3f9d266709666/dubbo-rpc/dubbo-rpc-api/src/main/java/com/alibaba/dubbo/rpc/proxy/InvokerInvocationHandler.java)查看代码。
+     * - 第一次调用 `Proxy#newProxyInstance(...)` 方法，创建调用 Dubbo Service 服务的 Proxy。
      * - 第二次调用 `Proxy#newProxyInstance(...)` 方法，创建对调用 Dubbo Service 的 Proxy 的 Proxy。
      *
      * @param invoker

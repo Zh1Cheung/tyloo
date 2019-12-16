@@ -32,10 +32,16 @@ public final class TccClassGenerator {
     public static interface DC {
     } // dynamic class tag interface.
 
+    /**
+     * 线程安全的基本数据类型
+     */
     private static final AtomicLong CLASS_NAME_COUNTER = new AtomicLong(0);
 
     private static final String SIMPLE_NAME_TAG = "<init>";
 
+    /**
+     * 类加载器与类池的映射
+     */
     private static final Map<ClassLoader, ClassPool> POOL_MAP = new ConcurrentHashMap<ClassLoader, ClassPool>(); //ClassLoader - ClassPool
 
     /**
@@ -48,6 +54,15 @@ public final class TccClassGenerator {
         return new TccClassGenerator(getClassPool(Thread.currentThread().getContextClassLoader()));
     }
 
+    /**
+     * 创建 Proxy
+     * 创建生成 Dubbo Service 调用 Proxy  的代码生成器
+     * <p>
+     * ClassLoader类的作用：根据一个指定的类的全限定名,找到对应的Class字节码文件,然后加载它转化成一个java.lang.Class类的一个实例.
+     *
+     * @param loader
+     * @return
+     */
     public static TccClassGenerator newInstance(ClassLoader loader) {
         return new TccClassGenerator(getClassPool(loader));
     }
@@ -57,6 +72,14 @@ public final class TccClassGenerator {
     }
 
 
+    /**
+     * 一个ClassPool对象是包含CtClass对象的容器。一旦一个CtClass对象被创建后，就会被记录到一个ClassPool中。这是因为编译器在编译源码时会引用代表CtClass的类，可能会访问CtClass对象。
+     * 比如，假设一个新的方法getter()被添加到一个代表Point类的CtClass对象中。之后，程序尝试编译Point中包含调用getter()方法的源代码，并且使用编译后的代码作为方法的方法体，将其添加到另一个类Line中。
+     * 如果代表Point的CtClass对象丢失了，编译器则不能编译Line中调用getter()的方法。注意：原来定义的类是不包含getter()方法的。因此，为了正确编译这样的方法调用，ClassPool必须包含程序执行时所有的CtClass实例。
+     *
+     * @param loader
+     * @return
+     */
     public static ClassPool getClassPool(ClassLoader loader) {
         if (loader == null)
             return ClassPool.getDefault();
@@ -253,6 +276,7 @@ public final class TccClassGenerator {
         return addConstructor(mod, pts, null, body);
     }
 
+
     public TccClassGenerator addConstructor(int mod, Class<?>[] pts, Class<?>[] ets, String body) {
         StringBuilder sb = new StringBuilder();
         sb.append(modifier(mod)).append(' ').append(SIMPLE_NAME_TAG);
@@ -316,7 +340,7 @@ public final class TccClassGenerator {
             mCtc = mPool.makeClass(mClassName);
             if (mSuperClass != null)
                 mCtc.setSuperclass(ctcs);
-            mCtc.addInterface(mPool.get(DC.class.getName())); // add dynamic class tag.
+            mCtc.addInterface(mPool.get(DC.class.getName()));
             if (mInterfaces != null)
                 for (String cl : mInterfaces) mCtc.addInterface(mPool.get(cl));
             if (mFields != null)
@@ -329,6 +353,7 @@ public final class TccClassGenerator {
 
                         CtMethod ctMethod = CtNewMethod.make(code, mCtc);
 
+                        // 注解方法处理
                         if (compensableMethods.contains(code)) {
 
                             ConstPool constpool = mCtc.getClassFile().getConstPool();

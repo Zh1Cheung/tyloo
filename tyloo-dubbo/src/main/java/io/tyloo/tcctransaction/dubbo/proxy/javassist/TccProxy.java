@@ -31,6 +31,11 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * TCC Proxy 工厂，生成 Dubbo Service 调用 Proxy
  *
+ * 参考了 Dubbo 自带的实现：
+ *     com.alibaba.dubbo.common.bytecode.Proxy
+ *     com.alibaba.dubbo.common.bytecode.ClassGenerator
+ *     com.alibaba.dubbo.common.bytecode.Wrapper
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 9:34 2019/12/5
  *
@@ -55,6 +60,9 @@ public abstract class TccProxy {
 
     private static final Map<ClassLoader, Map<String, Object>> ProxyCacheMap = new WeakHashMap<ClassLoader, Map<String, Object>>();
 
+    /**
+     * 挂起生成标记
+     */
     private static final Object PendingGenerationMarker = new Object();
 
     /**
@@ -75,7 +83,6 @@ public abstract class TccProxy {
      * 4. 一直获得 TCC Proxy 工厂直到成功。
      * 5. 生成 Dubbo Service 调用 ProxyFactory、Proxy 的代码生成器
      * 6. 生成 Dubbo Service 调用 Proxy 的代码。
-     * 7.
      *
      * @param cl
      * @param ics
@@ -106,10 +113,10 @@ public abstract class TccProxy {
             sb.append(itf).append(';');
         }
 
-        // use interface class name list as key.
+        // 使用接口类名列表作为 Key
         String key = sb.toString();
 
-        // get cache by class loader.
+        // 通过类加载器获取缓存
         Map<String, Object> cache;
         synchronized (ProxyCacheMap) {
             cache = ProxyCacheMap.get(cl);
@@ -118,11 +125,12 @@ public abstract class TccProxy {
                 ProxyCacheMap.put(cl, cache);
             }
         }
+
         // 获得 TccProxy 工厂
         TccProxy proxy = null;
         synchronized (cache) {
             do {
-                // 从缓存中获取 TccProxy 工
+                // 从缓存中获取 TccProxy 工厂
                 Object value = cache.get(key);
                 if (value instanceof Reference<?>) {
                     proxy = (TccProxy) ((Reference<?>) value).get();
@@ -133,7 +141,7 @@ public abstract class TccProxy {
                 if (value == PendingGenerationMarker) {
                     try {
                         cache.wait();
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                 } else {
                     cache.put(key, PendingGenerationMarker);
@@ -143,8 +151,13 @@ public abstract class TccProxy {
             while (true);
         }
 
+        /**
+         * 生成 Dubbo Service 调用 Proxy 的代码
+         */
         long id = PROXY_CLASS_COUNTER.getAndIncrement();
         String pkg = null;
+        //ccp : 生成 Dubbo Service 调用 Proxy 的代码生成器
+        //ccm : 生成 Dubbo Service 调用 ProxyFactory 的代码生成器
         TccClassGenerator ccp = null, ccm = null;
         try {
             // 创建 Tcc class 代码生成器
@@ -175,24 +188,26 @@ public abstract class TccProxy {
                     if (worked.contains(desc))
                         continue;
                     worked.add(desc);
-                    // 生成接口方法实现代码
+
+                    // 生成 Dubbo Service 调用实现代码
+                    // 将所有的方法调用都让InvocationHandler统一处理，由IH决定对真实方法的调用
                     int ix = methods.size();
                     Class<?> rt = method.getReturnType();
                     Class<?>[] pts = method.getParameterTypes();
-
                     StringBuilder code = new StringBuilder("Object[] args = new Object[").append(pts.length).append("];");
                     for (int j = 0; j < pts.length; j++)
                         code.append(" args[").append(j).append("] = ($w)$").append(j + 1).append(";");
-                    code.append(" Object ret = handler.invoke(this, methods[" + ix + "], args);");
+                    code.append(" Object ret = handler.invoke(this, methods[").append(ix).append("], args);");
                     if (!Void.TYPE.equals(rt))
                         code.append(" return ").append(asArgument(rt, "ret")).append(";");
 
-                    methods.add(method);
 
+                    methods.add(method);
                     StringBuilder compensableDesc = new StringBuilder();
-                    // 添加方法
+                    // 添加注解
                     Compensable compensable = method.getAnnotation(Compensable.class);
 
+                    //添加生成的方法
                     if (compensable != null) {
                         ccp.addMethod(true, method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());
                     } else {
@@ -200,6 +215,7 @@ public abstract class TccProxy {
                     }
                 }
             }
+
             // 设置包路径
             if (pkg == null)
                 pkg = PACKAGE_NAME;
@@ -257,7 +273,7 @@ public abstract class TccProxy {
 
 
     /**
-     * get instance with default handler.
+     * 使用默认 handeler 获取实例。
      *
      * @return instance.
      */
@@ -266,7 +282,8 @@ public abstract class TccProxy {
     }
 
     /**
-     * get instance with special handler.
+     * 获取具体 handeler 的实例。
+     * TccJavassistProxyFactory 调用该方法，获得 Proxy 。
      *
      * @return instance.
      */

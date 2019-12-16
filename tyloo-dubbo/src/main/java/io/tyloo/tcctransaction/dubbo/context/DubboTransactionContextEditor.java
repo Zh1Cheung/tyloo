@@ -24,6 +24,7 @@ public class DubboTransactionContextEditor implements TransactionContextEditor {
     @Override
     public TransactionContext get(Object target, Method method, Object[] args) {
 
+        //Dubbo隐式传参方式
         String context = RpcContext.getContext().getAttachment(TransactionContextConstants.TRANSACTION_CONTEXT);
 
         if (StringUtils.isNotEmpty(context)) {
@@ -36,6 +37,7 @@ public class DubboTransactionContextEditor implements TransactionContextEditor {
     @Override
     public void set(TransactionContext transactionContext, Object target, Method method, Object[] args) {
 
+        //Dubbo隐式传参方式
         RpcContext.getContext().setAttachment(TransactionContextConstants.TRANSACTION_CONTEXT, JSON.toJSONString(transactionContext));
     }
 }
