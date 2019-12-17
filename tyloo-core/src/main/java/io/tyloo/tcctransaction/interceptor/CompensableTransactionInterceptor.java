@@ -1,12 +1,10 @@
 package io.tyloo.tcctransaction.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import io.tyloo.api.Propagation;
-import io.tyloo.api.TransactionContext;
-import io.tyloo.tcctransaction.exception.NoExistedTransactionException;
-import io.tyloo.tcctransaction.exception.SystemException;
 import io.tyloo.tcctransaction.Transaction;
 import io.tyloo.tcctransaction.TransactionManager;
+import io.tyloo.tcctransaction.exception.NoExistedTransactionException;
+import io.tyloo.tcctransaction.exception.SystemException;
 import io.tyloo.tcctransaction.utils.ReflectionUtils;
 import io.tyloo.tcctransaction.utils.TransactionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -31,7 +29,7 @@ public class CompensableTransactionInterceptor {
     static final Logger logger = Logger.getLogger(CompensableTransactionInterceptor.class.getSimpleName());
 
     /**
-     * 事务管理器
+     * 事务配置器
      */
     private TransactionManager transactionManager;
 
@@ -54,27 +52,25 @@ public class CompensableTransactionInterceptor {
      * 拦截补偿方法.
      *
      * @param pjp
-     * @param propagation
-     * @param transactionContext
      * @throws Throwable
      */
-    public Object interceptCompensableMethod(ProceedingJoinPoint pjp, Propagation propagation, TransactionContext transactionContext) throws Throwable {
+    public Object interceptCompensableMethod(ProceedingJoinPoint pjp) throws Throwable {
 
         // 从拦截方法的参数中获取事务上下文
         CompensableMethodContext compensableMethodContext = new CompensableMethodContext(pjp);
-        // 当前线程是否在事务中
+
         boolean isTransactionActive = transactionManager.isTransactionActive();
 
         if (!TransactionUtils.isLegalTransactionContext(isTransactionActive, compensableMethodContext)) {
-            throw new SystemException("no active compensable transaction while propagation is mandatory for method " + compensableMethodContext.getMethod(pjp).getName());
+            throw new SystemException("no active compensable transaction while propagation is mandatory for method " + compensableMethodContext.getMethod().getName());
         }
 
         // 计算可补偿事务方法类型
-        switch (compensableMethodContext.getMethodRole(propagation, isTransactionActive, transactionContext)) {
+        switch (compensableMethodContext.getMethodRole(isTransactionActive)) {
             case ROOT:
                 return rootMethodProceed(compensableMethodContext); // 主事务方法的处理
             case PROVIDER:
-                return providerMethodProceed(compensableMethodContext, pjp); // 服务提供者事务方法处理
+                return providerMethodProceed(compensableMethodContext); // 服务提供者事务方法处理
             default:
                 return pjp.proceed(); // 其他的方法都是直接执行
         }
@@ -135,10 +131,9 @@ public class CompensableTransactionInterceptor {
      * 根据事务的状态是 CONFIRMING / CANCELLING 来调用对应方法
      *
      * @param compensableMethodContext
-     * @param pjp
      * @throws Throwable
      */
-    private Object providerMethodProceed(CompensableMethodContext compensableMethodContext, ProceedingJoinPoint pjp) throws Throwable {
+    private Object providerMethodProceed(CompensableMethodContext compensableMethodContext) throws Throwable {
 
         Transaction transaction = null;
 
@@ -148,7 +143,7 @@ public class CompensableTransactionInterceptor {
         boolean asyncCancel = compensableMethodContext.getAnnotation().asyncCancel();
 
         try {
-            // 计算事务状态
+
             switch (TransactionStatus.valueOf(compensableMethodContext.getTransactionContext().getStatus())) {
                 case TRYING:
                     // 基于全局事务ID扩展创建新的分支事务，并存于当前线程的事务局部变量中.
@@ -180,7 +175,7 @@ public class CompensableTransactionInterceptor {
             transactionManager.cleanAfterCompletion(transaction);
         }
 
-        Method method = compensableMethodContext.getMethod(pjp);
+        Method method = compensableMethodContext.getMethod();
 
         return ReflectionUtils.getNullValue(method.getReturnType());
     }

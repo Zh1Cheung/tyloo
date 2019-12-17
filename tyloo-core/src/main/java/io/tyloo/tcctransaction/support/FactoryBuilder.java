@@ -23,7 +23,11 @@ public final class FactoryBuilder {
     /**
      * 类与Bean工厂 的映射
      */
-    private static ConcurrentHashMap<Class, SingletonFactory> classFactoryMap = new ConcurrentHashMap<Class, SingletonFactory>();
+    private static ConcurrentHashMap<Class, SingletonFactory> classFactoryMap;
+
+    static {
+        classFactoryMap = new ConcurrentHashMap<Class, SingletonFactory>();
+    }
 
     /**
      * 将Bean工厂注册到当前Builder
@@ -37,11 +41,11 @@ public final class FactoryBuilder {
     /**
      * 获得指定类单例工厂
      *
-     * @param clazz 指定类
      * @param <T>   泛型
+     * @param clazz 指定类
      * @return 单例工厂
      */
-    public static <T> SingletonFactory<T> factoryOf(Class<T> clazz) {
+    public static <T> SingletonFactory factoryOf(Class<T> clazz) {
         if (!classFactoryMap.containsKey(clazz)) {
             // 优先从 Bean 工厂集合 获取
             for (BeanFactory beanFactory : beanFactories) {

@@ -1,5 +1,6 @@
 package io.tyloo.tcctransaction.interceptor;
 
+import io.tyloo.api.*;
 import io.tyloo.tcctransaction.InvocationContext;
 import io.tyloo.tcctransaction.Participant;
 import io.tyloo.tcctransaction.Transaction;
@@ -9,10 +10,6 @@ import io.tyloo.tcctransaction.utils.CompensableMethodUtils;
 import io.tyloo.tcctransaction.utils.ReflectionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import io.tyloo.api.Compensable;
-import io.tyloo.api.TransactionContext;
-import io.tyloo.api.TransactionStatus;
-import io.tyloo.api.TransactionXid;
 
 import java.lang.reflect.Method;
 
@@ -89,9 +86,10 @@ public class ResourceCoordinatorInterceptor {
         // 创建 事务编号
         TransactionXid xid = new TransactionXid(transaction.getXid().getGlobalTransactionId());
         //如果该注解的单例类的参数中没有事务上下文 便新建一个事务上下文
-        if (FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().get(pjp.getTarget(), method, pjp.getArgs()) == null) {
-            FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().set(new TransactionContext(xid, TransactionStatus.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
-    }
+        TransactionContextEditor instance = (TransactionContextEditor) FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance();
+        if (instance.get(pjp.getTarget(), method, pjp.getArgs()) == null) {
+            instance.set(new TransactionContext(xid, TransactionStatus.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
+        }
 
         // 获得类
         Class targetClass = ReflectionUtils.getDeclaringType(pjp.getTarget().getClass(), method.getName(), method.getParameterTypes());

@@ -18,6 +18,8 @@ import java.util.List;
  *
  * 事务恢复
  *
+ * 事务信息被持久化到外部的存储器（事务库）中。事务存储是事务恢复的基础。通过读取外部存储器中的异常事务，定时任务会按照一定频率对事务进行重试，直到事务完成或超过最大重试次数。
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 18:51 2019/12/4
  *
@@ -67,13 +69,14 @@ public class TransactionRecovery {
 
 
         for (Transaction transaction : transactions) {
-
+            //比较重试次数，大于则跳过该事务
             if (transaction.getRetriedCount() > transactionConfigurator.getRecoverConfig().getMaxRetryCount()) {
 
                 logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)));
                 continue;
             }
 
+            //当前事务是分支事务或超时，则跳过该事务
             if (transaction.getTransactionType().equals(TransactionType.BRANCH)
                     && (transaction.getCreateTime().getTime() +
                     transactionConfigurator.getRecoverConfig().getMaxRetryCount() *
@@ -86,8 +89,9 @@ public class TransactionRecovery {
                 // 重试次数+1
                 transaction.addRetriedCount();
 
+                // 如果是CONFIRMING(2)状态，则将事务往前执行
                 if (transaction.getStatus().equals(TransactionStatus.CONFIRMING)) {
-                    // 如果是CONFIRMING(2)状态，则将事务往前执行
+
                     transaction.changeStatus(TransactionStatus.CONFIRMING);
 
                     transactionConfigurator.getTransactionRepository().update(transaction);

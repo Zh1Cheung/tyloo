@@ -32,6 +32,11 @@ public interface RecoverConfig {
      */
     public String getCronExpression();
 
+    /**
+     * 延迟取消异常集合
+     *
+     * @return
+     */
     public Set<Class<? extends Exception>> getDelayCancelExceptions();
 
     public void setDelayCancelExceptions(Set<Class<? extends Exception>> delayRecoverExceptions);

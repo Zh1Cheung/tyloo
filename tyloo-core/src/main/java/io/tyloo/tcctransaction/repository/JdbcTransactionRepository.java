@@ -368,6 +368,13 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         }
     }
 
+    /**
+     * 从当前TransactionRepository中拿到前缀拼接成表名，这个前缀是在刚刚的
+     * appcontext-service-dao.xml中配置，其配置了前缀和连接池(此时的前缀是"_ORD",连接池是tccDataSource)，最终
+     * 将数据保存在当前模块中的tcc库中的tcc_transaction_ord表，并且将其设置到缓存中
+     *
+     * @return
+     */
     private String getTableName() {
         return StringUtils.isNotEmpty(tbSuffix) ? "TCC_TRANSACTION" + tbSuffix : "TCC_TRANSACTION";
     }

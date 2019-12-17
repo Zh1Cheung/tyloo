@@ -1,12 +1,10 @@
 package io.tyloo.tcctransaction.interceptor;
 
+import io.tyloo.api.*;
 import io.tyloo.tcctransaction.common.MethodRole;
 import io.tyloo.tcctransaction.support.FactoryBuilder;
 import org.aspectj.lang.ProceedingJoinPoint;
-import io.tyloo.api.Compensable;
-import io.tyloo.api.Propagation;
-import io.tyloo.api.TransactionContext;
-import io.tyloo.api.UniqueIdentity;
+import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -50,7 +48,8 @@ public class CompensableMethodContext {
         this.method = getCompensableMethod();
         this.compensable = method.getAnnotation(Compensable.class);
         this.propagation = compensable.propagation();
-        this.transactionContext = FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().get(pjp.getTarget(), method, pjp.getArgs());
+        TransactionContextEditor instance = (TransactionContextEditor) FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance();
+        this.transactionContext = instance.get(pjp.getTarget(), method, pjp.getArgs());
 
     }
 
@@ -66,7 +65,7 @@ public class CompensableMethodContext {
         return transactionContext;
     }
 
-    public Method getMethod(ProceedingJoinPoint pjp) {
+    public Method getMethod() {
         return method;
     }
 
@@ -76,7 +75,7 @@ public class CompensableMethodContext {
      * @return
      */
     public Object getUniqueIdentity() {
-        Annotation[][] annotations = this.getMethod(pjp).getParameterAnnotations();
+        Annotation[][] annotations = this.getMethod().getParameterAnnotations();
 
         for (int i = 0; i < annotations.length; i++) {
             for (Annotation annotation : annotations[i]) {
@@ -99,20 +98,33 @@ public class CompensableMethodContext {
      * @return
      */
     private Method getCompensableMethod() {
-        return getMethod(pjp);
+        Method method = ((MethodSignature) (pjp.getSignature())).getMethod();
+
+        if (method.getAnnotation(Compensable.class) == null) {
+            try {
+                method = pjp.getTarget().getClass().getMethod(method.getName(), method.getParameterTypes());
+            } catch (NoSuchMethodException e) {
+                return null;
+            }
+        }
+        return method;
     }
 
     /**
      * 通过该方法事务传播级别获取方法类型
      *
-     *
-     * @param propagation
      * @param isTransactionActive
-     * @param transactionContext
      * @return
      */
-    public MethodRole getMethodRole(Propagation propagation, boolean isTransactionActive, TransactionContext transactionContext) {
-        return getMethodRole(this.propagation, isTransactionActive, this.transactionContext);
+    public MethodRole getMethodRole(boolean isTransactionActive) {
+        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && transactionContext == null) ||
+                propagation.equals(Propagation.REQUIRES_NEW)) {
+            return MethodRole.ROOT;
+        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && transactionContext != null) {
+            return MethodRole.PROVIDER;
+        } else {
+            return MethodRole.NORMAL;
+        }
     }
 
     public Object proceed() throws Throwable {

@@ -22,6 +22,7 @@ public abstract class CompensableTransactionAspect {
 
     private CompensableTransactionInterceptor compensableTransactionInterceptor;
 
+
     public void setCompensableTransactionInterceptor(CompensableTransactionInterceptor compensableTransactionInterceptor) {
         this.compensableTransactionInterceptor = compensableTransactionInterceptor;
     }
@@ -32,9 +33,9 @@ public abstract class CompensableTransactionAspect {
     }
 
     @Around("compensableService()")
-    public Object interceptCompensableMethod(ProceedingJoinPoint pjp, Propagation propagation, TransactionContext transactionContext) throws Throwable {
+    public Object interceptCompensableMethod(ProceedingJoinPoint pjp) throws Throwable {
 
-        return compensableTransactionInterceptor.interceptCompensableMethod(pjp, propagation, transactionContext);
+        return compensableTransactionInterceptor.interceptCompensableMethod(pjp);
     }
 
     public abstract int getOrder();

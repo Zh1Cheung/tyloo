@@ -1,5 +1,6 @@
 package io.tyloo.tcctransaction;
 
+
 import io.tyloo.api.TransactionContext;
 import io.tyloo.api.TransactionContextEditor;
 import io.tyloo.tcctransaction.exception.SystemException;
@@ -46,7 +47,10 @@ public class Terminator implements Serializable {
                 // 找到要调用的目标方法
                 method = target.getClass().getMethod(invocationContext.getMethodName(), invocationContext.getParameterTypes());
 
-                FactoryBuilder.factoryOf(transactionContextEditorClass).getInstance().set(transactionContext, target, method, invocationContext.getArgs());
+                //注入事务上下文
+                TransactionContextEditor instance = (TransactionContextEditor) FactoryBuilder.factoryOf(transactionContextEditorClass).getInstance();
+                instance.set(transactionContext, target, method, invocationContext.getArgs());
+
                 // 调用服务方法，被再次被TccTransactionContextAspect和ResourceCoordinatorInterceptor拦截，但因为事务状态已经不再是TRYING了，所以直接执行远程服务
                 return method.invoke(target, invocationContext.getArgs());
 

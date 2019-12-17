@@ -48,12 +48,20 @@ public class TransactionManager {
 
     }
 
+    /**
+     * 完成 begin 方法之后，其实也就创建完了一个根环境的全局事务管理器，这个根环境其实就是order订单环境
+     * 接着回到 rootMethodProceed 方法继续往下执行
+     *
+     * @param uniqueIdentify
+     * @return
+     */
     public Transaction begin(Object uniqueIdentify) {
-        Transaction transaction = new Transaction(uniqueIdentify,TransactionType.ROOT);
+        Transaction transaction = new Transaction(uniqueIdentify, TransactionType.ROOT);
         transactionRepository.create(transaction);
         registerTransaction(transaction);
         return transaction;
     }
+
     /**
      * 发起根事务
      *
@@ -65,6 +73,7 @@ public class TransactionManager {
         registerTransaction(transaction);
         return transaction;
     }
+
     /**
      * 传播发起分支事务
      *
@@ -79,6 +88,7 @@ public class TransactionManager {
         registerTransaction(transaction);
         return transaction;
     }
+
     /**
      * 传播获取分支事务
      *
@@ -100,6 +110,7 @@ public class TransactionManager {
             throw new NoExistedTransactionException();
         }
     }
+
     /**
      * 提交事务
      */
@@ -184,6 +195,7 @@ public class TransactionManager {
             throw new CancellingException(rollbackException);
         }
     }
+
     /**
      * 获取当前线程事务第一个(头部)元素
      *
@@ -195,6 +207,7 @@ public class TransactionManager {
         }
         return null;
     }
+
     /**
      * 当前线程是否在事务中
      *
@@ -218,6 +231,7 @@ public class TransactionManager {
 
         CURRENT.get().push(transaction);
     }
+
     /**
      * 将事务从当前线程事务队列移除
      *
@@ -236,6 +250,7 @@ public class TransactionManager {
             }
         }
     }
+
     /**
      * 添加参与者到事务
      *
