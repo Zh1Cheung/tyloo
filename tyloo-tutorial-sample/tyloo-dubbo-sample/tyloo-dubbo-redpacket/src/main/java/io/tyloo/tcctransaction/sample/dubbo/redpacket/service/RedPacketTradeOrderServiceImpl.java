@@ -18,6 +18,7 @@ import java.util.Calendar;
 
 /*
  *
+ * 红包支付交易订单（同资金账户交易订单）
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 9:23 2019/12/5
  *

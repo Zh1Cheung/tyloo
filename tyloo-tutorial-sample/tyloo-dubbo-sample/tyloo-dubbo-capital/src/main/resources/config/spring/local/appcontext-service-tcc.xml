@@ -5,9 +5,10 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <context:component-scan base-package="io.tyloo.tcctransaction.sample.dubbo"/>
+    <context:component-scan base-package="io.tyloo.tcctransaction.sample.dubbo*"/>
 
     <util:properties id="tccJdbc" location="classpath:tccjdbc.properties"/>
+
     <!-- 设置恢复策略(可选） -->
     <bean class="io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig">
         <!-- maxRetryCount表示一个事务最多尝试恢复次数，超过将不在自动恢复，需要人工干预，默认是30次 -->
@@ -18,6 +19,7 @@
         <!-- cronExpression表示恢复Job触发间隔配置，默认是(每分钟)0 */130 * * * * ? -->
         <property name="cronExpression" value="0/30 * * * * ?"/>
     </bean>
+
     <!-- 使用SpringJdbc事务库 -->
     <bean id="transactionRepository"
           class="io.tyloo.tcctransaction.spring.repository.SpringJdbcTransactionRepository">
@@ -25,6 +27,7 @@
         <property name="domain" value="CAPITAL"/>
         <property name="tbSuffix" value="_CAP"/>
     </bean>
+
     <!-- TCC事务日志库数据源 -->
     <bean id="tccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close" lazy-init="false">

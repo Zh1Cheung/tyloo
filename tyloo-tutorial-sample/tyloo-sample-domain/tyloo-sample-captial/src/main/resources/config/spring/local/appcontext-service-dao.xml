@@ -13,7 +13,7 @@
 
     <bean id="capitalAccountDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.capital.infrastructure.dao.CapitalAccountDao"></property>
+                   value="io.tyloo.tcctransaction.sample.capital.infrastructure.dao.CapitalAccountDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
     </bean>
 

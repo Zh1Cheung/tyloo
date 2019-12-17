@@ -20,7 +20,9 @@
     <!--<dubbo:registry protocol="mulitcast" address="224.5.6.7:1234" />-->
 
     <!--<dubbo:registry address="N/A" />-->
-    <!-- 用dubbo协议在${dubbo.port}端口暴露服务 ;payload:请求及响应数据包大小限制,单位：字节,默认值88388608(=8M)-->
+
+    <!-- 用dubbo协议在${dubbo.port}端口暴露服务 ; payload:请求及响应数据包大小限制,单位：字节,默认值88388608(=8M)-->
+
     <dubbo:protocol name="dubbo" port="${dubbo.port}" payload="52428800"/>
     <!-- 声明需要暴露的服务接口 -->
     <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalTradeOrderService"
@@ -31,6 +33,6 @@
                    ref="capitalAccountService" timeout="60000" retries="0"/>
 
     <!--<bean id="capitalTradeOrderService"-->
-          <!--class="CapitalTradeOrderServiceImpl"/>-->
+    <!--class="CapitalTradeOrderServiceImpl"/>-->
 
 </beans>

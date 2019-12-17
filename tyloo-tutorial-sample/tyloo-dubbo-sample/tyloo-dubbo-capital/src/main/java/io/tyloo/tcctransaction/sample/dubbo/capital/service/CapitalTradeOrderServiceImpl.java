@@ -18,6 +18,8 @@ import java.util.Calendar;
 
 /*
  *
+ * 资金交易订单实现类
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 8:57 2019/12/5
  *
@@ -31,6 +33,12 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     @Autowired
     TradeOrderRepository tradeOrderRepository;
 
+    /**
+     * 资金帐户交易订单记录
+     *
+     * @param tradeOrderDto
+     * @return
+     */
     @Override
     @Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = DubboTransactionContextEditor.class)
     @Transactional
@@ -48,7 +56,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
         TradeOrder foundTradeOrder = tradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
 
-        //check if trade order has been recorded, if yes, return success directly.
+        //检查是否记录了交易订单，如果是，直接返回成功；如果不是，新建交易订单，进行记录。
         if (foundTradeOrder == null) {
 
             TradeOrder tradeOrder = new TradeOrder(
@@ -60,20 +68,21 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
 
             try {
                 tradeOrderRepository.insert(tradeOrder);
-
+                //需要减少的账户金额（自己ID）
                 CapitalAccount transferFromAccount = capitalAccountRepository.findByUserId(tradeOrderDto.getSelfUserId());
-
+                //减少账户金额预处理
                 transferFromAccount.transferFrom(tradeOrderDto.getAmount());
 
                 capitalAccountRepository.save(transferFromAccount);
 
             } catch (DataIntegrityViolationException e) {
-                //this exception may happen when insert trade order concurrently, if happened, ignore this insert operation.
+                //当同时插入交易订单时可能发生此异常，如果发生，则忽略此插入操作。
             }
         }
 
         return "success";
     }
+
 
     @Transactional
     public void confirmRecord(CapitalTradeOrderDto tradeOrderDto) {
@@ -86,13 +95,13 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
 
         TradeOrder tradeOrder = tradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
-        //check if the trade order status is DRAFT, if yes, return directly, ensure idempotency.
+        //检查交易订单状态是否为 DRAFT ，如果是，直接返回，确保等幂性。
         if (tradeOrder != null && tradeOrder.getStatus().equals("DRAFT")) {
             tradeOrder.confirm();
             tradeOrderRepository.update(tradeOrder);
-
+            //需要增加的账户金额（对方ID）
             CapitalAccount transferToAccount = capitalAccountRepository.findByUserId(tradeOrderDto.getOppositeUserId());
-
+            //增加账户金额预处理
             transferToAccount.transferTo(tradeOrderDto.getAmount());
 
             capitalAccountRepository.save(transferToAccount);
@@ -111,13 +120,13 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
 
         TradeOrder tradeOrder = tradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 
-        //check if the trade order status is DRAFT, if yes, return directly, ensure idempotency.
+        //检查交易订单状态是否为 DRAFT ，如果是，直接返回，确保等幂性。
         if (null != tradeOrder && "DRAFT".equals(tradeOrder.getStatus())) {
             tradeOrder.cancel();
             tradeOrderRepository.update(tradeOrder);
-
+            //需要减少的账户金额（自己ID）
             CapitalAccount capitalAccount = capitalAccountRepository.findByUserId(tradeOrderDto.getSelfUserId());
-
+            //取消减少账户金额（转出）的操作
             capitalAccount.cancelTransfer(tradeOrderDto.getAmount());
 
             capitalAccountRepository.save(capitalAccount);

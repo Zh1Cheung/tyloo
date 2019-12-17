@@ -19,6 +19,12 @@ import java.util.Calendar;
 
 /*
  *
+ * 付款实现类
+ *
+ * 如果事务日志没有成功提交，那么整个TCC事务将会需要恢复，
+ * 如果是在 CONFIRMING 阶段出异常，则恢复Job将继续启动事务的 Confirm 操作过程，
+ * 如果是在 TRYING 阶段出异常，则恢复Job将启动事务的 Cancel 操作过程。
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 9:07 2019/12/5
  *
@@ -34,11 +40,7 @@ public class PaymentServiceImpl {
 
     @Autowired
     OrderRepository orderRepository;
-    /*
-     * 如果事务日志没有成功提交，那么整个TCC事务将会需要恢复，
-     * 如果是在CONFIRMING阶段出异常，则恢复Job将继续启动事务的Confirm操作过程，
-     * 如果是在TRYING阶段出异常，则恢复Job将启动事务的Cancel操作过程。
-     */
+
 
     /**
      * 付款.
@@ -51,16 +53,26 @@ public class PaymentServiceImpl {
     public void makePayment(@UniqueIdentity String orderNo, Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
         System.out.println("order try make payment called.time seq:" + DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
 
-        //check if the order status is DRAFT, if no, means that another call makePayment for the same order happened, ignore this call makePayment.
+        //检查订单状态是否为DRAFT，如果不是，则表示发生了同一订单的另一个调用makePayment，忽略此调用makePayment。
         if (order.getStatus().equals("DRAFT")) {
             order.pay(redPacketPayAmount, capitalPayAmount);
             try {
                 orderRepository.updateOrder(order);
             } catch (OptimisticLockingFailureException e) {
-                //ignore the concurrently update order exception, ensure idempotency.
+                //忽略并发更新顺序异常，确保幂等性。
             }
         }
-        // 资金帐户交易订单记录（因为此方法中有TransactionContext参数，因此也会被TccTransactionContextAspect拦截处理）
+        /*
+          资金帐户交易订单记录
+          没有 贴@Compensable注解，所以会且只会被第二个切面切到
+
+          此时的capitalTradeOrderService是本地的一个代理类，所以这个 record 方法实际上是本地代理对象中的一个方法，
+          在这个方法里中才通过dubbo(RPC)调用远程的record业务方法返回结果,真正的业务方法的实现是在tcyloo-dubbo-capital模块内
+
+         */
+        /*
+          capitalTradeOrderService和redPacketTradeOrderService是dubbo动态代理出来本地代理类
+         */
         String result = capitalTradeOrderService.record(buildCapitalTradeOrderDto(order));
         // 红包帐户交易订单记录
         String result2 = redPacketTradeOrderService.record(buildRedPacketTradeOrderDto(order));
@@ -75,7 +87,6 @@ public class PaymentServiceImpl {
      */
     public void confirmMakePayment(String orderNo, Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
 
-
         try {
             Thread.sleep(1000l);
         } catch (InterruptedException e) {
@@ -86,7 +97,7 @@ public class PaymentServiceImpl {
 
         Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
 
-        //check if the trade order status is PAYING, if no, means another call confirmMakePayment happened, return directly, ensure idempotency.
+        //检查交易订单状态是否为 PAYING ，如果为否，则表示发生了另一个呼叫确认支付，直接返回，确保等幂性。
         if (foundOrder != null && foundOrder.getStatus().equals("PAYING")) {
             order.confirm();
             orderRepository.updateOrder(order);
@@ -112,7 +123,7 @@ public class PaymentServiceImpl {
 
         Order foundOrder = orderRepository.findByMerchantOrderNo(order.getMerchantOrderNo());
 
-        //check if the trade order status is PAYING, if no, means another call cancelMakePayment happened, return directly, ensure idempotency.
+        //检查交易订单状态是否为 PAYING ，如果为否，则表示发生了另一个调用cancelMakePayment，直接返回，确保等幂性。
         if (foundOrder != null && foundOrder.getStatus().equals("PAYING")) {
             order.cancelPayment();
             orderRepository.updateOrder(order);

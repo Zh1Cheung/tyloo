@@ -23,6 +23,7 @@ import java.util.List;
 
 /*
  *
+ * 订单Controller
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 9:11 2019/12/5
  *
@@ -120,6 +121,12 @@ public class OrderController {
         return new RedirectView("/payresult/" + merchantOrderNo);
     }
 
+    /**
+     * 支付完成后返回支付状态和支付后结果
+     *
+     * @param merchantOrderNo
+     * @return
+     */
     @RequestMapping(value = "/payresult/{merchantOrderNo}", method = RequestMethod.GET)
     public ModelAndView getPayResult(@PathVariable String merchantOrderNo) {
 
@@ -144,6 +151,15 @@ public class OrderController {
     }
 
 
+    /**
+     * 构建支付请求
+     *
+     * @param redPacketPayAmount
+     * @param shopId
+     * @param payerUserId
+     * @param productId
+     * @return
+     */
     private PlaceOrderRequest buildRequest(String redPacketPayAmount, long shopId, long payerUserId, long productId) {
         BigDecimal redPacketPayAmountInBigDecimal = new BigDecimal(redPacketPayAmount);
         if (redPacketPayAmountInBigDecimal.compareTo(BigDecimal.ZERO) < 0)

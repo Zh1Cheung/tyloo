@@ -12,5 +12,11 @@ import java.math.BigDecimal;
  */
 public interface CapitalAccountService {
 
+    /**
+     * 获得资金账户金额
+     *
+     * @param userId
+     * @return
+     */
     BigDecimal getCapitalAccountByUserId(long userId);
 }

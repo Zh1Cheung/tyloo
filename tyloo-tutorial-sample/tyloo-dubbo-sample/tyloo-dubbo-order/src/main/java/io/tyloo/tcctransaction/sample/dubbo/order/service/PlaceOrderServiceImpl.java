@@ -15,6 +15,8 @@ import java.util.List;
 
 /*
  *
+ * 下订单实现类
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 9:09 2019/12/5
  *
@@ -45,7 +47,7 @@ public class PlaceOrderServiceImpl {
         // 创建订单
         final Order order = orderService.createOrder(payerUserId, shop.getOwnerUserId(), productQuantities);
 
-        Boolean result = false;
+        boolean result = false;
 
         try {
 
@@ -70,18 +72,17 @@ public class PlaceOrderServiceImpl {
 //            future2.get();
 
         } catch (ConfirmingException confirmingException) {
-            //exception throws with the tcc transaction status is CONFIRMING,
-            //when tcc transaction is confirming status,
-            // the tcc transaction recovery will try to confirm the whole transaction to ensure eventually consistent.
-
+            //异常抛出，tcc事务状态为 CONFIRMING ，
+            //当tcc事务正在 CONFIRMING 状态时，
+            //tcc事务恢复将尝试确认整个事务，以确保最终一致。
             result = true;
         } catch (CancellingException cancellingException) {
-            //exception throws with the tcc transaction status is CANCELLING,
-            //when tcc transaction is under CANCELLING status,
-            // the tcc transaction recovery will try to cancel the whole transaction to ensure eventually consistent.
+            //异常抛出，tcc事务状态为 CANCELLING ，
+            //当tcc事务处于 CANCELLING 状态时，
+            //tcc事务恢复将尝试取消整个事务，以确保最终一致。
         } catch (Throwable e) {
-            //other exceptions throws at TRYING stage.
-            //you can retry or cancel the operation.
+            //其他的例外在 TRYING 阶段抛出。
+            //您可以重试或取消该操作。
             e.printStackTrace();
         }
 

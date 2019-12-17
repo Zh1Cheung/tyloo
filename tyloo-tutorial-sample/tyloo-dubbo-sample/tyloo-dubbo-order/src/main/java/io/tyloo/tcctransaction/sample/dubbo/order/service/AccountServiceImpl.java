@@ -9,12 +9,15 @@ import java.math.BigDecimal;
 
 /*
  *
+ * 账户实现类
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 9:08 2019/12/5
  *
  */
 @Service("accountService")
 public class AccountServiceImpl {
+
 
     @Autowired
     RedPacketAccountService redPacketAccountService;

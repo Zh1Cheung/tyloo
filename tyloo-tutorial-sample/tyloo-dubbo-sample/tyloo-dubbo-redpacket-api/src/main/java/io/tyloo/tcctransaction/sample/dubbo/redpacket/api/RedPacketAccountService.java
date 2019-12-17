@@ -8,6 +8,7 @@ import java.math.BigDecimal;
  * @Date: 9:26 2019/12/5
  *
  */
+
 public interface RedPacketAccountService {
     BigDecimal getRedPacketAccountByUserId(long userId);
 }

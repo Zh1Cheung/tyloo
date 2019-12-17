@@ -6,8 +6,9 @@
     <display-name>Sample Dubbo Order</display-name>
 
     <context-param>
+        <!--appcontext-*.xml是将所有和业务相关的配置比如servler、datasource、dao、dubbo等引入-->
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath*:config/spring/local/appcontext-*.xml,classpath:tyloo.xml,classpath:tyloo-dubbo.xml
+        <param-value>classpath*:config/spring/local/appcontext-*.xml,classpath:tyloo.xml,classpath:tyloo.xml
         </param-value>
     </context-param>
 

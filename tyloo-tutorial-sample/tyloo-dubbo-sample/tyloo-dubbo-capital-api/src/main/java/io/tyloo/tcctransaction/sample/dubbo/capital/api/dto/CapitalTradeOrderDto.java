@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 
 /*
  *
+ * 资金帐户变更
+ *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 8:57 2019/12/5
  *

@@ -65,6 +65,12 @@
             <version>1.2.7</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.tyloo</groupId>
+            <artifactId>tyloo-dubbo</artifactId>
+            <version>1.2.7</version>
+            <scope>compile</scope>
+        </dependency>
 
 
     </dependencies>
