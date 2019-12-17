@@ -14,12 +14,12 @@
     <bean id="transactionConfigurator" class="io.tyloo.tcctransaction.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
     <!-- 可补偿事务拦截器 -->
-    <bean id="compensableTransactionAspect" class="io.tyloo.tcctransaction.spring.ConfigurableTransactionAspect"
+    <bean id="compensableTransactionAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 资源协调拦截器 -->
-    <bean id="resourceCoordinatorAspect" class="io.tyloo.tcctransaction.spring.ConfigurableCoordinatorAspect"
+    <bean id="resourceCoordinatorAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableCoordinatorAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>

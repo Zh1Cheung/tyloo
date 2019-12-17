@@ -10,6 +10,7 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 /*
  *
  * 事务恢复定时任务
+ * 基于 Quartz 实现调度，不断执行事务恢复
  *
  * @Author:Zh1Cheung 945503088@qq.com
  * @Date: 20:15 2019/12/4

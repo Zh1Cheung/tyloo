@@ -32,15 +32,34 @@ public class DefaultRecoverConfig implements RecoverConfig {
 
     /**
      * 恢复Job触发间隔配置，默认是(每分钟)
+     * cron 表达式
+     * 0/30 * * * * ?，每 30 秒执行一次。
      */
     private String cronExpression = "0 */1 * * * ?";
 
     private int asyncTerminateThreadPoolSize = 1024;
 
+    /**
+     * 延迟取消异常集合
+     */
     private Set<Class<? extends Exception>> delayCancelExceptions = new HashSet<Class<? extends Exception>>();
 
     public DefaultRecoverConfig() {
+
+        /**
+         * 还是 SocketTimeoutException 的情况，事务恢复间隔时间小于 Socket 超时时间，此时事务恢复调用远程参与者取消回滚事务，
+         * 远程参与者下次更新事务时，会因为乐观锁更新失败，抛出 OptimisticLockException。如果 CompensableTransactionInterceptor 此时立刻取消回滚，
+         * 可能会和定时任务的取消回滚冲突，因此统一交给定时任务处理。
+         *
+         */
         delayCancelExceptions.add(OptimisticLockException.class);
+        /**
+         * try 阶段，本地参与者调用远程参与者( 远程服务，例如 Dubbo，Http 服务)，远程参与者 try 阶段的方法逻辑执行时间较长，超过 Socket 等待时长，发生 SocketTimeoutException，
+         * 如果立刻执行事务回滚，远程参与者 try 的方法未执行完成，可能导致 cancel 的方法实际未执行( try 的方法未执行完成，数据库事务【非 TCC 事务】未提交，
+         * cancel 的方法读取数据时发现未变更，导致方法实际未执行，最终 try 的方法执行完后，提交数据库事务【非 TCC 事务】，较为极端 )，最终引起数据不一致。
+         * 在事务恢复时，会对这种情况的事务进行取消回滚，如果此时远程参与者的 try 的方法还未结束，还是可能发生数据不一致。
+         *
+         */
         delayCancelExceptions.add(SocketTimeoutException.class);
     }
 
