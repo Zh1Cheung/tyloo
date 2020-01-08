@@ -1,11 +1,11 @@
 
-![tyloo](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/tyloo.jpg)
+![](https://raw.githubusercontent.com/Zh1Cheung/tyloo/master/image/tyloo.jpg)
 
 
 
 # Tyloo：Distributed transaction framework——TCC 
 
-![Build Status](https://travis-ci.org/seata/seata.svg?branch=develop)         ![正常大小的圆角矩形](https://img.shields.io/badge/language-java-green.svg)    ![正常大小的圆角矩形](https://img.shields.io/badge/mozilla%20add--on-v1.2.7-blue)          ![codecov](https://codecov.io/gh/seata/seata/branch/develop/graph/badge.svg)         ![正常大小的圆角矩形](https://img.shields.io/badge/Stars-100-lightgrey?logo=github&style=social)
+![ ](https://travis-ci.org/seata/seata.svg?branch=develop)         ![](https://img.shields.io/badge/language-java-green.svg)    ![](https://img.shields.io/badge/mozilla%20add--on-v1.2.7-blue)          ![codecov](https://codecov.io/gh/seata/seata/branch/develop/graph/badge.svg)         ![](https://img.shields.io/badge/Stars-100-lightgrey?logo=github&style=social)
 
 
 
@@ -17,7 +17,7 @@
 
 参与者需要声明 try / confirm / cancel 三个类型的方法，和 TCC 的操作一一对应。在程序里，通过 @Compensable 注解标记在 try 方法上，并填写对应的 confirm / cancel 方法，
 
-tyloo有两个拦截器，通过对 @Compensable AOP 切面( 参与者 try 方法 )进行拦截，透明化对参与者 confirm / cancel 方法调用，从而实现 TCC。
+tyloo有两个拦截器，通过对 @Tyloo AOP 切面( 参与者 try 方法 )进行拦截，透明化对参与者 confirm / cancel 方法调用，从而实现 TCC。
 
 第一个拦截器，可补偿事务拦截器，实现如下功能：
 
@@ -206,26 +206,26 @@ class="ZooKeeperTransactionRepository">
 try接口方法：
 
 ```java
- public String record(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto);
+ public String record(TylooContext TylooContext, CapitalTradeOrderDto tradeOrderDto);
 ```
 
 try实现方法：
 
 ```java
-@Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = MethodTransactionContextEditor.class)
-public String record(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+@Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = MethodTylooContextLoader.class)
+public String record(TylooContext TylooContext, CapitalTradeOrderDto tradeOrderDto) {
 ```
 
 confirm方法：
 
 ```java
-public void confirmRecord(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+public void confirmRecord(TylooContext TylooContext, CapitalTradeOrderDto tradeOrderDto) {
 ```
 
 cancel方法：
 
 ```java
-public void cancelRecord(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+public void cancelRecord(TylooContext TylooContext, CapitalTradeOrderDto tradeOrderDto) {
 ```
 
 ### 在tyloo-http-redpacket中发布Tcc服务示例：
@@ -233,26 +233,26 @@ public void cancelRecord(TransactionContext transactionContext, CapitalTradeOrde
 try接口方法：
 
 ```java
-public String record(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto);
+public String record(TylooContext TylooContext, RedPacketTradeOrderDto tradeOrderDto);
 ```
 
 try实现方法：
 
 ```java
-@Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = MethodTransactionContextEditor.class)
-public String record(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
+@Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = MethodTylooContextLoader.class)
+public String record(TylooContext TylooContext, RedPacketTradeOrderDto tradeOrderDto) {
 ```
 
 confirm方法：
 
 ```java
-public void confirmRecord(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
+public void confirmRecord(TylooContext TylooContext, RedPacketTradeOrderDto tradeOrderDto) {
 ```
 
 cancel方法：
 
 ```java
-public void cancelRecord(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
+public void cancelRecord(TylooContext TylooContext, RedPacketTradeOrderDto tradeOrderDto) {
 ```
 
 
@@ -261,16 +261,16 @@ public void cancelRecord(TransactionContext transactionContext, RedPacketTradeOr
 
 调用远程Tcc服务，将远程Tcc服务参与到本地Tcc事务中，本地的服务方法也需要声明为Tcc服务，与发布一个Tcc服务不同，本地Tcc服务方法有三个约束：
 
-1. 在服务方法上加上@Compensable注解,并设置注解属性
+1. 在服务方法上加上@Tyloo注解,并设置注解属性
 2. 服务方法的入参都须能序列化(实现Serializable接口)
 3. try方法、confirm方法和cancel方法入参类型须一样
 
-与发布Tcc服务不同的是本地Tcc服务Compensable注解属性transactionContextEditor可以不用设置。
+与发布Tcc服务不同的是本地Tcc服务Tyloo注解属性tylooContextLoader可以不用设置。
 
 本地服务通过远程tcc服务提供的client来调用，需要将这些tcc服务的client声明为可加入到TCC事务中，如tcc服务的client方法明为tryXXX,则需要在方法tryXXX上加上如下配置：
 
 ```java
-@Compensable(propagation = Propagation.SUPPORTS, confirmMethod = "tryXXX", cancelMethod = "tryXXX", transactionContextEditor = MethodTransactionContextEditor.class)
+@Tyloo(propagation = Propagation.SUPPORTS, confirmMethod = "tryXXX", cancelMethod = "tryXXX", tylooContextLoader = MethodTylooContextLoader.class)
 ```
 
 其中propagation = Propagation.SUPPORTS表示该方法支持参与到TCC事务中。 如果tcc服务的client为框架自动生成实现（比如代理机制实现）不能添加注解，可为该client实现一个代理类，在代理类的方法上加上注解。
@@ -280,7 +280,7 @@ public void cancelRecord(TransactionContext transactionContext, RedPacketTradeOr
 try方法：
 
 ```java
-@Compensable(confirmMethod = "confirmMakePayment",cancelMethod = "cancelMakePayment")
+@Tyloo(confirmMethod = "confirmMakePayment",cancelMethod = "cancelMakePayment")
 public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
 
     System.out.println("order try make payment called");
@@ -306,8 +306,8 @@ public void cancelMakePayment(Order order, BigDecimal redPacketPayAmount, BigDec
 tcc服务提供的client方法增加注解：
 
 ```java
-@Compensable(propagation = Propagation.SUPPORTS, confirmMethod = "record", cancelMethod = "record", transactionContextEditor = MethodTransactionContextEditor.class)
-public String record(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+@Tyloo(propagation = Propagation.SUPPORTS, confirmMethod = "record", cancelMethod = "record", tylooContextLoader = MethodTylooContextLoader.class)
+public String record(TylooContext TylooContext, CapitalTradeOrderDto tradeOrderDto) {
 ```
 
 
@@ -350,26 +350,26 @@ rpc框架为dubbo时支持以隐式传参方式配置TCC事务。
 
 发布一个Tcc服务方法，可被远程调用并参与到Tcc事务中，发布支持隐式传参的Tcc服务方法有下面四个约束：
 
-1. 在服务提供方的实现方法上加上@Compensable注解，并设置注解的属性
-2. 在服务提供方的接口方法上加上@Compensable注解
+1. 在服务提供方的实现方法上加上@Tyloo注解，并设置注解的属性
+2. 在服务提供方的接口方法上加上@Tyloo注解
 3. 服务方法的入参能被序列化(默认使用jdk序列化机制，需要参数实现Serializable接口，可以设置repository的serializer属性自定义序列化实现)
 4. try方法、confirm方法和cancel方法入参类型须一样
 
-Compensable的属性包括propagation、confirmMethod、cancelMethod、transactionContextEditor。propagation可不用设置，框架使用缺省值；设置confirmMethod指定CONFIRM阶段的调用方法；设置cancelMethod指定CANCEL阶段的调用方法；设置transactionContextEditor为DubboTransactionContextEditor.class。
+Tyloo的属性包括propagation、confirmMethod、cancelMethod、tylooContextLoader。propagation可不用设置，框架使用缺省值；设置confirmMethod指定CONFIRM阶段的调用方法；设置cancelMethod指定CANCEL阶段的调用方法；设置tylooContexLoader为DubboTransactionContextLoader.class。
 
 ### 在tyloo-dubbo-capital中发布Tcc服务示例：
 
 try接口方法：
 
 ```java
- @Compensable
+ @Tyloo
 public String record(CapitalTradeOrderDto tradeOrderDto);
 ```
 
 try实现方法：
 
 ```java
-@Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = DubboTransactionContextEditor.class)
+@Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = DubboTransactionContextLoader.class)
 public String record(CapitalTradeOrderDto tradeOrderDto) {
 ```
 
@@ -390,14 +390,14 @@ public void cancelRecord(CapitalTradeOrderDto tradeOrderDto) {
 try接口方法：
 
 ```java
-@Compensable
+@Tyloo
 public String record(RedPacketTradeOrderDto tradeOrderDto);
 ```
 
 try实现方法：
 
 ```java
-@Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = DubboTransactionContextEditor.class)
+@Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = DubboTransactionContextLoader.class)
 public String record(RedPacketTradeOrderDto tradeOrderDto) {
 ```
 
@@ -419,7 +419,7 @@ public void cancelRecord(RedPacketTradeOrderDto tradeOrderDto) {
 
 调用远程Tcc服务，将远程Tcc服务参与到本地Tcc事务中，本地的服务方法也需要声明为Tcc服务，声明方式与非隐式传参方式一样，有三个约束：
 
-1. 在服务方法上加上@Compensable注解,并设置注解属性
+1. 在服务方法上加上@Tyloo注解,并设置注解属性
 2. 服务方法的入参都须能序列化(实现Serializable接口)
 3. try方法、confirm方法和cancel方法入参类型须一样
 
@@ -432,7 +432,7 @@ public void cancelRecord(RedPacketTradeOrderDto tradeOrderDto) {
 try方法：
 
 ```java
-@Compensable(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment")
+@Tyloo(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment")
 public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
     System.out.println("order try make payment called.time seq:" + DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
 
@@ -483,11 +483,11 @@ TransactionManager，事务管理器，提供事务的获取、发起、提交�
 
 ## 事务拦截器
 
- 基于@Compensable和@Aspect 注解 AOP 切面实现业务方法的 TCC 事务声明拦截，同 Spring 的 org.springframework.transaction.annotation.@Transactional 的实现。
+ 基于@Tyloo和@Aspect 注解 AOP 切面实现业务方法的 TCC 事务声明拦截，同 Spring 的 org.springframework.transaction.annotation.@Transactional 的实现。
 
-- CompensableTransactionInterceptor，可补偿事务拦截器。
-- ResourceCoordinatorInterceptor，资源协调者拦截器。
-- XXXInterceptor通过 `org.aspectj.lang.annotation.@Pointcut` + `org.aspectj.lang.annotation.@Around` 注解，配置对 **@Compensable 注解的方法**进行拦截，调用 `CompensableTransactionInterceptor#interceptXXXMethod(...)` 方法进行处理。
+- TylooTransactionInterceptor，可补偿事务拦截器。
+- TylooCoordinatorInterceptor，资源协调者拦截器。
+- XXXInterceptor通过 `org.aspectj.lang.annotation.@Pointcut` + `org.aspectj.lang.annotation.@Around` 注解，配置对 **@Tyloo 注解的方法**进行拦截，调用 `TylooInterceptor#interceptXXXMethod(...)` 方法进行处理。
 
 ## 详细文档
 

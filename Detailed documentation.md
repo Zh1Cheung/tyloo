@@ -2,17 +2,17 @@
 
 **web.xml**
 
-因为刚刚运行demo的时候，是直接访问暴露的接口，tomcat收到请求后就会找到资源路径像的web.xml,刚刚运行demo的时候，是访问tcc-transaction-dubbo-order模块的，所以先进order模块的web.xml，在这里，发现其引进了一些配置文件
+因为刚刚运行demo的时候，是直接访问暴露的接口，tomcat收到请求后就会找到资源路径像的web.xml,刚刚运行demo的时候，是访问tyloo-dubbo-order模块的，所以先进order模块的web.xml，在这里，发现其引进了一些配置文件
 
 ```xml
 <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath*:config/spring/local/appcontext-*.xml,classpath:tcc-transaction.xml
+    <param-value>classpath*:config/spring/local/appcontext-*.xml,classpath:tyloo.xml
     </param-value>
 </context-param>
 ```
 
-`<context-param>`其实就相当于全局的`<init-param>`,初始化servlet时可以获取，在这段代码中，appcontext-*.xml是将所有和业务相关的配置比如servler、datasource、dao、dubbo等引入，tcc-transaction.xml是将事务的相关配置引入，这个xml是放在transaction-spring模块的，也就是这个xml将一些配置类以bean的形式交给Spring管理
+`<context-param>`其实就相当于全局的`<init-param>`,初始化servlet时可以获取，在这段代码中，appcontext-*.xml是将所有和业务相关的配置比如servler、datasource、dao、dubbo等引入，tyloo.xml是将事务的相关配置引入，这个xml是放在tyloo-spring模块的，也就是这个xml将一些配置类以bean的形式交给Spring管理
 
 
 
@@ -20,7 +20,7 @@
 
 ```xml
  <!-- 开启Spring对@AspectJ风格切面的支持(因为下面用到自定义的TCC补偿切面类) -->
-    <!-- @Aspect注解不能被Spring自动识别并注册为Bean,因此要通过xml的bean配置,或通过@Compenent注解标识其为Spring管理Bean -->
+    <!-- @Aspect注解不能被Spring自动识别并注册为Bean,因此要通过xml的bean配置,或通过@Tyloo注解标识其为Spring管理Bean -->
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <bean id="springBeanFactory" class="io.tyloo.tcctransaction.spring.support.SpringBeanFactory"/>
@@ -29,12 +29,12 @@
     <bean id="transactionConfigurator" class="io.tyloo.tcctransaction.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
     <!-- 可补偿事务拦截器 -->
-    <bean id="compensableTransactionAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableTransactionAspect"
+    <bean id="tylooAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 资源协调拦截器 -->
-    <bean id="resourceCoordinatorAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableCoordinatorAspect"
+    <bean id="tylooCoordinatorAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableCoordinatorAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
@@ -45,43 +45,43 @@
 
 
 
-**CompensableTransactionAspect**
+**TylooAspect**
 
 ```java
-    public void setCompensableTransactionInterceptor(CompensableTransactionInterceptor compensableTransactionInterceptor) {
-        this.compensableTransactionInterceptor = compensableTransactionInterceptor;
+    public void setTylooInterceptor(TylooInterceptor tylooInterceptor) {
+        this.tylooInterceptor = tylooInterceptor;
     }
 
-    @Pointcut("@annotation(io.tyloo.api.Compensable)")
-    public void compensableService() {
+    @Pointcut("@annotation(io.tyloo.api.Tyloo)")
+    public void tylooService() {
 
     }
 
-    @Around("compensableService()")
-    public Object interceptCompensableMethod(ProceedingJoinPoint pjp) throws Throwable {
+    @Around("tylooService()")
+    public Object interceptTylooMethod(ProceedingJoinPoint pjp) throws Throwable {
 
-        return compensableTransactionInterceptor.interceptCompensableMethod(pjp);
+        return tylooInterceptor.interceptTylooMethod(pjp);
     }
 ```
 
 
 
-**ResourceCoordinatorAspect**
+**TylooCoordinatorAspect**
 
 ```java
 
-    @Pointcut("@annotation(io.tyloo.api.Compensable)")
+    @Pointcut("@annotation(io.tyloo.api.Tyloo)")
     public void transactionContextCall() {
 
     }
 
     @Around("transactionContextCall()")
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
-        return resourceCoordinatorInterceptor.interceptTransactionContextMethod(pjp);
+        return tylooCoordinatorInterceptor.interceptTransactionContextMethod(pjp);
     }
 
-    public void setResourceCoordinatorInterceptor(ResourceCoordinatorInterceptor resourceCoordinatorInterceptor) {
-        this.resourceCoordinatorInterceptor = resourceCoordinatorInterceptor;
+    public void setTylooCoordinatorInterceptor(TylooCoordinatorInterceptor tylooCoordinatorInterceptor) {
+        this.tylooCoordinatorInterceptor = tylooCoordinatorInterceptor;
     }
 
 ```
@@ -107,24 +107,24 @@
 1. 以OrderController开始
    1. 执行 placeOrder方法
       1. 执行makePayment方法支付
-         1. 当点进去makePayment时，发现其方法上贴有 @Compensable 注解，并且指定了确认和取消的方法的方法名
-         2. 因为贴有 @Compensable 注解，所以进行环绕增强，调用**compensableTransactionInterceptor**
+         1. 当点进去makePayment时，发现其方法上贴有 @Tyloo 注解，并且指定了确认和取消的方法的方法名
+         2. 因为贴有 @Tyloo 注解，所以进行环绕增强，调用**tylooInterceptor**
             1. 发现返回的 **methodType是ROOT**，即当前方法类型处于根环境，接着往下执行 **rootMethodProceed 方法** 
                1. 走到其 begin 方法
                   1. 先**创建一个根环境的事务对象**
                   2. 通过transactionRepository对象调用 create 方法将创建的事务对象保存在本地
          3. pjp.proceed() 方法继续执行这条执行链
-            1. 添加根环境参与者，调用**ResourceCoordinatorInterceptor**的 interceptTransactionContextMethod 进行方法增强
+            1. 添加根环境参与者，调用**TylooCoordinatorInterceptor**的 interceptTransactionContextMethod 进行方法增强
                1. **methodType为ROOT**，调用 EnlistRootParticipant 方法（**添加根环境参与者**）
                2. 回到makePayment()方法（**执行主服务的业务**）
                3. **创建当前主环境(Order)的其他消费参与者**
-                  1. 在执行 record 方法时，依旧调用compensableTransactionInterceptor和ResourceCoordinatorInterceptor
-                     1. 由于此时的capitalTradeOrderService是本地的一个代理类，所以这个 record 方法实际上是本地代理对 象中的一个方法，在这个方法里中才通过dubbo(RPC)调用远程的record业务方法返回结果,真正的业务方法的实 现是在tyloo-dubbo-capital模块内，而刚刚分析到的程序的执行还是在tyloo-dubbo-order模块中的代理对象上，是没有贴上*@Compensable*注解的
+                  1. 在执行 record 方法时，依旧调用tylooInterceptor和TylooCoordinatorInterceptor
+                     1. 由于此时的capitalTradeOrderService是本地的一个代理类，所以这个 record 方法实际上是本地代理对 象中的一个方法，在这个方法里中才通过dubbo(RPC)调用远程的record业务方法返回结果,真正的业务方法的实 现是在tyloo-dubbo-capital模块内，而刚刚分析到的程序的执行还是在tyloo-dubbo-order模块中的代理对象上，是没有贴上*@Tyloo*注解的
                      2. 此时获得的**methodType为CONSUMER**,执行 **EnlistConsumerParticipant方法**。接着执行往下完成执行链，此时程序便RPC远程调用实现类的 record 方法，接着执行相应的操作
                      3. 在 makePayment 方法中执行完capitalTradeOrderService.record()方法后便创建完了一个capital**消费参与者**先不管其后续操作，那么在执行完redPacketTradeOrderService.record()就会创建完redpacket的**消费参与者**
                      4. **此时程序通过远程调用来到了Capital模块的CapitalTradeOrderServiceImpl实现类调用 record 方法**，因为这是一个请求来到Capital模块，所以在Capital中这是一个新的线程
-                        1. 因为贴有@Compensable注解,会被CompensableTransactionAspect切面切入，由上面的流程可以得出经过CompensableTransactionAspect切面可以在本地创建一个transaction对象（**在Capital模块创建分支Transaction对象**）
-                        2. 此时被ResourceCoordinatorAspect切面切到，此时**methodType是PROVIDER**,所以执行 EnlistProviderParticipant 方法在**Captial分支事务**中添加**Capital参与者**
+                        1. 因为贴有@Tyloo注解,会被TylooTransactionAspect切面切入，由上面的流程可以得出经过TylooTransactionAspect切面可以在本地创建一个transaction对象（**在Capital模块创建分支Transaction对象**）
+                        2. 此时被TylooCoordinatorAspect切面切到，此时**methodType是PROVIDER**,所以执行 EnlistProviderParticipant 方法在**Captial分支事务**中添加**Capital参与者**
                         3. **至此，已经创建完Capital的分布式事务**
                         4. 同理，Redpacket的分布式事务
             2. 程序回到interceptTransactionContextMethod方法中的最后一行，执行**pjp.proceed(pjp.getArgs())方法**，将参数列表传入往下执行，因为已经没有切面，所以**开始执行record的真实业务方法 **
@@ -138,7 +138,7 @@
                4. **Order的Confifirm操作**
                   1. 在PaymentServiceImpl的confifirm方法中，修改订单的状态为CONFIRMED，此时order参与者已经提交
                5. **Capital和RedPacket的Confifirm操作**
-                  1. 接着执行到根事务中Capital的参与者，此时的target对象CapitalTradeOrderService的动态代理对象，因为之前存在 这个参与者中的方法是 record 方法，所以执行的也是CapitalTradeOrderService动态代理对象的 record 方法。因为此时Transaction对象的 状态值不是*TRYING*,所以此时判断失败继续往下执行，来到Capital模块的真实 record ，因为贴有@Compensable标签，所以会被第一个切面拦截，执行 providerMethodProceed 方法
+                  1. 接着执行到根事务中Capital的参与者，此时的target对象CapitalTradeOrderService的动态代理对象，因为之前存在 这个参与者中的方法是 record 方法，所以执行的也是CapitalTradeOrderService动态代理对象的 record 方法。因为此时Transaction对象的 状态值不是*TRYING*,所以此时判断失败继续往下执行，来到Capital模块的真实 record ，因为贴有@Tyloo标签，所以会被第一个切面拦截，执行 providerMethodProceed 方法
                   2. **至此，Capital的confifirm操作执行完成，同理RedPacket的confifirm操作也执行完成**
                6. **最后删除根事务，整个分布式事务结束**
 
@@ -193,7 +193,7 @@
 
 
 
-此时错误会被抛回到CompensableTransactionAspect的 returnValue = pjp.proceed(); 位置，此时后面的catch捕获到,执行 roolback()方法
+此时错误会被抛回到TylooAspect的 returnValue = pjp.proceed(); 位置，此时后面的catch捕获到,执行 roolback()方法
 
 
 
@@ -234,6 +234,6 @@
 
 
 
-TransactionRecovery对象中定时执行的方法 startRecover 在TransactionRecovery类中编写，主要是将超过设置存活时间的transaction对象从数据库查出,3台服务器都会去执行这个定时任务，所以会**根据根事务还是分支事务做一个过滤**，(分支事务通过判断的时间是超时时间120乘上重试次数30) **判断事务状态是否为 CONFIRMING**，如果是CONFIRMING则会调用transaction.commit()去完成commit方法，解决先持久化到数据库了，到了下一个服务confifirm中宕机或回传异常的问题
+Recovery对象中定时执行的方法 startRecover 在Recovery类中编写，主要是将超过设置存活时间的transaction对象从数据库查出,3台服务器都会去执行这个定时任务，所以会**根据根事务还是分支事务做一个过滤**，(分支事务通过判断的时间是超时时间120乘上重试次数30) **判断事务状态是否为 CONFIRMING**，如果是CONFIRMING则会调用transaction.commit()去完成commit方法，解决先持久化到数据库了，到了下一个服务confifirm中宕机或回传异常的问题
 
 > 判断事务状态是否为CANCELLING或者事务类型为ROOT，CANCELLING主要是解决解决先持久化到数据库了，到了 下一个服务rollback中宕机或回传异常的问题，而ROOT则是因为如果根事务数据库中还存在ROOT类型的事务的话， 就一定是异常，将这个分布式事务全部回滚
