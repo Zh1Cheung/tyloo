@@ -6,7 +6,7 @@ import io.tyloo.tcctransaction.serializer.KryoPoolSerializer;
 import io.tyloo.tcctransaction.serializer.ObjectSerializer;
 import io.tyloo.tcctransaction.utils.CollectionUtils;
 import io.tyloo.tcctransaction.utils.StringUtils;
-import io.tyloo.api.TransactionStatus;
+import io.tyloo.api.Status;
 
 import javax.sql.DataSource;
 import javax.transaction.xa.Xid;
@@ -331,7 +331,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         while (resultSet.next()) {
             byte[] transactionBytes = resultSet.getBytes(3);
             Transaction transaction = (Transaction) serializer.deserialize(transactionBytes);
-            transaction.changeStatus(TransactionStatus.valueOf(resultSet.getInt(4)));
+            transaction.changeStatus(Status.valueOf(resultSet.getInt(4)));
             transaction.setLastUpdateTime(resultSet.getDate(7));
             transaction.setVersion(resultSet.getLong(9));
             transaction.resetRetriedCount(resultSet.getInt(8));

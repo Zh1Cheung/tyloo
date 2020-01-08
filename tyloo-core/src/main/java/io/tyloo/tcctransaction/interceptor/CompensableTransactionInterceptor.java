@@ -10,7 +10,7 @@ import io.tyloo.tcctransaction.utils.TransactionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
-import io.tyloo.api.TransactionStatus;
+import io.tyloo.api.Status;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -62,7 +62,7 @@ public class CompensableTransactionInterceptor {
         boolean isTransactionActive = transactionManager.isTransactionActive();
 
         if (!TransactionUtils.isLegalTransactionContext(isTransactionActive, compensableMethodContext)) {
-            throw new SystemException("no active compensable transaction while propagation is mandatory for method " + compensableMethodContext.getMethod().getName());
+            throw new SystemException("no active tyloo transaction while propagation is mandatory for method " + compensableMethodContext.getMethod().getName());
         }
 
         // 计算可补偿事务方法类型
@@ -108,7 +108,7 @@ public class CompensableTransactionInterceptor {
 
                 if (!isDelayCancelException(tryingException, allDelayCancelExceptions)) {
 
-                    logger.warn(String.format("compensable transaction trying failed. transaction content:%s", JSON.toJSONString(transaction)), tryingException);
+                    logger.warn(String.format("tyloo transaction trying failed. transaction content:%s", JSON.toJSONString(transaction)), tryingException);
 
                     transactionManager.rollback(asyncCancel);
                 }
@@ -144,15 +144,15 @@ public class CompensableTransactionInterceptor {
 
         try {
 
-            switch (TransactionStatus.valueOf(compensableMethodContext.getTransactionContext().getStatus())) {
+            switch (Status.valueOf(compensableMethodContext.getTylooContext().getStatus())) {
                 case TRYING:
                     // 基于全局事务ID扩展创建新的分支事务，并存于当前线程的事务局部变量中.
-                    transaction = transactionManager.propagationNewBegin(compensableMethodContext.getTransactionContext());
+                    transaction = transactionManager.propagationNewBegin(compensableMethodContext.getTylooContext());
                     return compensableMethodContext.proceed();
                 case CONFIRMING:
                     try {
                         // 找出存在的事务并处理.
-                        transaction = transactionManager.propagationExistBegin(compensableMethodContext.getTransactionContext());
+                        transaction = transactionManager.propagationExistBegin(compensableMethodContext.getTylooContext());
                         // 提交
                         transactionManager.commit(asyncConfirm);
                     } catch (NoExistedTransactionException excepton) {
@@ -162,7 +162,7 @@ public class CompensableTransactionInterceptor {
                 case CANCELLING:
 
                     try {
-                        transaction = transactionManager.propagationExistBegin(compensableMethodContext.getTransactionContext());
+                        transaction = transactionManager.propagationExistBegin(compensableMethodContext.getTylooContext());
                         // 回滚
                         transactionManager.rollback(asyncCancel);
                     } catch (NoExistedTransactionException exception) {

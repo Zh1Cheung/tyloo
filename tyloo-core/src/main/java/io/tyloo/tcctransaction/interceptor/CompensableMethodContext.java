@@ -31,7 +31,7 @@ public class CompensableMethodContext {
     /**
      * 注解
      */
-    Compensable compensable = null;
+    Tyloo tyloo = null;
 
     /**
      * 传播级别
@@ -41,28 +41,28 @@ public class CompensableMethodContext {
     /**
      * 事务上下文
      */
-    TransactionContext transactionContext = null;
+    TylooContext tylooContext = null;
 
     public CompensableMethodContext(ProceedingJoinPoint pjp) {
         this.pjp = pjp;
         this.method = getCompensableMethod();
-        this.compensable = method.getAnnotation(Compensable.class);
-        this.propagation = compensable.propagation();
-        TransactionContextEditor instance = (TransactionContextEditor) FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance();
-        this.transactionContext = instance.get(pjp.getTarget(), method, pjp.getArgs());
+        this.tyloo = method.getAnnotation(Tyloo.class);
+        this.propagation = tyloo.propagation();
+        TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tyloo.transactionContextEditor()).getInstance();
+        this.tylooContext = instance.get(pjp.getTarget(), method, pjp.getArgs());
 
     }
 
-    public Compensable getAnnotation() {
-        return compensable;
+    public Tyloo getAnnotation() {
+        return tyloo;
     }
 
     public Propagation getPropagation() {
         return propagation;
     }
 
-    public TransactionContext getTransactionContext() {
-        return transactionContext;
+    public TylooContext getTylooContext() {
+        return tylooContext;
     }
 
     public Method getMethod() {
@@ -100,7 +100,7 @@ public class CompensableMethodContext {
     private Method getCompensableMethod() {
         Method method = ((MethodSignature) (pjp.getSignature())).getMethod();
 
-        if (method.getAnnotation(Compensable.class) == null) {
+        if (method.getAnnotation(Tyloo.class) == null) {
             try {
                 method = pjp.getTarget().getClass().getMethod(method.getName(), method.getParameterTypes());
             } catch (NoSuchMethodException e) {
@@ -117,10 +117,10 @@ public class CompensableMethodContext {
      * @return
      */
     public MethodRole getMethodRole(boolean isTransactionActive) {
-        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && transactionContext == null) ||
+        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooContext == null) ||
                 propagation.equals(Propagation.REQUIRES_NEW)) {
             return MethodRole.ROOT;
-        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && transactionContext != null) {
+        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && tylooContext != null) {
             return MethodRole.PROVIDER;
         } else {
             return MethodRole.NORMAL;

@@ -70,25 +70,25 @@ public class ResourceCoordinatorInterceptor {
      */
     private void enlistParticipant(ProceedingJoinPoint pjp) throws IllegalAccessException, InstantiationException {
 
-        // 获得 @Compensable 注解
+        // 获得 @Tyloo 注解
         Method method = CompensableMethodUtils.getCompensableMethod(pjp);
         if (method == null) {
             throw new RuntimeException(String.format("join point not found method, point is : %s", pjp.getSignature().getName()));
         }
-        Compensable compensable = method.getAnnotation(Compensable.class);
+        Tyloo tyloo = method.getAnnotation(Tyloo.class);
 
         // 获得 确认执行业务方法 和 取消执行业务方法
-        String confirmMethodName = compensable.confirmMethod();
-        String cancelMethodName = compensable.cancelMethod();
+        String confirmMethodName = tyloo.confirmMethod();
+        String cancelMethodName = tyloo.cancelMethod();
 
         // 获取 当前线程事务第一个(头部)元素
         Transaction transaction = transactionManager.getCurrentTransaction();
         // 创建 事务编号
         TransactionXid xid = new TransactionXid(transaction.getXid().getGlobalTransactionId());
         //如果该注解的单例类的参数中没有事务上下文 便新建一个事务上下文
-        TransactionContextEditor instance = (TransactionContextEditor) FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance();
+        TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tyloo.transactionContextEditor()).getInstance();
         if (instance.get(pjp.getTarget(), method, pjp.getArgs()) == null) {
-            instance.set(new TransactionContext(xid, TransactionStatus.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
+            instance.set(new TylooContext(xid, Status.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
         }
 
         // 获得类
@@ -107,7 +107,7 @@ public class ResourceCoordinatorInterceptor {
                         xid,
                         confirmInvocation,
                         cancelInvocation,
-                        compensable.transactionContextEditor());
+                        tyloo.transactionContextEditor());
 
         transactionManager.enlistParticipant(participant);
 

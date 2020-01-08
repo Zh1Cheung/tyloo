@@ -26,7 +26,7 @@ public class TransactionUtils {
     public static boolean isLegalTransactionContext(boolean isTransactionActive, CompensableMethodContext compensableMethodContext) {
 
 
-        return !compensableMethodContext.getPropagation().equals(Propagation.MANDATORY) || isTransactionActive || compensableMethodContext.getTransactionContext() != null;
+        return !compensableMethodContext.getPropagation().equals(Propagation.MANDATORY) || isTransactionActive || compensableMethodContext.getTylooContext() != null;
 
     }
 }

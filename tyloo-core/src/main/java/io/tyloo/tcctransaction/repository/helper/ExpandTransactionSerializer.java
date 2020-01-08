@@ -6,7 +6,7 @@ import io.tyloo.tcctransaction.Transaction;
 import io.tyloo.tcctransaction.utils.ByteUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import io.tyloo.api.TransactionStatus;
+import io.tyloo.api.Status;
 import io.tyloo.tcctransaction.serializer.ObjectSerializer;
 
 import java.text.ParseException;
@@ -50,7 +50,7 @@ public class ExpandTransactionSerializer {
 
         byte[] content = propertyMap.get("CONTENT");
         Transaction transaction = (Transaction) serializer.deserialize(content);
-        transaction.changeStatus(TransactionStatus.valueOf(ByteUtils.bytesToInt(propertyMap.get("STATUS"))));
+        transaction.changeStatus(Status.valueOf(ByteUtils.bytesToInt(propertyMap.get("STATUS"))));
         transaction.resetRetriedCount(ByteUtils.bytesToInt(propertyMap.get("RETRIED_COUNT")));
 
         try {

@@ -1,8 +1,8 @@
 package io.tyloo.tcctransaction;
 
 
-import io.tyloo.api.TransactionContext;
-import io.tyloo.api.TransactionStatus;
+import io.tyloo.api.TylooContext;
+import io.tyloo.api.Status;
 import io.tyloo.api.TransactionXid;
 import io.tyloo.tcctransaction.common.TransactionType;
 
@@ -32,7 +32,7 @@ public class Transaction implements Serializable {
     /**
      * 事务状态
      */
-    private TransactionStatus status;
+    private Status status;
     /**
      * 事务类型
      */
@@ -69,11 +69,11 @@ public class Transaction implements Serializable {
     /**
      * 创建分支事务
      *
-     * @param transactionContext 事务上下文
+     * @param tylooContext 事务上下文
      */
-    public Transaction(TransactionContext transactionContext) {
-        this.xid = transactionContext.getXid();
-        this.status = TransactionStatus.TRYING;
+    public Transaction(TylooContext tylooContext) {
+        this.xid = tylooContext.getXid();
+        this.status = Status.TRYING;
         this.transactionType = TransactionType.BRANCH;
     }
 
@@ -84,7 +84,7 @@ public class Transaction implements Serializable {
      */
     public Transaction(TransactionType transactionType) {
         this.xid = new TransactionXid();
-        this.status = TransactionStatus.TRYING;
+        this.status = Status.TRYING;
         this.transactionType = transactionType;
     }
 
@@ -97,7 +97,7 @@ public class Transaction implements Serializable {
     public Transaction(Object uniqueIdentity, TransactionType transactionType) {
 
         this.xid = new TransactionXid(uniqueIdentity);
-        this.status = TransactionStatus.TRYING;
+        this.status = Status.TRYING;
         this.transactionType = transactionType;
     }
 
@@ -115,7 +115,7 @@ public class Transaction implements Serializable {
         return xid.clone();
     }
 
-    public TransactionStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -128,7 +128,7 @@ public class Transaction implements Serializable {
         return transactionType;
     }
 
-    public void changeStatus(TransactionStatus status) {
+    public void changeStatus(Status status) {
         this.status = status;
     }
 

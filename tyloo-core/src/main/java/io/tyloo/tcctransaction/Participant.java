@@ -1,8 +1,8 @@
 package io.tyloo.tcctransaction;
 
-import io.tyloo.api.TransactionContext;
-import io.tyloo.api.TransactionContextEditor;
-import io.tyloo.api.TransactionStatus;
+import io.tyloo.api.TylooContext;
+import io.tyloo.api.TylooContextLoader;
+import io.tyloo.api.Status;
 import io.tyloo.api.TransactionXid;
 
 import java.io.Serializable;
@@ -34,7 +34,7 @@ public class Participant implements Serializable {
     /**
      * 事务上下文编辑
      */
-    Class<? extends TransactionContextEditor> transactionContextEditorClass;
+    Class<? extends TylooContextLoader> transactionContextEditorClass;
     /**
      * 执行器
      */
@@ -45,14 +45,14 @@ public class Participant implements Serializable {
 
     }
 
-    public Participant(TransactionXid xid, InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TransactionContextEditor> transactionContextEditorClass) {
+    public Participant(TransactionXid xid, InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooContextLoader> transactionContextEditorClass) {
         this.xid = xid;
         this.confirmInvocationContext = confirmInvocationContext;
         this.cancelInvocationContext = cancelInvocationContext;
         this.transactionContextEditorClass = transactionContextEditorClass;
     }
 
-    public Participant(InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TransactionContextEditor> transactionContextEditorClass) {
+    public Participant(InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooContextLoader> transactionContextEditorClass) {
         this.confirmInvocationContext = confirmInvocationContext;
         this.cancelInvocationContext = cancelInvocationContext;
         this.transactionContextEditorClass = transactionContextEditorClass;
@@ -66,14 +66,14 @@ public class Participant implements Serializable {
      * 回滚参与者事务（在Transaction中被调用）
      */
     public void rollback() {
-        terminator.invoke(new TransactionContext(xid, TransactionStatus.CANCELLING.getId()), cancelInvocationContext, transactionContextEditorClass);
+        terminator.invoke(new TylooContext(xid, Status.CANCELLING.getId()), cancelInvocationContext, transactionContextEditorClass);
     }
 
     /**
      * 提交参与者事务（在Transaction中被调用）.
      */
     public void commit() {
-        terminator.invoke(new TransactionContext(xid, TransactionStatus.CONFIRMING.getId()), confirmInvocationContext, transactionContextEditorClass);
+        terminator.invoke(new TylooContext(xid, Status.CONFIRMING.getId()), confirmInvocationContext, transactionContextEditorClass);
     }
 
     public Terminator getTerminator() {

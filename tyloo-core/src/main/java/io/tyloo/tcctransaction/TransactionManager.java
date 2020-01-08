@@ -1,12 +1,12 @@
 package io.tyloo.tcctransaction;
 
+import io.tyloo.api.TylooContext;
 import io.tyloo.tcctransaction.exception.CancellingException;
 import io.tyloo.tcctransaction.exception.ConfirmingException;
 import io.tyloo.tcctransaction.exception.NoExistedTransactionException;
 import io.tyloo.tcctransaction.exception.SystemException;
 import org.apache.log4j.Logger;
-import io.tyloo.api.TransactionContext;
-import io.tyloo.api.TransactionStatus;
+import io.tyloo.api.Status;
 import io.tyloo.tcctransaction.common.TransactionType;
 
 import java.util.Deque;
@@ -77,12 +77,12 @@ public class TransactionManager {
     /**
      * 传播发起分支事务
      *
-     * @param transactionContext 事务上下文
+     * @param tylooContext 事务上下文
      * @return 分支事务
      */
-    public Transaction propagationNewBegin(TransactionContext transactionContext) {
+    public Transaction propagationNewBegin(TylooContext tylooContext) {
 
-        Transaction transaction = new Transaction(transactionContext);
+        Transaction transaction = new Transaction(tylooContext);
         transactionRepository.create(transaction);
 
         registerTransaction(transaction);
@@ -92,17 +92,17 @@ public class TransactionManager {
     /**
      * 传播获取分支事务
      *
-     * @param transactionContext 事务上下文
+     * @param tylooContext 事务上下文
      * @return 分支事务
      * @throws NoExistedTransactionException 当事务不存在时
      */
-    public Transaction propagationExistBegin(TransactionContext transactionContext) throws NoExistedTransactionException {
+    public Transaction propagationExistBegin(TylooContext tylooContext) throws NoExistedTransactionException {
         // 查询 事务
-        Transaction transaction = transactionRepository.findByXid(transactionContext.getXid());
+        Transaction transaction = transactionRepository.findByXid(tylooContext.getXid());
 
         if (transaction != null) {
             // 设置 事务 状态
-            transaction.changeStatus(TransactionStatus.valueOf(transactionContext.getStatus()));
+            transaction.changeStatus(Status.valueOf(tylooContext.getStatus()));
             // 注册 事务
             registerTransaction(transaction);
             return transaction;
@@ -118,7 +118,7 @@ public class TransactionManager {
         // 获取 事务
         final Transaction transaction = getCurrentTransaction();
         // 设置 事务状态 为 CONFIRMING
-        transaction.changeStatus(TransactionStatus.CONFIRMING);
+        transaction.changeStatus(Status.CONFIRMING);
         // 更新 事务
         transactionRepository.update(transaction);
 
@@ -148,7 +148,7 @@ public class TransactionManager {
     public void rollback(boolean asyncRollback) {
 
         final Transaction transaction = getCurrentTransaction();
-        transaction.changeStatus(TransactionStatus.CANCELLING);
+        transaction.changeStatus(Status.CANCELLING);
 
         transactionRepository.update(transaction);
 
