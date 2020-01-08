@@ -488,3 +488,7 @@ TransactionManager，事务管理器，提供事务的获取、发起、提交�
 - CompensableTransactionInterceptor，可补偿事务拦截器。
 - ResourceCoordinatorInterceptor，资源协调者拦截器。
 - XXXInterceptor通过 `org.aspectj.lang.annotation.@Pointcut` + `org.aspectj.lang.annotation.@Around` 注解，配置对 **@Compensable 注解的方法**进行拦截，调用 `CompensableTransactionInterceptor#interceptXXXMethod(...)` 方法进行处理。
+
+## 详细文档
+
+Detailed documentation.md
