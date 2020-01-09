@@ -40,7 +40,7 @@ public @interface Tyloo {
     /**
      * 事务上下文编辑
      */
-    public Class<? extends TylooContextLoader> transactionContextEditor() default DefaultTylooContextLoader.class;
+    public Class<? extends TylooContextLoader> tylooContextLoader() default DefaultTylooContextLoader.class;
 
     /**
      * 超时异常
