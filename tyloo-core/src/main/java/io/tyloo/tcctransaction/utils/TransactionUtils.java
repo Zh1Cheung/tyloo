@@ -1,7 +1,7 @@
 package io.tyloo.tcctransaction.utils;
 
 import io.tyloo.api.Propagation;
-import io.tyloo.tcctransaction.interceptor.CompensableMethodContext;
+import io.tyloo.tcctransaction.interceptor.TylooMethodContext;
 
 /*
  *
@@ -20,13 +20,13 @@ public class TransactionUtils {
      * 在 Propagation.MANDATORY 必须有在事务内
      *
      * @param isTransactionActive 是否事务开启
-     * @param compensableMethodContext 事务上下文
+     * @param tylooMethodContext 事务上下文
      * @return 是否合法
      */
-    public static boolean isLegalTransactionContext(boolean isTransactionActive, CompensableMethodContext compensableMethodContext) {
+    public static boolean isLegalTransactionContext(boolean isTransactionActive, TylooMethodContext tylooMethodContext) {
 
 
-        return !compensableMethodContext.getPropagation().equals(Propagation.MANDATORY) || isTransactionActive || compensableMethodContext.getTylooContext() != null;
+        return !tylooMethodContext.getPropagation().equals(Propagation.MANDATORY) || isTransactionActive || tylooMethodContext.getTylooContext() != null;
 
     }
 }

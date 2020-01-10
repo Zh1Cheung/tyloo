@@ -34,7 +34,7 @@ public class Terminator implements Serializable {
      * @return
      */
 
-    public Object invoke(TylooContext tylooContext, InvocationContext invocationContext, Class<? extends TylooContextLoader> transactionContextEditorClass) {
+    public Object invoke(TylooContext tylooContext, InvocationContext invocationContext, Class<? extends TylooContextLoader> tylooContextLoaderClass) {
 
 
         if (StringUtils.isNotEmpty(invocationContext.getMethodName())) {
@@ -48,7 +48,7 @@ public class Terminator implements Serializable {
                 method = target.getClass().getMethod(invocationContext.getMethodName(), invocationContext.getParameterTypes());
 
                 //注入事务上下文
-                TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(transactionContextEditorClass).getInstance();
+                TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tylooContextLoaderClass).getInstance();
                 instance.set(tylooContext, target, method, invocationContext.getArgs());
 
                 // 调用服务方法，被再次被TccTransactionContextAspect和ResourceCoordinatorInterceptor拦截，但因为事务状态已经不再是TRYING了，所以直接执行远程服务

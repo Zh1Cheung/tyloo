@@ -6,7 +6,6 @@ import com.google.common.cache.CacheBuilder;
 import io.tyloo.tcctransaction.exception.ConcurrentTransactionException;
 import io.tyloo.tcctransaction.exception.OptimisticLockException;
 import io.tyloo.tcctransaction.Transaction;
-import io.tyloo.tcctransaction.TransactionRepository;
 import io.tyloo.api.TransactionXid;
 
 
@@ -32,7 +31,7 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     /**
      * 事务日志记录缓存<Xid, Transaction>
      */
-    private Cache<Xid, Transaction> transactionXidCompensableTransactionCache;
+    private Cache<Xid, Transaction> transactionXidTylooTransactionCache;
 
     /**
      * 创建事务日志记录
@@ -127,7 +126,7 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     }
 
     public CachableTransactionRepository() {
-        transactionXidCompensableTransactionCache = CacheBuilder.newBuilder().expireAfterAccess(expireDuration, TimeUnit.SECONDS).maximumSize(1000).build();
+        transactionXidTylooTransactionCache = CacheBuilder.newBuilder().expireAfterAccess(expireDuration, TimeUnit.SECONDS).maximumSize(1000).build();
     }
 
     /**
@@ -136,7 +135,7 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * @param transaction
      */
     protected void putToCache(Transaction transaction) {
-        transactionXidCompensableTransactionCache.put(transaction.getXid(), transaction);
+        transactionXidTylooTransactionCache.put(transaction.getXid(), transaction);
     }
 
     /**
@@ -145,7 +144,7 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * @param transaction
      */
     protected void removeFromCache(Transaction transaction) {
-        transactionXidCompensableTransactionCache.invalidate(transaction.getXid());
+        transactionXidTylooTransactionCache.invalidate(transaction.getXid());
     }
 
     /**
@@ -155,7 +154,7 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * @return
      */
     protected Transaction findFromCache(TransactionXid transactionXid) {
-        return transactionXidCompensableTransactionCache.getIfPresent(transactionXid);
+        return transactionXidTylooTransactionCache.getIfPresent(transactionXid);
     }
 
     public void setExpireDuration(int durationInSeconds) {

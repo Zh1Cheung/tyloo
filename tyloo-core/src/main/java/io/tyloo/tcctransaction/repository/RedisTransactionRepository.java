@@ -1,6 +1,7 @@
 package io.tyloo.tcctransaction.repository;
 
 import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.exception.TransactionIOException;
 import io.tyloo.tcctransaction.repository.helper.ExpandTransactionSerializer;
 import io.tyloo.tcctransaction.repository.helper.RedisHelper;
 import io.tyloo.tcctransaction.serializer.KryoPoolSerializer;

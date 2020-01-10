@@ -5,9 +5,10 @@ import io.tyloo.tcctransaction.exception.CancellingException;
 import io.tyloo.tcctransaction.exception.ConfirmingException;
 import io.tyloo.tcctransaction.exception.NoExistedTransactionException;
 import io.tyloo.tcctransaction.exception.SystemException;
+import io.tyloo.tcctransaction.repository.TransactionRepository;
 import org.apache.log4j.Logger;
 import io.tyloo.api.Status;
-import io.tyloo.tcctransaction.common.TransactionType;
+import io.tyloo.tcctransaction.common.Type;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public class TransactionManager {
      * @return
      */
     public Transaction begin(Object uniqueIdentify) {
-        Transaction transaction = new Transaction(uniqueIdentify, TransactionType.ROOT);
+        Transaction transaction = new Transaction(uniqueIdentify, Type.ROOT);
         transactionRepository.create(transaction);
         registerTransaction(transaction);
         return transaction;
@@ -68,7 +69,7 @@ public class TransactionManager {
      * @return 事务
      */
     public Transaction begin() {
-        Transaction transaction = new Transaction(TransactionType.ROOT);
+        Transaction transaction = new Transaction(Type.ROOT);
         transactionRepository.create(transaction);
         registerTransaction(transaction);
         return transaction;
@@ -134,7 +135,7 @@ public class TransactionManager {
                 });
                 logger.debug("async submit cost time:" + (System.currentTimeMillis() - statTime));
             } catch (Throwable commitException) {
-                logger.warn("compensable transaction async submit confirm failed, recovery job will try to confirm later.", commitException);
+                logger.warn("Tyloo transaction async submit confirm failed, recovery job will try to confirm later.", commitException);
                 throw new ConfirmingException(commitException);
             }
         } else {
@@ -162,7 +163,7 @@ public class TransactionManager {
                     }
                 });
             } catch (Throwable rollbackException) {
-                logger.warn("compensable transaction async rollback failed, recovery job will try to rollback later.", rollbackException);
+                logger.warn("Tyloo transaction async rollback failed, recovery job will try to rollback later.", rollbackException);
                 throw new CancellingException(rollbackException);
             }
         } else {
@@ -179,7 +180,7 @@ public class TransactionManager {
             // 删除 事务
             transactionRepository.delete(transaction);
         } catch (Throwable commitException) {
-            logger.warn("compensable transaction confirm failed, recovery job will try to confirm later.", commitException);
+            logger.warn("Tyloo transaction confirm failed, recovery job will try to confirm later.", commitException);
             throw new ConfirmingException(commitException);
         }
     }
@@ -191,7 +192,7 @@ public class TransactionManager {
             // 删除 事务
             transactionRepository.delete(transaction);
         } catch (Throwable rollbackException) {
-            logger.warn("compensable transaction rollback failed, recovery job will try to rollback later.", rollbackException);
+            logger.warn("Tyloo transaction rollback failed, recovery job will try to rollback later.", rollbackException);
             throw new CancellingException(rollbackException);
         }
     }

@@ -2,7 +2,7 @@ package io.tyloo.tcctransaction.support;
 
 import io.tyloo.tcctransaction.TransactionManager;
 import io.tyloo.tcctransaction.recover.RecoverConfig;
-import io.tyloo.tcctransaction.TransactionRepository;
+import io.tyloo.tcctransaction.repository.TransactionRepository;
 
 /*
  *

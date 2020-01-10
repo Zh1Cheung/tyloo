@@ -2,6 +2,7 @@ package io.tyloo.tcctransaction.repository;
 
 
 import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.exception.TransactionIOException;
 import io.tyloo.tcctransaction.serializer.KryoPoolSerializer;
 import io.tyloo.tcctransaction.serializer.ObjectSerializer;
 import io.tyloo.tcctransaction.utils.CollectionUtils;
@@ -84,7 +85,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             stmt.setBytes(1, transaction.getXid().getGlobalTransactionId());
             stmt.setBytes(2, transaction.getXid().getBranchQualifier());
-            stmt.setInt(3, transaction.getTransactionType().getId());
+            stmt.setInt(3, transaction.getType().getId());
             stmt.setBytes(4, serializer.serialize(transaction));
             stmt.setInt(5, transaction.getStatus().getId());
             stmt.setInt(6, transaction.getRetriedCount());

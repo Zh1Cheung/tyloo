@@ -34,7 +34,7 @@ public class Participant implements Serializable {
     /**
      * 事务上下文编辑
      */
-    Class<? extends TylooContextLoader> transactionContextEditorClass;
+    Class<? extends TylooContextLoader> tylooContextLoaderClass;
     /**
      * 执行器
      */
@@ -45,17 +45,17 @@ public class Participant implements Serializable {
 
     }
 
-    public Participant(TransactionXid xid, InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooContextLoader> transactionContextEditorClass) {
+    public Participant(TransactionXid xid, InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooContextLoader> tylooContextLoaderClass) {
         this.xid = xid;
         this.confirmInvocationContext = confirmInvocationContext;
         this.cancelInvocationContext = cancelInvocationContext;
-        this.transactionContextEditorClass = transactionContextEditorClass;
+        this.tylooContextLoaderClass = tylooContextLoaderClass;
     }
 
-    public Participant(InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooContextLoader> transactionContextEditorClass) {
+    public Participant(InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooContextLoader> tylooContextLoaderClass) {
         this.confirmInvocationContext = confirmInvocationContext;
         this.cancelInvocationContext = cancelInvocationContext;
-        this.transactionContextEditorClass = transactionContextEditorClass;
+        this.tylooContextLoaderClass = tylooContextLoaderClass;
     }
 
     public void setXid(TransactionXid xid) {
@@ -66,14 +66,14 @@ public class Participant implements Serializable {
      * 回滚参与者事务（在Transaction中被调用）
      */
     public void rollback() {
-        terminator.invoke(new TylooContext(xid, Status.CANCELLING.getId()), cancelInvocationContext, transactionContextEditorClass);
+        terminator.invoke(new TylooContext(xid, Status.CANCELLING.getId()), cancelInvocationContext, tylooContextLoaderClass);
     }
 
     /**
      * 提交参与者事务（在Transaction中被调用）.
      */
     public void commit() {
-        terminator.invoke(new TylooContext(xid, Status.CONFIRMING.getId()), confirmInvocationContext, transactionContextEditorClass);
+        terminator.invoke(new TylooContext(xid, Status.CONFIRMING.getId()), confirmInvocationContext, tylooContextLoaderClass);
     }
 
     public Terminator getTerminator() {

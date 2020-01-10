@@ -30,7 +30,7 @@ public class ExpandTransactionSerializer {
         map.put("GLOBAL_TX_ID".getBytes(), transaction.getXid().getGlobalTransactionId());
         map.put("BRANCH_QUALIFIER".getBytes(), transaction.getXid().getBranchQualifier());
         map.put("STATUS".getBytes(), ByteUtils.intToBytes(transaction.getStatus().getId()));
-        map.put("TRANSACTION_TYPE".getBytes(), ByteUtils.intToBytes(transaction.getTransactionType().getId()));
+        map.put("TRANSACTION_TYPE".getBytes(), ByteUtils.intToBytes(transaction.getType().getId()));
         map.put("RETRIED_COUNT".getBytes(), ByteUtils.intToBytes(transaction.getRetriedCount()));
         map.put("CREATE_TIME".getBytes(), DateFormatUtils.format(transaction.getCreateTime(), "yyyy-MM-dd HH:mm:ss").getBytes());
         map.put("LAST_UPDATE_TIME".getBytes(), DateFormatUtils.format(transaction.getLastUpdateTime(), "yyyy-MM-dd HH:mm:ss").getBytes());

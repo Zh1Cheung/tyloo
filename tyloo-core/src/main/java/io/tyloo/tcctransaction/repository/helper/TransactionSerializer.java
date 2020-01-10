@@ -23,7 +23,7 @@ public class TransactionSerializer {
         map.put("GLOBAL_TX_ID", transaction.getXid().getGlobalTransactionId());
         map.put("BRANCH_QUALIFIER", transaction.getXid().getBranchQualifier());
         map.put("STATUS", transaction.getStatus().getId());
-        map.put("TRANSACTION_TYPE", transaction.getTransactionType().getId());
+        map.put("TRANSACTION_TYPE", transaction.getType().getId());
         map.put("RETRIED_COUNT", transaction.getRetriedCount());
         map.put("CREATE_TIME", transaction.getCreateTime());
         map.put("LAST_UPDATE_TIME", transaction.getLastUpdateTime());

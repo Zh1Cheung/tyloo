@@ -4,7 +4,7 @@ package io.tyloo.tcctransaction;
 import io.tyloo.api.TylooContext;
 import io.tyloo.api.Status;
 import io.tyloo.api.TransactionXid;
-import io.tyloo.tcctransaction.common.TransactionType;
+import io.tyloo.tcctransaction.common.Type;
 
 import javax.transaction.xa.Xid;
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class Transaction implements Serializable {
     /**
      * 事务类型
      */
-    private TransactionType transactionType;
+    private Type type;
     /**
      * 重试次数
      */
@@ -74,31 +74,31 @@ public class Transaction implements Serializable {
     public Transaction(TylooContext tylooContext) {
         this.xid = tylooContext.getXid();
         this.status = Status.TRYING;
-        this.transactionType = TransactionType.BRANCH;
+        this.type = Type.BRANCH;
     }
 
     /**
      * 创建指定类型的事务
      *
-     * @param transactionType 事务类型
+     * @param type 事务类型
      */
-    public Transaction(TransactionType transactionType) {
+    public Transaction(Type type) {
         this.xid = new TransactionXid();
         this.status = Status.TRYING;
-        this.transactionType = transactionType;
+        this.type = type;
     }
 
     /**
      * 创建指定类型和制定Xid的事务
      *
      * @param uniqueIdentity
-     * @param transactionType
+     * @param type
      */
-    public Transaction(Object uniqueIdentity, TransactionType transactionType) {
+    public Transaction(Object uniqueIdentity, Type type) {
 
         this.xid = new TransactionXid(uniqueIdentity);
         this.status = Status.TRYING;
-        this.transactionType = transactionType;
+        this.type = type;
     }
 
     /**
@@ -124,8 +124,8 @@ public class Transaction implements Serializable {
         return participants;
     }
 
-    public TransactionType getTransactionType() {
-        return transactionType;
+    public Type getType() {
+        return type;
     }
 
     public void changeStatus(Status status) {
