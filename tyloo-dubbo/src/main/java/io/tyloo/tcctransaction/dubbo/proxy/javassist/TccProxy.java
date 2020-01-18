@@ -17,7 +17,7 @@ package io.tyloo.tcctransaction.dubbo.proxy.javassist;
 
 import com.alibaba.dubbo.common.utils.ClassHelper;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
-import io.tyloo.api.Compensable;
+import io.tyloo.api.Tyloo;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -203,12 +203,12 @@ public abstract class TccProxy {
 
 
                     methods.add(method);
-                    StringBuilder compensableDesc = new StringBuilder();
+                    StringBuilder TylooDesc = new StringBuilder();
                     // 添加注解
-                    Compensable compensable = method.getAnnotation(Compensable.class);
+                    Tyloo Tyloo = method.getAnnotation(Tyloo.class);
 
                     //添加生成的方法
-                    if (compensable != null) {
+                    if (Tyloo != null) {
                         ccp.addMethod(true, method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());
                     } else {
                         ccp.addMethod(false, method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());

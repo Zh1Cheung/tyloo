@@ -108,7 +108,7 @@ public final class TccClassGenerator {
 
     private List<String> mFields, mConstructors, mMethods;
 
-    private Set<String> compensableMethods = new HashSet<String>();
+    private Set<String> TylooMethods = new HashSet<String>();
 
     private Map<String, Method> mCopyMethods; // <method desc,method instance>
 
@@ -214,7 +214,7 @@ public final class TccClassGenerator {
         return addMethod(false, name, mod, rt, pts, null, body);
     }
 
-    public TccClassGenerator addMethod(boolean isCompensableMethod, String name, int mod, Class<?> rt, Class<?>[] pts, Class<?>[] ets, String body) {
+    public TccClassGenerator addMethod(boolean isTylooMethod, String name, int mod, Class<?> rt, Class<?>[] pts, Class<?>[] ets, String body) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(modifier(mod)).append(' ').append(ReflectUtils.getName(rt)).append(' ').append(name);
@@ -236,8 +236,8 @@ public final class TccClassGenerator {
         }
         sb.append('{').append(body).append('}');
 
-        if (isCompensableMethod) {
-            compensableMethods.add(sb.toString());
+        if (isTylooMethod) {
+            TylooMethods.add(sb.toString());
         }
 
         return addMethod(sb.toString());
@@ -354,11 +354,11 @@ public final class TccClassGenerator {
                         CtMethod ctMethod = CtNewMethod.make(code, mCtc);
 
                         // 注解方法处理
-                        if (compensableMethods.contains(code)) {
+                        if (TylooMethods.contains(code)) {
 
                             ConstPool constpool = mCtc.getClassFile().getConstPool();
                             AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-                            Annotation annot = new Annotation("Compensable", constpool);
+                            Annotation annot = new Annotation("Tyloo", constpool);
                             EnumMemberValue enumMemberValue = new EnumMemberValue(constpool);
                             enumMemberValue.setType("Propagation");
                             enumMemberValue.setValue("SUPPORTS");
@@ -366,8 +366,8 @@ public final class TccClassGenerator {
                             annot.addMemberValue("confirmMethod", new StringMemberValue(ctMethod.getName(), constpool));
                             annot.addMemberValue("cancelMethod", new StringMemberValue(ctMethod.getName(), constpool));
 
-                            ClassMemberValue classMemberValue = new ClassMemberValue("DubboTransactionContextEditor", constpool);
-                            annot.addMemberValue("transactionContextEditor", classMemberValue);
+                            ClassMemberValue classMemberValue = new ClassMemberValue("DubboTransactionContextLoader", constpool);
+                            annot.addMemberValue("tylooContextLoader", classMemberValue);
 
                             attr.addAnnotation(annot);
                             ctMethod.getMethodInfo().addAttribute(attr);

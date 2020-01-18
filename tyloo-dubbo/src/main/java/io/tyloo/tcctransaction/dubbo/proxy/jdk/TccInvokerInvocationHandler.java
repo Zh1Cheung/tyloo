@@ -3,13 +3,13 @@ package io.tyloo.tcctransaction.dubbo.proxy.jdk;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.proxy.InvokerInvocationHandler;
-import io.tyloo.tcctransaction.dubbo.context.DubboTransactionContextEditor;
-import io.tyloo.tcctransaction.interceptor.ResourceCoordinatorAspect;
+import io.tyloo.api.Propagation;
+import io.tyloo.api.Tyloo;
+import io.tyloo.tcctransaction.dubbo.context.DubboTransactionContextLoader;
+import io.tyloo.tcctransaction.interceptor.TylooCoordinatorAspect;
 import io.tyloo.tcctransaction.support.FactoryBuilder;
 import io.tyloo.tcctransaction.utils.ReflectionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
-import io.tyloo.api.Compensable;
-import io.tyloo.api.Propagation;
 
 import java.lang.reflect.Method;
 
@@ -37,15 +37,15 @@ public class TccInvokerInvocationHandler extends InvokerInvocationHandler {
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        Compensable compensable = method.getAnnotation(Compensable.class);
+        Tyloo tyloo = method.getAnnotation(Tyloo.class);
 
-        if (compensable != null) {
+        if (tyloo != null) {
             // 设置 @Compensable 属性
-            if (StringUtils.isEmpty(compensable.confirmMethod())) {
-                ReflectionUtils.changeAnnotationValue(compensable, "confirmMethod", method.getName());
-                ReflectionUtils.changeAnnotationValue(compensable, "cancelMethod", method.getName());
-                ReflectionUtils.changeAnnotationValue(compensable, "transactionContextEditor", DubboTransactionContextEditor.class);
-                ReflectionUtils.changeAnnotationValue(compensable, "propagation", Propagation.SUPPORTS);
+            if (StringUtils.isEmpty(tyloo.confirmMethod())) {
+                ReflectionUtils.changeAnnotationValue(tyloo, "confirmMethod", method.getName());
+                ReflectionUtils.changeAnnotationValue(tyloo, "cancelMethod", method.getName());
+                ReflectionUtils.changeAnnotationValue(tyloo, "tylooContextLoader", DubboTransactionContextLoader.class);
+                ReflectionUtils.changeAnnotationValue(tyloo, "propagation", Propagation.SUPPORTS);
             }
 
             /**
@@ -55,7 +55,9 @@ public class TccInvokerInvocationHandler extends InvokerInvocationHandler {
              * 因为传播级别为 Propagation.SUPPORTS，不会发起事务。
              */
             ProceedingJoinPoint pjp = new MethodProceedingJoinPoint(proxy, target, method, args);
-            return FactoryBuilder.factoryOf(ResourceCoordinatorAspect.class).getInstance().interceptTransactionContextMethod(pjp);
+            TylooCoordinatorAspect tylooCoordinatorAspect = (TylooCoordinatorAspect) FactoryBuilder.factoryOf(TylooCoordinatorAspect.class).getInstance();
+            return tylooCoordinatorAspect.interceptTransactionContextMethod(pjp);
+
         } else {
             return super.invoke(target, method, args);
         }
