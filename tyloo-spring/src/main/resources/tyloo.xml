@@ -2,7 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- 开启Spring对@AspectJ风格切面的支持(因为下面用到自定义的TCC补偿切面类) -->
     <!-- @Aspect注解不能被Spring自动识别并注册为Bean,因此要通过xml的bean配置,或通过@Compenent注解标识其为Spring管理Bean -->
@@ -14,12 +14,12 @@
     <bean id="transactionConfigurator" class="io.tyloo.tcctransaction.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
     <!-- 可补偿事务拦截器 -->
-    <bean id="compensableTransactionAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableTransactionAspect"
+    <bean id="TylooAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 资源协调拦截器 -->
-    <bean id="resourceCoordinatorAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableCoordinatorAspect"
+    <bean id="TylooCoordinatorAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableCoordinatorAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
@@ -27,7 +27,7 @@
     <task:annotation-driven/>
 
     <!-- 事务恢复 -->
-    <bean id="transactionRecovery" class="io.tyloo.tcctransaction.recover.TransactionRecovery">
+    <bean id="transactionRecovery" class="io.tyloo.tcctransaction.recover.Recovery">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 事务恢复任务调度器 -->

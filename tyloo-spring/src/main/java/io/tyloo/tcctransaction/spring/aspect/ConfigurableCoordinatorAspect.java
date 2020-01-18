@@ -1,9 +1,10 @@
 package io.tyloo.tcctransaction.spring.aspect;
 
-import org.aspectj.lang.annotation.Aspect;
-import io.tyloo.tcctransaction.interceptor.ResourceCoordinatorAspect;
-import io.tyloo.tcctransaction.interceptor.ResourceCoordinatorInterceptor;
+
+import io.tyloo.tcctransaction.interceptor.TylooCoordinatorAspect;
+import io.tyloo.tcctransaction.interceptor.TylooCoordinatorInterceptor;
 import io.tyloo.tcctransaction.support.TransactionConfigurator;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.Ordered;
 
 /*
@@ -15,7 +16,7 @@ import org.springframework.core.Ordered;
  *
  */
 @Aspect
-public class ConfigurableCoordinatorAspect extends ResourceCoordinatorAspect implements Ordered {
+public class ConfigurableCoordinatorAspect extends TylooCoordinatorAspect implements Ordered {
 
     private TransactionConfigurator transactionConfigurator;
 
@@ -25,9 +26,9 @@ public class ConfigurableCoordinatorAspect extends ResourceCoordinatorAspect imp
      */
     public void init() {
 
-        ResourceCoordinatorInterceptor resourceCoordinatorInterceptor = new ResourceCoordinatorInterceptor();
+        TylooCoordinatorInterceptor resourceCoordinatorInterceptor = new TylooCoordinatorInterceptor();
         resourceCoordinatorInterceptor.setTransactionManager(transactionConfigurator.getTransactionManager());
-        this.setResourceCoordinatorInterceptor(resourceCoordinatorInterceptor);
+        this.setTylooCoordinatorInterceptor(resourceCoordinatorInterceptor);
     }
 
     @Override

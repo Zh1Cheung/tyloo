@@ -3,6 +3,7 @@ package io.tyloo.tcctransaction.spring.support;
 import io.tyloo.tcctransaction.support.BeanFactory;
 import io.tyloo.tcctransaction.support.FactoryBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -14,12 +15,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @Date: 20:13 2019/12/4
  *
  */
-public class SpringPostProcessor implements ApplicationListener<ContextRefreshedEvent> {
+public class SpringPostProcessor implements ApplicationListener {
     /**
      * Spring启动时加载.
      */
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        ContextRefreshedEvent contextRefreshedEvent = new ContextRefreshedEvent((ApplicationContext) applicationEvent);
         ApplicationContext applicationContext = contextRefreshedEvent.getApplicationContext();
 
         if (applicationContext.getParent() == null) {

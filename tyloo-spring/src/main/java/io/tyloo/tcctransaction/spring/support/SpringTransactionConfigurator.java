@@ -1,13 +1,12 @@
 package io.tyloo.tcctransaction.spring.support;
 
-import io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig;
 import io.tyloo.tcctransaction.TransactionManager;
-import io.tyloo.tcctransaction.TransactionRepository;
+import io.tyloo.tcctransaction.repository.TransactionRepository;
 import io.tyloo.tcctransaction.recover.RecoverConfig;
 import io.tyloo.tcctransaction.repository.CachableTransactionRepository;
+import io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig;
 import io.tyloo.tcctransaction.support.TransactionConfigurator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,7 +29,6 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
     /**
      * 事务恢复配置
      */
-    @Qualifier("")
     @Autowired(required = false)
     private RecoverConfig recoverConfig = DefaultRecoverConfig.INSTANCE;
 

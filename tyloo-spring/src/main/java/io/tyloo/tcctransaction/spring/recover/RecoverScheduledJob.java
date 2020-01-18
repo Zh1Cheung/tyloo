@@ -1,7 +1,7 @@
 package io.tyloo.tcctransaction.spring.recover;
 
 import io.tyloo.tcctransaction.exception.SystemException;
-import io.tyloo.tcctransaction.recover.TransactionRecovery;
+import io.tyloo.tcctransaction.recover.Recovery;
 import io.tyloo.tcctransaction.support.TransactionConfigurator;
 import org.quartz.Scheduler;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
@@ -21,7 +21,7 @@ public class RecoverScheduledJob {
     /**
      * 事务恢复
      */
-    private TransactionRecovery transactionRecovery;
+    private Recovery transactionRecovery;
 
     /**
      * 注入的是TCC事务配置器.
@@ -73,7 +73,7 @@ public class RecoverScheduledJob {
         }
     }
 
-    public void setTransactionRecovery(TransactionRecovery transactionRecovery) {
+    public void setTransactionRecovery(Recovery transactionRecovery) {
         this.transactionRecovery = transactionRecovery;
     }
 

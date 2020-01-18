@@ -1,10 +1,10 @@
 package io.tyloo.tcctransaction.spring.aspect;
 
-import org.aspectj.lang.annotation.Aspect;
 import io.tyloo.tcctransaction.TransactionManager;
-import io.tyloo.tcctransaction.interceptor.CompensableTransactionAspect;
-import io.tyloo.tcctransaction.interceptor.CompensableTransactionInterceptor;
+import io.tyloo.tcctransaction.interceptor.TylooAspect;
+import io.tyloo.tcctransaction.interceptor.TylooInterceptor;
 import io.tyloo.tcctransaction.support.TransactionConfigurator;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.Ordered;
 
 /*
@@ -16,7 +16,7 @@ import org.springframework.core.Ordered;
  *
  */
 @Aspect
-public class ConfigurableTransactionAspect extends CompensableTransactionAspect implements Ordered {
+public class ConfigurableTransactionAspect extends TylooAspect implements Ordered {
 
     private TransactionConfigurator transactionConfigurator;
 
@@ -28,11 +28,11 @@ public class ConfigurableTransactionAspect extends CompensableTransactionAspect 
 
         TransactionManager transactionManager = transactionConfigurator.getTransactionManager();
 
-        CompensableTransactionInterceptor compensableTransactionInterceptor = new CompensableTransactionInterceptor();
-        compensableTransactionInterceptor.setTransactionManager(transactionManager);
-        compensableTransactionInterceptor.setDelayCancelExceptions(transactionConfigurator.getRecoverConfig().getDelayCancelExceptions());
+        TylooInterceptor TylooTransactionInterceptor = new TylooInterceptor();
+        TylooTransactionInterceptor.setTransactionManager(transactionManager);
+        TylooTransactionInterceptor.setDelayCancelExceptions(transactionConfigurator.getRecoverConfig().getDelayCancelExceptions());
 
-        this.setCompensableTransactionInterceptor(compensableTransactionInterceptor);
+        this.setTylooInterceptor(TylooTransactionInterceptor);
     }
 
     @Override

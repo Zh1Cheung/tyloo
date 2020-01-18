@@ -48,7 +48,7 @@ public class DefaultRecoverConfig implements RecoverConfig {
 
         /**
          * 还是 SocketTimeoutException 的情况，事务恢复间隔时间小于 Socket 超时时间，此时事务恢复调用远程参与者取消回滚事务，
-         * 远程参与者下次更新事务时，会因为乐观锁更新失败，抛出 OptimisticLockException。如果 CompensableTransactionInterceptor 此时立刻取消回滚，
+         * 远程参与者下次更新事务时，会因为乐观锁更新失败，抛出 OptimisticLockException。如果 TylooInterceptor 此时立刻取消回滚，
          * 可能会和定时任务的取消回滚冲突，因此统一交给定时任务处理。
          *
          */
