@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.sample.http.capital.api;
 
-import io.tyloo.api.TransactionContext;
+import io.tyloo.api.TylooContext;
 import io.tyloo.tcctransaction.sample.http.capital.api.dto.CapitalTradeOrderDto;
 
 /*
@@ -10,5 +10,5 @@ import io.tyloo.tcctransaction.sample.http.capital.api.dto.CapitalTradeOrderDto;
  *
  */
 public interface CapitalTradeOrderService {
-    public String record(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto);
+    public String record(TylooContext transactionContext, CapitalTradeOrderDto tradeOrderDto);
 }

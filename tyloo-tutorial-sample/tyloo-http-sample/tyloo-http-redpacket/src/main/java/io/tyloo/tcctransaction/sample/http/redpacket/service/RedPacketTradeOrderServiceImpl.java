@@ -1,15 +1,15 @@
 package io.tyloo.tcctransaction.sample.http.redpacket.service;
 
-import io.tyloo.tcctransaction.context.MethodTransactionContextEditor;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import io.tyloo.api.Compensable;
-import io.tyloo.api.TransactionContext;
+import io.tyloo.api.Tyloo;
+import io.tyloo.api.TylooContext;
+import io.tyloo.api.TylooContextLoader;
 import io.tyloo.tcctransaction.sample.http.redpacket.api.RedPacketTradeOrderService;
 import io.tyloo.tcctransaction.sample.http.redpacket.api.dto.RedPacketTradeOrderDto;
 import io.tyloo.tcctransaction.sample.redpacket.domain.entity.RedPacketAccount;
 import io.tyloo.tcctransaction.sample.redpacket.domain.entity.TradeOrder;
 import io.tyloo.tcctransaction.sample.redpacket.domain.repository.RedPacketAccountRepository;
 import io.tyloo.tcctransaction.sample.redpacket.domain.repository.TradeOrderRepository;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +31,9 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
     TradeOrderRepository tradeOrderRepository;
 
     @Override
-    @Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = MethodTransactionContextEditor.class)
+    @Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = TylooContextLoader.class)
     @Transactional
-    public String record(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
+    public String record(TylooContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
 
         try {
             Thread.sleep(1000l);
@@ -73,7 +73,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
     }
 
     @Transactional
-    public void confirmRecord(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
+    public void confirmRecord(TylooContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
 
         try {
             Thread.sleep(1000l);
@@ -98,7 +98,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
     }
 
     @Transactional
-    public void cancelRecord(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
+    public void cancelRecord(TylooContext transactionContext, RedPacketTradeOrderDto tradeOrderDto) {
 
         try {
             Thread.sleep(1000l);

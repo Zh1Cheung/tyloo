@@ -16,6 +16,12 @@
             <groupId>io.tyloo</groupId>
             <artifactId>tyloo-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.tyloo</groupId>
+            <artifactId>tyloo-api</artifactId>
+            <version>1.2.7</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

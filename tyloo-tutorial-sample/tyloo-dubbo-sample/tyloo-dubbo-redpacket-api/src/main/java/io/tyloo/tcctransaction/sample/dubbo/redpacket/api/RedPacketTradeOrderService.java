@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.sample.dubbo.redpacket.api;
 
-import io.tyloo.api.Compensable;
+import io.tyloo.api.Tyloo;
 import io.tyloo.tcctransaction.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
 
 /*
@@ -11,6 +11,6 @@ import io.tyloo.tcctransaction.sample.dubbo.redpacket.api.dto.RedPacketTradeOrde
  */
 public interface RedPacketTradeOrderService {
 
-    @Compensable
+    @Tyloo
     public String record(RedPacketTradeOrderDto tradeOrderDto);
 }

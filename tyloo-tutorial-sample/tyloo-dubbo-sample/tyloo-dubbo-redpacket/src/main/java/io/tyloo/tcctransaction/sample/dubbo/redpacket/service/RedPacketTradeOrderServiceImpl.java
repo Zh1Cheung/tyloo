@@ -1,8 +1,8 @@
 package io.tyloo.tcctransaction.sample.dubbo.redpacket.service;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
-import io.tyloo.api.Compensable;
-import io.tyloo.tcctransaction.dubbo.context.DubboTransactionContextEditor;
+import io.tyloo.api.Tyloo;
+import io.tyloo.tcctransaction.dubbo.context.DubboTransactionContextLoader;
 import io.tyloo.tcctransaction.sample.dubbo.redpacket.api.RedPacketTradeOrderService;
 import io.tyloo.tcctransaction.sample.dubbo.redpacket.api.dto.RedPacketTradeOrderDto;
 import io.tyloo.tcctransaction.sample.redpacket.domain.entity.RedPacketAccount;
@@ -33,7 +33,7 @@ public class RedPacketTradeOrderServiceImpl implements RedPacketTradeOrderServic
     TradeOrderRepository tradeOrderRepository;
 
     @Override
-    @Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = DubboTransactionContextEditor.class)
+    @Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = DubboTransactionContextLoader.class)
     @Transactional
     public String record(RedPacketTradeOrderDto tradeOrderDto) {
 

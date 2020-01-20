@@ -7,7 +7,7 @@ import io.tyloo.tcctransaction.sample.dubbo.redpacket.api.dto.RedPacketTradeOrde
 import io.tyloo.tcctransaction.sample.order.domain.entity.Order;
 import io.tyloo.tcctransaction.sample.order.domain.repository.OrderRepository;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import io.tyloo.api.Compensable;
+import io.tyloo.api.Tyloo;
 import io.tyloo.api.UniqueIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -49,7 +49,7 @@ public class PaymentServiceImpl {
      * @param redPacketPayAmount 红包支付金额
      * @param capitalPayAmount   资金帐户支付金额.
      */
-    @Compensable(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment", asyncConfirm = false, delayCancelExceptions = {SocketTimeoutException.class, com.alibaba.dubbo.remoting.TimeoutException.class})
+    @Tyloo(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment", asyncConfirm = false, delayCancelExceptions = {SocketTimeoutException.class, com.alibaba.dubbo.remoting.TimeoutException.class})
     public void makePayment(@UniqueIdentity String orderNo, Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
         System.out.println("order try make payment called.time seq:" + DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
 
@@ -64,7 +64,7 @@ public class PaymentServiceImpl {
         }
         /*
           资金帐户交易订单记录
-          没有 贴@Compensable注解，所以会且只会被第二个切面切到
+          没有 贴@Tyloo注解，所以会且只会被第二个切面切到
 
           此时的capitalTradeOrderService是本地的一个代理类，所以这个 record 方法实际上是本地代理对象中的一个方法，
           在这个方法里中才通过dubbo(RPC)调用远程的record业务方法返回结果,真正的业务方法的实现是在tcyloo-dubbo-capital模块内

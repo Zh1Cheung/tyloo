@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.sample.http.redpacket.api;
 
-import io.tyloo.api.TransactionContext;
+import io.tyloo.api.TylooContext;
 import io.tyloo.tcctransaction.sample.http.redpacket.api.dto.RedPacketTradeOrderDto;
 
 /*
@@ -11,5 +11,5 @@ import io.tyloo.tcctransaction.sample.http.redpacket.api.dto.RedPacketTradeOrder
  */
 public interface RedPacketTradeOrderService {
 
-    public String record(TransactionContext transactionContext, RedPacketTradeOrderDto tradeOrderDto);
+    public String record(TylooContext transactionContext, RedPacketTradeOrderDto tradeOrderDto);
 }

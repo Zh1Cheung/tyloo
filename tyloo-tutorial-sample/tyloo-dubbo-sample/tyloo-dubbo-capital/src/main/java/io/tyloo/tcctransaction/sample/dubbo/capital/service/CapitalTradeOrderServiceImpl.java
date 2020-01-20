@@ -1,8 +1,8 @@
 package io.tyloo.tcctransaction.sample.dubbo.capital.service;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
-import io.tyloo.api.Compensable;
-import io.tyloo.tcctransaction.dubbo.context.DubboTransactionContextEditor;
+import io.tyloo.api.Tyloo;
+import io.tyloo.tcctransaction.dubbo.context.DubboTransactionContextLoader;
 import io.tyloo.tcctransaction.sample.capital.domain.entity.CapitalAccount;
 import io.tyloo.tcctransaction.sample.capital.domain.entity.TradeOrder;
 import io.tyloo.tcctransaction.sample.capital.domain.repository.CapitalAccountRepository;
@@ -40,7 +40,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
      * @return
      */
     @Override
-    @Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = DubboTransactionContextEditor.class)
+    @Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = DubboTransactionContextLoader.class)
     @Transactional
     public String record(CapitalTradeOrderDto tradeOrderDto) {
 

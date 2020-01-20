@@ -1,15 +1,15 @@
 package io.tyloo.tcctransaction.sample.http.capital.service;
 
+import io.tyloo.api.Tyloo;
+import io.tyloo.api.TylooContext;
+import io.tyloo.api.TylooContextLoader;
 import io.tyloo.tcctransaction.sample.capital.domain.entity.CapitalAccount;
+import io.tyloo.tcctransaction.sample.capital.domain.entity.TradeOrder;
 import io.tyloo.tcctransaction.sample.capital.domain.repository.CapitalAccountRepository;
 import io.tyloo.tcctransaction.sample.capital.domain.repository.TradeOrderRepository;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import io.tyloo.api.Compensable;
-import io.tyloo.api.TransactionContext;
-import io.tyloo.tcctransaction.context.MethodTransactionContextEditor;
-import io.tyloo.tcctransaction.sample.capital.domain.entity.TradeOrder;
 import io.tyloo.tcctransaction.sample.http.capital.api.CapitalTradeOrderService;
 import io.tyloo.tcctransaction.sample.http.capital.api.dto.CapitalTradeOrderDto;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +31,9 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     TradeOrderRepository tradeOrderRepository;
 
     @Override
-    @Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = MethodTransactionContextEditor.class)
+    @Tyloo(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", tylooContextLoader = TylooContextLoader.class)
     @Transactional
-    public String record(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+    public String record(TylooContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
 
         try {
             Thread.sleep(1000l);
@@ -72,7 +72,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     }
 
     @Transactional
-    public void confirmRecord(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+    public void confirmRecord(TylooContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
 
         try {
             Thread.sleep(1000l);
@@ -98,7 +98,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
     }
 
     @Transactional
-    public void cancelRecord(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
+    public void cancelRecord(TylooContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
 
         try {
             Thread.sleep(1000l);

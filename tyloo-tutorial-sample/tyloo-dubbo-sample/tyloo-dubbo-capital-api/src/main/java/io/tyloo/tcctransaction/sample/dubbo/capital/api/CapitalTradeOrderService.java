@@ -1,9 +1,7 @@
 package io.tyloo.tcctransaction.sample.dubbo.capital.api;
 
-import io.tyloo.api.Compensable;
+import io.tyloo.api.Tyloo;
 import io.tyloo.tcctransaction.sample.dubbo.capital.api.dto.CapitalTradeOrderDto;
-
-import javax.xml.ws.ServiceMode;
 
 /*
  *
@@ -21,7 +19,7 @@ public interface CapitalTradeOrderService {
      *
      * @param tradeOrderDto
      */
-    @Compensable
+    @Tyloo
     public String record(CapitalTradeOrderDto tradeOrderDto);
 
 }

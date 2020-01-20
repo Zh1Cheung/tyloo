@@ -3,7 +3,7 @@ package io.tyloo.tcctransaction.sample.http.order.service;
 import io.tyloo.tcctransaction.sample.order.domain.entity.Order;
 import io.tyloo.tcctransaction.sample.order.domain.repository.OrderRepository;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import io.tyloo.api.Compensable;
+import io.tyloo.api.Tyloo;
 import io.tyloo.tcctransaction.sample.http.capital.api.dto.CapitalTradeOrderDto;
 import io.tyloo.tcctransaction.sample.http.redpacket.api.dto.RedPacketTradeOrderDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class PaymentServiceImpl {
     OrderRepository orderRepository;
 
 
-    @Compensable(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment", asyncConfirm = true)
+    @Tyloo(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment", asyncConfirm = true)
     @Transactional
     public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
 
