@@ -1,16 +1,13 @@
-
-
-
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<artifactId>tyloo</artifactId>
-	<groupId>io.tyloo</groupId>
-	<packaging>pom</packaging>
-	<version>1.2.7</version>
-	<modelVersion>4.0.0</modelVersion> 
+    <artifactId>tyloo</artifactId>
+    <groupId>io.tyloo</groupId>
+    <packaging>pom</packaging>
+    <version>1.2.7</version>
+    <modelVersion>4.0.0</modelVersion>
 
     <modules>
         <module>tyloo-api</module>

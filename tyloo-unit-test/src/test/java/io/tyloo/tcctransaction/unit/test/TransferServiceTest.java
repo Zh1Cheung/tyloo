@@ -61,7 +61,7 @@ public class TransferServiceTest extends AbstractTestCase {
         try {
             transferService.transferWithMandatoryPropagation(1, 2, 50);
         } catch (SystemException e) {
-            Assert.assertTrue(e.getMessage().startsWith("no active compensable transaction while propagation is mandatory for method"));
+            Assert.assertTrue(e.getMessage().startsWith("no active tyloo transaction while propagation is mandatory for method"));
         }
     }
 

@@ -1,6 +1,9 @@
 package io.tyloo.tcctransaction.unittest.service;
 
+import io.tyloo.api.Propagation;
 import io.tyloo.api.TransactionContext;
+import io.tyloo.api.Tyloo;
+import io.tyloo.api.TylooContext;
 
 /*
  *
@@ -29,6 +32,12 @@ public interface AccountService {
     void transferFromConfirm(TransactionContext transactionContext, long accountId, int amount);
 
     void transferFromCancel(TransactionContext transactionContext, long accountId, int amount);
+
+    @Tyloo(propagation = Propagation.REQUIRED, confirmMethod = "transferToConfirm", cancelMethod = "transferToCancel")
+    void transferTo(TylooContext transactionContext, long accountId, int amount);
+
+    @Tyloo(confirmMethod = "transferFromConfirm", cancelMethod = "transferFromCancel")
+    void transferFromWithMultipleTier(TylooContext transactionContext, long accountId, int amount);
 
     void transferToWithMultipleTier(TransactionContext transactionContext, long accountId, int amount);
 

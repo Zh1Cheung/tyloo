@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.unittest.client;
 
-import io.tyloo.api.Compensable;
+import io.tyloo.api.Tyloo;
 import io.tyloo.api.Propagation;
 import io.tyloo.api.UniqueIdentity;
 import io.tyloo.tcctransaction.unittest.repository.SubAccountRepository;
@@ -31,13 +31,13 @@ public class TransferService {
     }
 
 
-    @Compensable
+    @Tyloo
     @Transactional
     public void performenceTuningTransfer() {
         accountService.performanceTuningTransferTo(null);
     }
 
-    @Compensable(propagation = Propagation.MANDATORY)
+    @Tyloo(propagation = Propagation.MANDATORY)
     public void transferWithMandatoryPropagation(long fromAccountId, long toAccountId, int amount) {
         System.out.println("transfer called");
 
@@ -50,7 +50,7 @@ public class TransferService {
         accountService.transferTo(null, toAccountId, amount);
     }
 
-    @Compensable(confirmMethod = "transferConfirm", cancelMethod = "transferCancel")
+    @Tyloo(confirmMethod = "transferConfirm", cancelMethod = "transferCancel")
     @Transactional
     public void transfer(@UniqueIdentity long fromAccountId, long toAccountId, int amount) {
 
@@ -65,7 +65,7 @@ public class TransferService {
         accountService.transferTo(null, toAccountId, amount);
     }
 
-    @Compensable(confirmMethod = "transferConfirm", cancelMethod = "transferCancel")
+    @Tyloo(confirmMethod = "transferConfirm", cancelMethod = "transferCancel")
     public void transferWithMultipleTier(long fromAccountId, long toAccountId, int amount) {
 
         System.out.println("transferWithMultipleTier called");
@@ -79,7 +79,7 @@ public class TransferService {
         accountService.transferToWithMultipleTier(null, toAccountId, amount);
     }
 
-    @Compensable(confirmMethod = "transferWithMultipleConsumerConfirm", cancelMethod = "transferWithMultipleConsumerCancel")
+    @Tyloo(confirmMethod = "transferWithMultipleConsumerConfirm", cancelMethod = "transferWithMultipleConsumerCancel")
     @Transactional
     public void transferWithMultipleConsumer(long fromAccountId, long toAccountId, int amount) {
         System.out.println("transferWithMultipleConsumer called");
@@ -87,14 +87,14 @@ public class TransferService {
         accountService.transferTo(null, toAccountId, amount);
     }
 
-    @Compensable
+    @Tyloo
     public void transferWithOnlyTryAndMultipleConsumer(long fromAccountId, long toAccountId, int amount) {
         System.out.println("transferWithOnlyTryAndMultipleConsumer called");
         accountService.transferFrom(null, fromAccountId, amount);
         accountService.transferTo(null, toAccountId, amount);
     }
 
-    @Compensable
+    @Tyloo
     public void transferWithNoTransactionContext(long fromAccountId, long toAccountId, int amount) {
         System.out.println("transferWithNoTransactionContext called");
         accountService.transferTo(toAccountId, amount);

@@ -1,11 +1,11 @@
 package io.tyloo.tcctransaction.unittest.thirdservice;
 
-import io.tyloo.api.TransactionContext;
-import io.tyloo.api.Compensable;
-import io.tyloo.tcctransaction.unittest.repository.AccountRecordRepository;
-import io.tyloo.tcctransaction.unittest.utils.UnitTest;
+import io.tyloo.api.Tyloo;
+import io.tyloo.api.TylooContext;
 import io.tyloo.tcctransaction.unittest.entity.AccountRecord;
 import io.tyloo.tcctransaction.unittest.entity.AccountStatus;
+import io.tyloo.tcctransaction.unittest.repository.AccountRecordRepository;
+import io.tyloo.tcctransaction.unittest.utils.UnitTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +23,8 @@ public class AccountRecordServiceImpl implements AccountRecordService {
     @Autowired
     AccountRecordRepository accountRecordRepository;
 
-    @Compensable(confirmMethod = "recordConfirm", cancelMethod = "recordCancel")
-    public void record(TransactionContext transactionContext, long accountId, int amount) {
+    @Tyloo(confirmMethod = "recordConfirm", cancelMethod = "recordCancel")
+    public void record(TylooContext transactionContext, long accountId, int amount) {
 
         System.out.println("record");
 
@@ -37,13 +37,13 @@ public class AccountRecordServiceImpl implements AccountRecordService {
         }
     }
 
-    public void recordConfirm(TransactionContext transactionContext, long accountId, int amount) {
+    public void recordConfirm(TylooContext transactionContext, long accountId, int amount) {
         System.out.println("recordConfirm");
         AccountRecord accountRecord = accountRecordRepository.findById(accountId);
         accountRecord.setStatusId(AccountStatus.NORMAL.getId());
     }
 
-    public void recordCancel(TransactionContext transactionContext, long accountId, int amount) {
+    public void recordCancel(TylooContext transactionContext, long accountId, int amount) {
         System.out.println("recordCancel");
 
         if (UnitTest.TRYING_EXCEPTION) {
