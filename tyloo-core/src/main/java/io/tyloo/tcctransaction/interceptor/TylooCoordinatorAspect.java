@@ -19,7 +19,7 @@ public abstract class TylooCoordinatorAspect {
 
     private TylooCoordinatorInterceptor tylooCoordinatorInterceptor;
 
-    @Pointcut("@annotation(io.tyloo.api.Tyloo)")
+    @Pointcut("@annotation(io.tyloo.api.Annotation.Tyloo)")
     public void transactionContextCall() {
 
     }

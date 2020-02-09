@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.support;
 
-import io.tyloo.tcctransaction.TransactionManager;
+import io.tyloo.tcctransaction.common.TylooTransactionManager;
 import io.tyloo.tcctransaction.recover.RecoverConfig;
 import io.tyloo.tcctransaction.repository.TransactionRepository;
 
@@ -18,7 +18,7 @@ public interface TransactionConfigurator {
      *
      * @return
      */
-    public TransactionManager getTransactionManager();
+    public TylooTransactionManager getTylooTransactionManager();
 
     /**
      * 获取事务库.

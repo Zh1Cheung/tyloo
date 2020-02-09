@@ -1,11 +1,11 @@
 package io.tyloo.tcctransaction.utils;
 
-import io.tyloo.api.TylooContext;
-import io.tyloo.tcctransaction.common.MethodRole;
+import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Enums.MethodRole;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import io.tyloo.api.Tyloo;
-import io.tyloo.api.Propagation;
+import io.tyloo.api.Annotation.Tyloo;
+import io.tyloo.api.Enums.Propagation;
 
 import java.lang.reflect.Method;
 

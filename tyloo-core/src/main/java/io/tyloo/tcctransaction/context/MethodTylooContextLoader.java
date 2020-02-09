@@ -1,7 +1,7 @@
 package io.tyloo.tcctransaction.context;
 
-import io.tyloo.api.TylooContext;
-import io.tyloo.api.TylooContextLoader;
+import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Context.TylooContextLoader;
 import io.tyloo.tcctransaction.utils.TylooMethodUtils;
 
 import java.lang.reflect.Method;

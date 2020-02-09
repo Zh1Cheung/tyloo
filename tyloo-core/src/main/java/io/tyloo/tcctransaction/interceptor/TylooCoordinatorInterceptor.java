@@ -1,10 +1,14 @@
 package io.tyloo.tcctransaction.interceptor;
 
-import io.tyloo.api.*;
-import io.tyloo.tcctransaction.InvocationContext;
-import io.tyloo.tcctransaction.Participant;
-import io.tyloo.tcctransaction.Transaction;
-import io.tyloo.tcctransaction.TransactionManager;
+import io.tyloo.api.Annotation.Tyloo;
+import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Context.TylooContextLoader;
+import io.tyloo.api.Enums.Status;
+import io.tyloo.api.Context.InvocationContext;
+import io.tyloo.tcctransaction.common.Participant;
+import io.tyloo.tcctransaction.common.TylooTransaction;
+import io.tyloo.tcctransaction.common.TylooTransactionManager;
+import io.tyloo.tcctransaction.common.TylooTransactionXid;
 import io.tyloo.tcctransaction.support.FactoryBuilder;
 import io.tyloo.tcctransaction.utils.TylooMethodUtils;
 import io.tyloo.tcctransaction.utils.ReflectionUtils;
@@ -24,15 +28,15 @@ public class TylooCoordinatorInterceptor {
     /**
      * 事务管理器.
      */
-    private TransactionManager transactionManager;
+    private TylooTransactionManager tylooTransactionManager;
 
     /**
      * 设置事务管理器.
      *
-     * @param transactionManager
+     * @param tylooTransactionManager
      */
-    public void setTransactionManager(TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
+    public void setTylooTransactionManager(TylooTransactionManager tylooTransactionManager) {
+        this.tylooTransactionManager = tylooTransactionManager;
     }
 
     /**
@@ -43,11 +47,11 @@ public class TylooCoordinatorInterceptor {
      */
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
         // 获取当前事务
-        Transaction transaction = transactionManager.getCurrentTransaction();
+        TylooTransaction tylooTransaction = tylooTransactionManager.getCurrentTransaction();
         // Trying(判断是否Try阶段的事务)
-        if (transaction != null) {
+        if (tylooTransaction != null) {
 
-            switch (transaction.getStatus()) {
+            switch (tylooTransaction.getStatus()) {
                 case TRYING:
                     enlistParticipant(pjp);
                     break;
@@ -82,9 +86,9 @@ public class TylooCoordinatorInterceptor {
         String cancelMethodName = tyloo.cancelMethod();
 
         // 获取 当前线程事务第一个(头部)元素
-        Transaction transaction = transactionManager.getCurrentTransaction();
+        TylooTransaction tylooTransaction = tylooTransactionManager.getCurrentTransaction();
         // 创建 事务编号
-        TransactionXid xid = new TransactionXid(transaction.getXid().getGlobalTransactionId());
+        TylooTransactionXid xid = new TylooTransactionXid(tylooTransaction.getXid().getGlobalTransactionId());
         //如果该注解的单例类的参数中没有事务上下文 便新建一个事务上下文
         TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tyloo.tylooContextLoader()).getInstance();
         if (instance.get(pjp.getTarget(), method, pjp.getArgs()) == null) {
@@ -109,7 +113,7 @@ public class TylooCoordinatorInterceptor {
                         cancelInvocation,
                         tyloo.tylooContextLoader());
 
-        transactionManager.enlistParticipant(participant);
+        tylooTransactionManager.enlistParticipant(participant);
 
     }
 

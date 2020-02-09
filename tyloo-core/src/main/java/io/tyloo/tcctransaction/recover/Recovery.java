@@ -1,13 +1,13 @@
 package io.tyloo.tcctransaction.recover;
 
 import com.alibaba.fastjson.JSON;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.exception.OptimisticLockException;
-import io.tyloo.tcctransaction.Transaction;
-import io.tyloo.tcctransaction.common.Type;
+import io.tyloo.api.Enums.Type;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import io.tyloo.tcctransaction.repository.TransactionRepository;
-import io.tyloo.api.Status;
+import io.tyloo.api.Enums.Status;
 import io.tyloo.tcctransaction.support.TransactionConfigurator;
 
 import java.util.Calendar;
@@ -39,9 +39,9 @@ public class Recovery {
      */
     public void startRecover() {
 
-        List<Transaction> transactions = loadErrorTransactions();
+        List<TylooTransaction> tylooTransactions = loadErrorTransactions();
 
-        recoverErrorTransactions(transactions);
+        recoverErrorTransactions(tylooTransactions);
     }
 
     /**
@@ -49,7 +49,7 @@ public class Recovery {
      *
      * @return
      */
-    private List<Transaction> loadErrorTransactions() {
+    private List<TylooTransaction> loadErrorTransactions() {
 
 
         long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
@@ -64,22 +64,22 @@ public class Recovery {
     /**
      * 恢复错误的事务.
      *
-     * @param transactions
+     * @param tylooTransactions
      */
-    private void recoverErrorTransactions(List<Transaction> transactions) {
+    private void recoverErrorTransactions(List<TylooTransaction> tylooTransactions) {
 
 
-        for (Transaction transaction : transactions) {
+        for (TylooTransaction tylooTransaction : tylooTransactions) {
             //比较重试次数，大于则跳过该事务
-            if (transaction.getRetriedCount() > transactionConfigurator.getRecoverConfig().getMaxRetryCount()) {
+            if (tylooTransaction.getRetriedCount() > transactionConfigurator.getRecoverConfig().getMaxRetryCount()) {
 
-                logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)));
+                logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,tylooTransaction content:%s", tylooTransaction.getXid(), tylooTransaction.getStatus().getId(), tylooTransaction.getRetriedCount(), JSON.toJSONString(tylooTransaction)));
                 continue;
             }
 
             //当前事务是分支事务或超时，则跳过该事务
-            if (transaction.getType().equals(Type.BRANCH)
-                    && (transaction.getCreateTime().getTime() +
+            if (tylooTransaction.getType().equals(Type.BRANCH)
+                    && (tylooTransaction.getCreateTime().getTime() +
                     transactionConfigurator.getRecoverConfig().getMaxRetryCount() *
                             transactionConfigurator.getRecoverConfig().getRecoverDuration() * 1000
                     > System.currentTimeMillis())) {
@@ -88,34 +88,34 @@ public class Recovery {
 
             try {
                 // 重试次数+1
-                transaction.addRetriedCount();
+                tylooTransaction.addRetriedCount();
 
                 // 如果是CONFIRMING(2)状态，则将事务往前执行
-                if (transaction.getStatus().equals(Status.CONFIRMING)) {
+                if (tylooTransaction.getStatus().equals(Status.CONFIRMING)) {
 
-                    transaction.changeStatus(Status.CONFIRMING);
+                    tylooTransaction.changeStatus(Status.CONFIRMING);
 
-                    transactionConfigurator.getTransactionRepository().update(transaction);
-                    transaction.commit();
-                    transactionConfigurator.getTransactionRepository().delete(transaction);
+                    transactionConfigurator.getTransactionRepository().update(tylooTransaction);
+                    tylooTransaction.commit();
+                    transactionConfigurator.getTransactionRepository().delete(tylooTransaction);
 
-                } else if (transaction.getStatus().equals(Status.CANCELLING)
-                        || transaction.getType().equals(Type.ROOT)) {
+                } else if (tylooTransaction.getStatus().equals(Status.CANCELLING)
+                        || tylooTransaction.getType().equals(Type.ROOT)) {
                     // 其他情况，把事务状态改为CANCELLING(3)，然后执行回滚
-                    transaction.changeStatus(Status.CANCELLING);
-                    transactionConfigurator.getTransactionRepository().update(transaction);
-                    transaction.rollback();
+                    tylooTransaction.changeStatus(Status.CANCELLING);
+                    transactionConfigurator.getTransactionRepository().update(tylooTransaction);
+                    tylooTransaction.rollback();
                     // 其他情况下，超时没处理的事务日志直接删除
-                    transactionConfigurator.getTransactionRepository().delete(transaction);
+                    transactionConfigurator.getTransactionRepository().delete(tylooTransaction);
                 }
 
             } catch (Throwable throwable) {
 
                 if (throwable instanceof OptimisticLockException
                         || ExceptionUtils.getRootCause(throwable) instanceof OptimisticLockException) {
-                    logger.warn(String.format("optimisticLockException happened while recover. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
+                    logger.warn(String.format("optimisticLockException happened while recover. txid:%s, status:%s,retried count:%d,tylooTransaction content:%s", tylooTransaction.getXid(), tylooTransaction.getStatus().getId(), tylooTransaction.getRetriedCount(), JSON.toJSONString(tylooTransaction)), throwable);
                 } else {
-                    logger.error(String.format("recover failed, txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
+                    logger.error(String.format("recover failed, txid:%s, status:%s,retried count:%d,tylooTransaction content:%s", tylooTransaction.getXid(), tylooTransaction.getStatus().getId(), tylooTransaction.getRetriedCount(), JSON.toJSONString(tylooTransaction)), throwable);
                 }
             }
         }

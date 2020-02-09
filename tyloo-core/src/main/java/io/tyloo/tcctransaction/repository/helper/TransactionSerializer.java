@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.repository.helper;
 
-import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.serializer.ObjectSerializer;
 
 import java.util.Date;
@@ -17,31 +17,31 @@ import java.util.Map;
  */
 public class TransactionSerializer {
 
-    public static byte[] serialize(ObjectSerializer serializer, Transaction transaction) {
+    public static byte[] serialize(ObjectSerializer serializer, TylooTransaction tylooTransaction) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        map.put("GLOBAL_TX_ID", transaction.getXid().getGlobalTransactionId());
-        map.put("BRANCH_QUALIFIER", transaction.getXid().getBranchQualifier());
-        map.put("STATUS", transaction.getStatus().getId());
-        map.put("TRANSACTION_TYPE", transaction.getType().getId());
-        map.put("RETRIED_COUNT", transaction.getRetriedCount());
-        map.put("CREATE_TIME", transaction.getCreateTime());
-        map.put("LAST_UPDATE_TIME", transaction.getLastUpdateTime());
-        map.put("VERSION", transaction.getVersion());
-        map.put("CONTENT", serializer.serialize(transaction));
+        map.put("GLOBAL_TX_ID", tylooTransaction.getXid().getGlobalTransactionId());
+        map.put("BRANCH_QUALIFIER", tylooTransaction.getXid().getBranchQualifier());
+        map.put("STATUS", tylooTransaction.getStatus().getId());
+        map.put("TRANSACTION_TYPE", tylooTransaction.getType().getId());
+        map.put("RETRIED_COUNT", tylooTransaction.getRetriedCount());
+        map.put("CREATE_TIME", tylooTransaction.getCreateTime());
+        map.put("LAST_UPDATE_TIME", tylooTransaction.getLastUpdateTime());
+        map.put("VERSION", tylooTransaction.getVersion());
+        map.put("CONTENT", serializer.serialize(tylooTransaction));
 
         return serializer.serialize(map);
     }
 
-    public static Transaction deserialize(ObjectSerializer serializer, byte[] value) {
+    public static TylooTransaction deserialize(ObjectSerializer serializer, byte[] value) {
 
         Map<String, Object> map = (Map<String, Object>) serializer.deserialize(value);
 
         byte[] content = (byte[]) map.get("CONTENT");
-        Transaction transaction = (Transaction) serializer.deserialize(content);
-        transaction.resetRetriedCount((Integer) map.get("RETRIED_COUNT"));
-        transaction.setLastUpdateTime((Date) map.get("LAST_UPDATE_TIME"));
-        transaction.setVersion((Long) map.get("VERSION"));
-        return transaction;
+        TylooTransaction tylooTransaction = (TylooTransaction) serializer.deserialize(content);
+        tylooTransaction.resetRetriedCount((Integer) map.get("RETRIED_COUNT"));
+        tylooTransaction.setLastUpdateTime((Date) map.get("LAST_UPDATE_TIME"));
+        tylooTransaction.setVersion((Long) map.get("VERSION"));
+        return tylooTransaction;
     }
 }

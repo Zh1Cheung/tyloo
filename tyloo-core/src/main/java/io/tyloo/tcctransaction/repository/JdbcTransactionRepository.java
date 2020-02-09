@@ -1,13 +1,13 @@
 package io.tyloo.tcctransaction.repository;
 
 
-import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.exception.TransactionIOException;
 import io.tyloo.tcctransaction.serializer.KryoPoolSerializer;
 import io.tyloo.tcctransaction.serializer.ObjectSerializer;
 import io.tyloo.tcctransaction.utils.CollectionUtils;
 import io.tyloo.tcctransaction.utils.StringUtils;
-import io.tyloo.api.Status;
+import io.tyloo.api.Enums.Status;
 
 import javax.sql.DataSource;
 import javax.transaction.xa.Xid;
@@ -65,10 +65,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
     /**
      * 创建事务日志记录
      *
-     * @param transaction
+     * @param tylooTransaction
      * @return
      */
-    protected int doCreate(Transaction transaction) {
+    protected int doCreate(TylooTransaction tylooTransaction) {
 
         Connection connection = null;
         PreparedStatement stmt = null;
@@ -83,15 +83,15 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             stmt = connection.prepareStatement(builder.toString());
 
-            stmt.setBytes(1, transaction.getXid().getGlobalTransactionId());
-            stmt.setBytes(2, transaction.getXid().getBranchQualifier());
-            stmt.setInt(3, transaction.getType().getId());
-            stmt.setBytes(4, serializer.serialize(transaction));
-            stmt.setInt(5, transaction.getStatus().getId());
-            stmt.setInt(6, transaction.getRetriedCount());
-            stmt.setTimestamp(7, new java.sql.Timestamp(transaction.getCreateTime().getTime()));
-            stmt.setTimestamp(8, new java.sql.Timestamp(transaction.getLastUpdateTime().getTime()));
-            stmt.setLong(9, transaction.getVersion());
+            stmt.setBytes(1, tylooTransaction.getXid().getGlobalTransactionId());
+            stmt.setBytes(2, tylooTransaction.getXid().getBranchQualifier());
+            stmt.setInt(3, tylooTransaction.getType().getId());
+            stmt.setBytes(4, serializer.serialize(tylooTransaction));
+            stmt.setInt(5, tylooTransaction.getStatus().getId());
+            stmt.setInt(6, tylooTransaction.getRetriedCount());
+            stmt.setTimestamp(7, new java.sql.Timestamp(tylooTransaction.getCreateTime().getTime()));
+            stmt.setTimestamp(8, new java.sql.Timestamp(tylooTransaction.getLastUpdateTime().getTime()));
+            stmt.setLong(9, tylooTransaction.getVersion());
 
             if (StringUtils.isNotEmpty(domain)) {
                 stmt.setString(10, domain);
@@ -116,18 +116,18 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
     /**
      * 更新事务日志记录
      *
-     * @param transaction
+     * @param tylooTransaction
      * @return
      */
-    protected int doUpdate(Transaction transaction) {
+    protected int doUpdate(TylooTransaction tylooTransaction) {
         Connection connection = null;
         PreparedStatement stmt = null;
 
-        java.util.Date lastUpdateTime = transaction.getLastUpdateTime();
-        long currentVersion = transaction.getVersion();
+        java.util.Date lastUpdateTime = tylooTransaction.getLastUpdateTime();
+        long currentVersion = tylooTransaction.getVersion();
 
-        transaction.updateTime();
-        transaction.updateVersion();
+        tylooTransaction.updateTime();
+        tylooTransaction.updateVersion();
 
         try {
             connection = this.getConnection();
@@ -140,13 +140,13 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             stmt = connection.prepareStatement(builder.toString());
 
-            stmt.setBytes(1, serializer.serialize(transaction));
-            stmt.setInt(2, transaction.getStatus().getId());
-            stmt.setTimestamp(3, new Timestamp(transaction.getLastUpdateTime().getTime()));
+            stmt.setBytes(1, serializer.serialize(tylooTransaction));
+            stmt.setInt(2, tylooTransaction.getStatus().getId());
+            stmt.setTimestamp(3, new Timestamp(tylooTransaction.getLastUpdateTime().getTime()));
 
-            stmt.setInt(4, transaction.getRetriedCount());
-            stmt.setBytes(5, transaction.getXid().getGlobalTransactionId());
-            stmt.setBytes(6, transaction.getXid().getBranchQualifier());
+            stmt.setInt(4, tylooTransaction.getRetriedCount());
+            stmt.setBytes(5, tylooTransaction.getXid().getGlobalTransactionId());
+            stmt.setBytes(6, tylooTransaction.getXid().getBranchQualifier());
             stmt.setLong(7, currentVersion);
 
             if (StringUtils.isNotEmpty(domain)) {
@@ -158,8 +158,8 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
             return result;
 
         } catch (Throwable e) {
-            transaction.setLastUpdateTime(lastUpdateTime);
-            transaction.setVersion(currentVersion);
+            tylooTransaction.setLastUpdateTime(lastUpdateTime);
+            tylooTransaction.setVersion(currentVersion);
             throw new TransactionIOException(e);
         } finally {
             closeStatement(stmt);
@@ -170,10 +170,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
     /**
      * 删除事务日志记录
      *
-     * @param transaction
+     * @param tylooTransaction
      * @return
      */
-    protected int doDelete(Transaction transaction) {
+    protected int doDelete(TylooTransaction tylooTransaction) {
         Connection connection = null;
         PreparedStatement stmt = null;
 
@@ -188,8 +188,8 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             stmt = connection.prepareStatement(builder.toString());
 
-            stmt.setBytes(1, transaction.getXid().getGlobalTransactionId());
-            stmt.setBytes(2, transaction.getXid().getBranchQualifier());
+            stmt.setBytes(1, tylooTransaction.getXid().getGlobalTransactionId());
+            stmt.setBytes(2, tylooTransaction.getXid().getBranchQualifier());
 
             if (StringUtils.isNotEmpty(domain)) {
                 stmt.setString(3, domain);
@@ -211,12 +211,12 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
      * @param xid
      * @return
      */
-    protected Transaction doFindOne(Xid xid) {
+    protected TylooTransaction doFindOne(Xid xid) {
 
-        List<Transaction> transactions = doFind(Arrays.asList(xid));
+        List<TylooTransaction> tylooTransactions = doFind(Arrays.asList(xid));
 
-        if (!CollectionUtils.isEmpty(transactions)) {
-            return transactions.get(0);
+        if (!CollectionUtils.isEmpty(tylooTransactions)) {
+            return tylooTransactions.get(0);
         }
         return null;
     }
@@ -228,9 +228,9 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
      * @return
      */
     @Override
-    protected List<Transaction> doFindAllUnmodifiedSince(java.util.Date date) {
+    protected List<TylooTransaction> doFindAllUnmodifiedSince(java.util.Date date) {
 
-        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TylooTransaction> tylooTransactions = new ArrayList<TylooTransaction>();
 
         Connection connection = null;
         PreparedStatement stmt = null;
@@ -256,7 +256,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             ResultSet resultSet = stmt.executeQuery();
 
-            this.constructTransactions(resultSet, transactions);
+            this.constructTransactions(resultSet, tylooTransactions);
         } catch (Throwable e) {
             throw new TransactionIOException(e);
         } finally {
@@ -264,7 +264,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
             this.releaseConnection(connection);
         }
 
-        return transactions;
+        return tylooTransactions;
     }
 
     /**
@@ -273,12 +273,12 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
      * @param xids
      * @return
      */
-    protected List<Transaction> doFind(List<Xid> xids) {
+    protected List<TylooTransaction> doFind(List<Xid> xids) {
 
-        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TylooTransaction> tylooTransactions = new ArrayList<TylooTransaction>();
 
         if (CollectionUtils.isEmpty(xids)) {
-            return transactions;
+            return tylooTransactions;
         }
 
         Connection connection = null;
@@ -317,7 +317,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             ResultSet resultSet = stmt.executeQuery();
 
-            this.constructTransactions(resultSet, transactions);
+            this.constructTransactions(resultSet, tylooTransactions);
         } catch (Throwable e) {
             throw new TransactionIOException(e);
         } finally {
@@ -325,18 +325,18 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
             this.releaseConnection(connection);
         }
 
-        return transactions;
+        return tylooTransactions;
     }
 
-    protected void constructTransactions(ResultSet resultSet, List<Transaction> transactions) throws SQLException {
+    protected void constructTransactions(ResultSet resultSet, List<TylooTransaction> tylooTransactions) throws SQLException {
         while (resultSet.next()) {
             byte[] transactionBytes = resultSet.getBytes(3);
-            Transaction transaction = (Transaction) serializer.deserialize(transactionBytes);
-            transaction.changeStatus(Status.valueOf(resultSet.getInt(4)));
-            transaction.setLastUpdateTime(resultSet.getDate(7));
-            transaction.setVersion(resultSet.getLong(9));
-            transaction.resetRetriedCount(resultSet.getInt(8));
-            transactions.add(transaction);
+            TylooTransaction tylooTransaction = (TylooTransaction) serializer.deserialize(transactionBytes);
+            tylooTransaction.changeStatus(Status.valueOf(resultSet.getInt(4)));
+            tylooTransaction.setLastUpdateTime(resultSet.getDate(7));
+            tylooTransaction.setVersion(resultSet.getLong(9));
+            tylooTransaction.resetRetriedCount(resultSet.getInt(8));
+            tylooTransactions.add(tylooTransaction);
         }
     }
 

@@ -1,7 +1,4 @@
-package io.tyloo.tcctransaction.repository;
-
-import io.tyloo.tcctransaction.common.TylooTransactionXid;
-import io.tyloo.tcctransaction.common.TylooTransaction;
+package io.tyloo.tcctransaction.common;
 
 import java.util.Date;
 import java.util.List;
@@ -17,7 +14,7 @@ import java.util.List;
  * @Date: 19:00 2019/12/4
  *
  */
-public interface TransactionRepository {
+public interface TylooTransactionRepository {
 
     /**
      * 存储事务

@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.repository;
 
-import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.exception.TransactionIOException;
 import io.tyloo.tcctransaction.repository.helper.TransactionSerializer;
 import io.tyloo.tcctransaction.serializer.KryoPoolSerializer;
@@ -54,11 +54,11 @@ public class ZooKeeperTransactionRepository extends CachableTransactionRepositor
     }
 
     @Override
-    protected int doCreate(Transaction transaction) {
+    protected int doCreate(TylooTransaction tylooTransaction) {
 
         try {
-            getZk().create(getTxidPath(transaction.getXid()),
-                    TransactionSerializer.serialize(serializer, transaction), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            getZk().create(getTxidPath(tylooTransaction.getXid()),
+                    TransactionSerializer.serialize(serializer, tylooTransaction), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             return 1;
         } catch (KeeperException e) {
 
@@ -74,13 +74,13 @@ public class ZooKeeperTransactionRepository extends CachableTransactionRepositor
     }
 
     @Override
-    protected int doUpdate(Transaction transaction) {
+    protected int doUpdate(TylooTransaction tylooTransaction) {
 
         try {
 
-            transaction.updateTime();
-            transaction.updateVersion();
-            Stat stat = getZk().setData(getTxidPath(transaction.getXid()), TransactionSerializer.serialize(serializer, transaction), (int) transaction.getVersion() - 2);
+            tylooTransaction.updateTime();
+            tylooTransaction.updateVersion();
+            Stat stat = getZk().setData(getTxidPath(tylooTransaction.getXid()), TransactionSerializer.serialize(serializer, tylooTransaction), (int) tylooTransaction.getVersion() - 2);
             return 1;
         } catch (Exception e) {
             throw new TransactionIOException(e);
@@ -88,9 +88,9 @@ public class ZooKeeperTransactionRepository extends CachableTransactionRepositor
     }
 
     @Override
-    protected int doDelete(Transaction transaction) {
+    protected int doDelete(TylooTransaction tylooTransaction) {
         try {
-            getZk().delete(getTxidPath(transaction.getXid()), (int) transaction.getVersion() - 1);
+            getZk().delete(getTxidPath(tylooTransaction.getXid()), (int) tylooTransaction.getVersion() - 1);
             return 1;
         } catch (Exception e) {
             throw new TransactionIOException(e);
@@ -98,14 +98,14 @@ public class ZooKeeperTransactionRepository extends CachableTransactionRepositor
     }
 
     @Override
-    protected Transaction doFindOne(Xid xid) {
+    protected TylooTransaction doFindOne(Xid xid) {
 
         byte[] content = null;
         try {
             Stat stat = new Stat();
             content = getZk().getData(getTxidPath(xid), false, stat);
-            Transaction transaction = TransactionSerializer.deserialize(serializer, content);
-            return transaction;
+            TylooTransaction tylooTransaction = TransactionSerializer.deserialize(serializer, content);
+            return tylooTransaction;
         } catch (KeeperException.NoNodeException e) {
 
         } catch (Exception e) {
@@ -115,24 +115,24 @@ public class ZooKeeperTransactionRepository extends CachableTransactionRepositor
     }
 
     @Override
-    protected List<Transaction> doFindAllUnmodifiedSince(Date date) {
+    protected List<TylooTransaction> doFindAllUnmodifiedSince(Date date) {
 
-        List<Transaction> allTransactions = doFindAll();
+        List<TylooTransaction> allTylooTransactions = doFindAll();
 
-        List<Transaction> allUnmodifiedSince = new ArrayList<Transaction>();
+        List<TylooTransaction> allUnmodifiedSince = new ArrayList<TylooTransaction>();
 
-        for (Transaction transaction : allTransactions) {
-            if (transaction.getLastUpdateTime().compareTo(date) < 0) {
-                allUnmodifiedSince.add(transaction);
+        for (TylooTransaction tylooTransaction : allTylooTransactions) {
+            if (tylooTransaction.getLastUpdateTime().compareTo(date) < 0) {
+                allUnmodifiedSince.add(tylooTransaction);
             }
         }
 
         return allUnmodifiedSince;
     }
 
-    protected List<Transaction> doFindAll() {
+    protected List<TylooTransaction> doFindAll() {
 
-        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TylooTransaction> tylooTransactions = new ArrayList<TylooTransaction>();
 
         List<String> znodePaths = null;
         try {
@@ -147,14 +147,14 @@ public class ZooKeeperTransactionRepository extends CachableTransactionRepositor
             try {
                 Stat stat = new Stat();
                 content = getZk().getData(getTxidPath(znodePath), false, stat);
-                Transaction transaction = TransactionSerializer.deserialize(serializer, content);
-                transactions.add(transaction);
+                TylooTransaction tylooTransaction = TransactionSerializer.deserialize(serializer, content);
+                tylooTransactions.add(tylooTransaction);
             } catch (Exception e) {
                 throw new TransactionIOException(e);
             }
         }
 
-        return transactions;
+        return tylooTransactions;
     }
 
     private ZooKeeper getZk() {

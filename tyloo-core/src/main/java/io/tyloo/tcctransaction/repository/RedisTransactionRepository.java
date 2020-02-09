@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.repository;
 
-import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.exception.TransactionIOException;
 import io.tyloo.tcctransaction.repository.helper.ExpandTransactionSerializer;
 import io.tyloo.tcctransaction.repository.helper.RedisHelper;
@@ -81,7 +81,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     }
 
     @Override
-    protected int doCreate(final Transaction transaction) {
+    protected int doCreate(final TylooTransaction tylooTransaction) {
 
 
         try {
@@ -93,13 +93,13 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
                     //当前事务的所有参数集合
                     List<byte[]> params = new ArrayList<byte[]>();
 
-                    for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, transaction).entrySet()) {
+                    for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, tylooTransaction).entrySet()) {
                         params.add(entry.getKey());
                         params.add(entry.getValue());
                     }
 
                     Object result = jedis.eval("if redis.call('exists', KEYS[1]) == 0 then redis.call('hmset', KEYS[1], unpack(ARGV)); return 1; end; return 0;".getBytes(),
-                            Arrays.asList(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())), params);
+                            Arrays.asList(RedisHelper.getRedisKey(keyPrefix, tylooTransaction.getXid())), params);
 
                     return (Long) result;
                 }
@@ -112,7 +112,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     }
 
     @Override
-    protected int doUpdate(final Transaction transaction) {
+    protected int doUpdate(final TylooTransaction tylooTransaction) {
 
         try {
 
@@ -120,19 +120,19 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
                 @Override
                 public Long doInJedis(Jedis jedis) {
 
-                    transaction.updateTime();
-                    transaction.updateVersion();
+                    tylooTransaction.updateTime();
+                    tylooTransaction.updateVersion();
 
                     List<byte[]> params = new ArrayList<byte[]>();
 
-                    for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, transaction).entrySet()) {
+                    for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, tylooTransaction).entrySet()) {
                         params.add(entry.getKey());
                         params.add(entry.getValue());
                     }
 
                     Object result = jedis.eval(String.format("if redis.call('hget',KEYS[1],'VERSION') == '%s' then redis.call('hmset', KEYS[1], unpack(ARGV)); return 1; end; return 0;",
-                            transaction.getVersion() - 1).getBytes(),
-                            Arrays.asList(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())), params);
+                            tylooTransaction.getVersion() - 1).getBytes(),
+                            Arrays.asList(RedisHelper.getRedisKey(keyPrefix, tylooTransaction.getXid())), params);
 
                     return (Long) result;
                 }
@@ -145,14 +145,14 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     }
 
     @Override
-    protected int doDelete(final Transaction transaction) {
+    protected int doDelete(final TylooTransaction tylooTransaction) {
         try {
 
             Long result = RedisHelper.execute(jedisPool, new JedisCallback<Long>() {
                 @Override
                 public Long doInJedis(Jedis jedis) {
 
-                    return jedis.del(RedisHelper.getRedisKey(keyPrefix, transaction.getXid()));
+                    return jedis.del(RedisHelper.getRedisKey(keyPrefix, tylooTransaction.getXid()));
                 }
             });
 
@@ -163,7 +163,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     }
 
     @Override
-    protected Transaction doFindOne(final Xid xid) {
+    protected TylooTransaction doFindOne(final Xid xid) {
 
         try {
             Long startTime = System.currentTimeMillis();
@@ -185,15 +185,15 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     }
 
     @Override
-    protected List<Transaction> doFindAllUnmodifiedSince(Date date) {
+    protected List<TylooTransaction> doFindAllUnmodifiedSince(Date date) {
 
-        List<Transaction> allTransactions = doFindAll();
+        List<TylooTransaction> allTylooTransactions = doFindAll();
 
-        List<Transaction> allUnmodifiedSince = new ArrayList<io.tyloo.tcctransaction.Transaction>();
+        List<TylooTransaction> allUnmodifiedSince = new ArrayList<TylooTransaction>();
 
-        for (Transaction transaction : allTransactions) {
-            if (transaction.getLastUpdateTime().compareTo(date) < 0) {
-                allUnmodifiedSince.add(transaction);
+        for (TylooTransaction tylooTransaction : allTylooTransactions) {
+            if (tylooTransaction.getLastUpdateTime().compareTo(date) < 0) {
+                allUnmodifiedSince.add(tylooTransaction);
             }
         }
 
@@ -206,7 +206,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
      * @return
      */
     //    @Override
-    protected List<Transaction> doFindAll() {
+    protected List<TylooTransaction> doFindAll() {
 
         try {
 
@@ -239,9 +239,9 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
             });
 
 
-            return RedisHelper.execute(jedisPool, new JedisCallback<List<Transaction>>() {
+            return RedisHelper.execute(jedisPool, new JedisCallback<List<TylooTransaction>>() {
                 @Override
-                public List<Transaction> doInJedis(Jedis jedis) {
+                public List<TylooTransaction> doInJedis(Jedis jedis) {
 
                     Pipeline pipeline = jedis.pipelined();
 
@@ -250,7 +250,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
                     }
                     List<Object> result = pipeline.syncAndReturnAll();
 
-                    List<Transaction> list = new ArrayList<Transaction>();
+                    List<TylooTransaction> list = new ArrayList<TylooTransaction>();
                     for (Object data : result) {
 
                         if (data != null && ((Map<byte[], byte[]>) data).size() > 0) {

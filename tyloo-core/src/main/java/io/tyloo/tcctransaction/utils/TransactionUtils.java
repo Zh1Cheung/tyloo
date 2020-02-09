@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.utils;
 
-import io.tyloo.api.Propagation;
+import io.tyloo.api.Enums.Propagation;
 import io.tyloo.tcctransaction.interceptor.TylooMethodContext;
 
 /*

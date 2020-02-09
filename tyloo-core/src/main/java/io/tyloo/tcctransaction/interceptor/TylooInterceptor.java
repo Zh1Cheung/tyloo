@@ -1,8 +1,8 @@
 package io.tyloo.tcctransaction.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import io.tyloo.tcctransaction.Transaction;
-import io.tyloo.tcctransaction.TransactionManager;
+import io.tyloo.tcctransaction.common.TylooTransaction;
+import io.tyloo.tcctransaction.common.TylooTransactionManager;
 import io.tyloo.tcctransaction.exception.NoExistedTransactionException;
 import io.tyloo.tcctransaction.exception.SystemException;
 import io.tyloo.tcctransaction.utils.ReflectionUtils;
@@ -10,7 +10,7 @@ import io.tyloo.tcctransaction.utils.TransactionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
-import io.tyloo.api.Status;
+import io.tyloo.api.Enums.Status;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -31,17 +31,17 @@ public class TylooInterceptor {
     /**
      * 事务配置器
      */
-    private TransactionManager transactionManager;
+    private TylooTransactionManager tylooTransactionManager;
 
     private Set<Class<? extends Exception>> delayCancelExceptions = new HashSet<Class<? extends Exception>>();
 
     /**
      * 设置事务配置器.
      *
-     * @param transactionManager
+     * @param tylooTransactionManager
      */
-    public void setTransactionManager(TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
+    public void setTylooTransactionManager(TylooTransactionManager tylooTransactionManager) {
+        this.tylooTransactionManager = tylooTransactionManager;
     }
 
     public void setDelayCancelExceptions(Set<Class<? extends Exception>> delayCancelExceptions) {
@@ -59,7 +59,7 @@ public class TylooInterceptor {
         // 从拦截方法的参数中获取事务上下文
         TylooMethodContext tylooMethodContext = new TylooMethodContext(pjp);
 
-        boolean isTransactionActive = transactionManager.isTransactionActive();
+        boolean isTransactionActive = tylooTransactionManager.isTransactionActive();
 
         if (!TransactionUtils.isLegalTransactionContext(isTransactionActive, tylooMethodContext)) {
             throw new SystemException("no active tyloo transaction while propagation is mandatory for method " + tylooMethodContext.getMethod().getName());
@@ -86,7 +86,7 @@ public class TylooInterceptor {
 
         Object returnValue = null;
 
-        Transaction transaction = null;
+        TylooTransaction tylooTransaction = null;
 
         boolean asyncConfirm = tylooMethodContext.getAnnotation().asyncConfirm();
 
@@ -99,7 +99,7 @@ public class TylooInterceptor {
         try {
 
             // 事务开始（创建事务日志记录，并在当前线程缓存该事务日志记录）
-            transaction = transactionManager.begin(tylooMethodContext.getUniqueIdentity());
+            tylooTransaction = tylooTransactionManager.begin(tylooMethodContext.getUniqueIdentity());
 
             try {
                 // Try (开始执行被拦截的方法)
@@ -108,19 +108,19 @@ public class TylooInterceptor {
 
                 if (!isDelayCancelException(tryingException, allDelayCancelExceptions)) {
 
-                    logger.warn(String.format("tyloo transaction trying failed. transaction content:%s", JSON.toJSONString(transaction)), tryingException);
+                    logger.warn(String.format("tyloo tylooTransaction trying failed. tylooTransaction content:%s", JSON.toJSONString(tylooTransaction)), tryingException);
 
-                    transactionManager.rollback(asyncCancel);
+                    tylooTransactionManager.rollback(asyncCancel);
                 }
 
                 throw tryingException;
             }
 
             // Try检验正常后提交(事务管理器在控制提交)
-            transactionManager.commit(asyncConfirm);
+            tylooTransactionManager.commit(asyncConfirm);
 
         } finally {
-            transactionManager.cleanAfterCompletion(transaction);
+            tylooTransactionManager.cleanAfterCompletion(tylooTransaction);
         }
 
         return returnValue;
@@ -135,7 +135,7 @@ public class TylooInterceptor {
      */
     private Object providerMethodProceed(TylooMethodContext tylooMethodContext) throws Throwable {
 
-        Transaction transaction = null;
+        TylooTransaction tylooTransaction = null;
 
 
         boolean asyncConfirm = tylooMethodContext.getAnnotation().asyncConfirm();
@@ -147,32 +147,32 @@ public class TylooInterceptor {
             switch (Status.valueOf(tylooMethodContext.getTylooContext().getStatus())) {
                 case TRYING:
                     // 基于全局事务ID扩展创建新的分支事务，并存于当前线程的事务局部变量中.
-                    transaction = transactionManager.propagationNewBegin(tylooMethodContext.getTylooContext());
+                    tylooTransaction = tylooTransactionManager.propagationNewBegin(tylooMethodContext.getTylooContext());
                     return tylooMethodContext.proceed();
                 case CONFIRMING:
                     try {
                         // 找出存在的事务并处理.
-                        transaction = transactionManager.propagationExistBegin(tylooMethodContext.getTylooContext());
+                        tylooTransaction = tylooTransactionManager.propagationExistBegin(tylooMethodContext.getTylooContext());
                         // 提交
-                        transactionManager.commit(asyncConfirm);
+                        tylooTransactionManager.commit(asyncConfirm);
                     } catch (NoExistedTransactionException excepton) {
-                        //the transaction has been commit,ignore it.
+                        //the tylooTransaction has been commit,ignore it.
                     }
                     break;
                 case CANCELLING:
 
                     try {
-                        transaction = transactionManager.propagationExistBegin(tylooMethodContext.getTylooContext());
+                        tylooTransaction = tylooTransactionManager.propagationExistBegin(tylooMethodContext.getTylooContext());
                         // 回滚
-                        transactionManager.rollback(asyncCancel);
+                        tylooTransactionManager.rollback(asyncCancel);
                     } catch (NoExistedTransactionException exception) {
-                        //the transaction has been rollback,ignore it.
+                        //the tylooTransaction has been rollback,ignore it.
                     }
                     break;
             }
 
         } finally {
-            transactionManager.cleanAfterCompletion(transaction);
+            tylooTransactionManager.cleanAfterCompletion(tylooTransaction);
         }
 
         Method method = tylooMethodContext.getMethod();

@@ -3,10 +3,10 @@ package io.tyloo.tcctransaction.repository;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.tyloo.tcctransaction.common.TylooTransactionXid;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.exception.ConcurrentTransactionException;
 import io.tyloo.tcctransaction.exception.OptimisticLockException;
-import io.tyloo.tcctransaction.Transaction;
-import io.tyloo.api.TransactionXid;
 
 
 import javax.transaction.xa.Xid;
@@ -29,20 +29,20 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      */
     private int expireDuration = 120;
     /**
-     * 事务日志记录缓存<Xid, Transaction>
+     * 事务日志记录缓存<Xid, TylooTransaction>
      */
-    private Cache<Xid, Transaction> transactionXidTylooTransactionCache;
+    private Cache<Xid, TylooTransaction> transactionXidTylooTransactionCache;
 
     /**
      * 创建事务日志记录
      */
     @Override
-    public int create(Transaction transaction) {
-        int result = doCreate(transaction);
+    public int create(TylooTransaction tylooTransaction) {
+        int result = doCreate(tylooTransaction);
         if (result > 0) {
-            putToCache(transaction);
+            putToCache(tylooTransaction);
         } else {
-            throw new ConcurrentTransactionException("transaction xid duplicated. xid:" + transaction.getXid().toString());
+            throw new ConcurrentTransactionException("tylooTransaction xid duplicated. xid:" + tylooTransaction.getXid().toString());
         }
 
         return result;
@@ -52,19 +52,19 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * 更新事务日志记录
      */
     @Override
-    public int update(Transaction transaction) {
+    public int update(TylooTransaction tylooTransaction) {
         int result = 0;
 
         try {
-            result = doUpdate(transaction);
+            result = doUpdate(tylooTransaction);
             if (result > 0) {
-                putToCache(transaction);
+                putToCache(tylooTransaction);
             } else {
                 throw new OptimisticLockException();
             }
         } finally {
             if (result <= 0) {
-                removeFromCache(transaction);
+                removeFromCache(tylooTransaction);
             }
         }
 
@@ -75,14 +75,14 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * 删除事务日志记录
      */
     @Override
-    public int delete(Transaction transaction) {
+    public int delete(TylooTransaction tylooTransaction) {
         int result = 0;
 
         try {
-            result = doDelete(transaction);
+            result = doDelete(tylooTransaction);
 
         } finally {
-            removeFromCache(transaction);
+            removeFromCache(tylooTransaction);
         }
         return result;
     }
@@ -90,22 +90,22 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     /**
      * 根据xid查找事务日志记录.
      *
-     * @param transactionXid
+     * @param tylooTransactionXid
      * @return
      */
     @Override
-    public Transaction findByXid(TransactionXid transactionXid) {
-        Transaction transaction = findFromCache(transactionXid);
+    public TylooTransaction findByXid(TylooTransactionXid tylooTransactionXid) {
+        TylooTransaction tylooTransaction = findFromCache(tylooTransactionXid);
 
-        if (transaction == null) {
-            transaction = doFindOne(transactionXid);
+        if (tylooTransaction == null) {
+            tylooTransaction = doFindOne(tylooTransactionXid);
 
-            if (transaction != null) {
-                putToCache(transaction);
+            if (tylooTransaction != null) {
+                putToCache(tylooTransaction);
             }
         }
 
-        return transaction;
+        return tylooTransaction;
     }
 
     /**
@@ -114,15 +114,15 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * @return
      */
     @Override
-    public List<Transaction> findAllUnmodifiedSince(Date date) {
+    public List<TylooTransaction> findAllUnmodifiedSince(Date date) {
 
-        List<Transaction> transactions = doFindAllUnmodifiedSince(date);
+        List<TylooTransaction> tylooTransactions = doFindAllUnmodifiedSince(date);
 
-        for (Transaction transaction : transactions) {
-            putToCache(transaction);
+        for (TylooTransaction tylooTransaction : tylooTransactions) {
+            putToCache(tylooTransaction);
         }
 
-        return transactions;
+        return tylooTransactions;
     }
 
     public CachableTransactionRepository() {
@@ -132,29 +132,29 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     /**
      * 放入缓存.
      *
-     * @param transaction
+     * @param tylooTransaction
      */
-    protected void putToCache(Transaction transaction) {
-        transactionXidTylooTransactionCache.put(transaction.getXid(), transaction);
+    protected void putToCache(TylooTransaction tylooTransaction) {
+        transactionXidTylooTransactionCache.put(tylooTransaction.getXid(), tylooTransaction);
     }
 
     /**
      * 从缓存中删除.
      *
-     * @param transaction
+     * @param tylooTransaction
      */
-    protected void removeFromCache(Transaction transaction) {
-        transactionXidTylooTransactionCache.invalidate(transaction.getXid());
+    protected void removeFromCache(TylooTransaction tylooTransaction) {
+        transactionXidTylooTransactionCache.invalidate(tylooTransaction.getXid());
     }
 
     /**
      * 从缓存中查找.
      *
-     * @param transactionXid
+     * @param tylooTransactionXid
      * @return
      */
-    protected Transaction findFromCache(TransactionXid transactionXid) {
-        return transactionXidTylooTransactionCache.getIfPresent(transactionXid);
+    protected TylooTransaction findFromCache(TylooTransactionXid tylooTransactionXid) {
+        return transactionXidTylooTransactionCache.getIfPresent(tylooTransactionXid);
     }
 
     public void setExpireDuration(int durationInSeconds) {
@@ -164,16 +164,16 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     /**
      * 创建事务日志记录
      *
-     * @param transaction
+     * @param tylooTransaction
      * @return
      */
-    protected abstract int doCreate(Transaction transaction);
+    protected abstract int doCreate(TylooTransaction tylooTransaction);
 
-    protected abstract int doUpdate(Transaction transaction);
+    protected abstract int doUpdate(TylooTransaction tylooTransaction);
 
-    protected abstract int doDelete(Transaction transaction);
+    protected abstract int doDelete(TylooTransaction tylooTransaction);
 
-    protected abstract Transaction doFindOne(Xid xid);
+    protected abstract TylooTransaction doFindOne(Xid xid);
 
-    protected abstract List<Transaction> doFindAllUnmodifiedSince(Date date);
+    protected abstract List<TylooTransaction> doFindAllUnmodifiedSince(Date date);
 }

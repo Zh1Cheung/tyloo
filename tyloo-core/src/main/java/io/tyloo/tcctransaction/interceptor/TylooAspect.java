@@ -25,7 +25,7 @@ public abstract class TylooAspect {
         this.tylooInterceptor = tylooInterceptor;
     }
 
-    @Pointcut("@annotation(io.tyloo.api.Tyloo)")
+    @Pointcut("@annotation(io.tyloo.api.Annotation.Tyloo)")
     public void tylooService() {
 
     }

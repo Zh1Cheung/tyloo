@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.repository;
 
-import io.tyloo.tcctransaction.Transaction;
+import io.tyloo.tcctransaction.common.TylooTransaction;
 import io.tyloo.tcctransaction.exception.TransactionIOException;
 import io.tyloo.tcctransaction.repository.helper.TransactionSerializer;
 import io.tyloo.tcctransaction.serializer.KryoPoolSerializer;
@@ -38,24 +38,24 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
     @Override
-    protected int doCreate(Transaction transaction) {
-        return createFile(transaction);
+    protected int doCreate(TylooTransaction tylooTransaction) {
+        return createFile(tylooTransaction);
     }
 
     @Override
-    protected int doUpdate(Transaction transaction) {
+    protected int doUpdate(TylooTransaction tylooTransaction) {
 
-        transaction.updateVersion();
-        transaction.updateTime();
+        tylooTransaction.updateVersion();
+        tylooTransaction.updateTime();
 
-        writeFile(transaction);
+        writeFile(tylooTransaction);
         return 1;
     }
 
     @Override
-    protected int doDelete(Transaction transaction) {
+    protected int doDelete(TylooTransaction tylooTransaction) {
 
-        String fullFileName = getFullFileName(transaction.getXid());
+        String fullFileName = getFullFileName(tylooTransaction.getXid());
         File file = new File(fullFileName);
         if (file.exists()) {
             return file.delete() ? 1 : 0;
@@ -64,7 +64,7 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
     @Override
-    protected Transaction doFindOne(Xid xid) {
+    protected TylooTransaction doFindOne(Xid xid) {
 
         String fullFileName = getFullFileName(xid);
         File file = new File(fullFileName);
@@ -77,15 +77,15 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
     @Override
-    protected List<Transaction> doFindAllUnmodifiedSince(Date date) {
+    protected List<TylooTransaction> doFindAllUnmodifiedSince(Date date) {
 
-        List<Transaction> allTransactions = doFindAll();
+        List<TylooTransaction> allTylooTransactions = doFindAll();
 
-        List<Transaction> allUnmodifiedSince = new ArrayList<Transaction>();
+        List<TylooTransaction> allUnmodifiedSince = new ArrayList<TylooTransaction>();
 
-        for (Transaction transaction : allTransactions) {
-            if (transaction.getLastUpdateTime().compareTo(date) < 0) {
-                allUnmodifiedSince.add(transaction);
+        for (TylooTransaction tylooTransaction : allTylooTransactions) {
+            if (tylooTransaction.getLastUpdateTime().compareTo(date) < 0) {
+                allUnmodifiedSince.add(tylooTransaction);
             }
         }
 
@@ -93,18 +93,18 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
 
-    protected List<Transaction> doFindAll() {
+    protected List<TylooTransaction> doFindAll() {
 
-        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TylooTransaction> tylooTransactions = new ArrayList<TylooTransaction>();
         File path = new File(rootPath);
         File[] files = path.listFiles();
 
         for (File file : files) {
-            Transaction transaction = readTransaction(file);
-            transactions.add(transaction);
+            TylooTransaction tylooTransaction = readTransaction(file);
+            tylooTransactions.add(tylooTransaction);
         }
 
-        return transactions;
+        return tylooTransactions;
     }
 
     private String getFullFileName(Xid xid) {
@@ -134,16 +134,16 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
 
-    private int createFile(Transaction transaction) {
+    private int createFile(TylooTransaction tylooTransaction) {
         makeDirIfNecessary();
 
-        String filePath = getFullFileName(transaction.getXid());
+        String filePath = getFullFileName(tylooTransaction.getXid());
 
         FileChannel channel = null;
         RandomAccessFile raf = null;
         File file = null;
 
-        byte[] content = TransactionSerializer.serialize(serializer, transaction);
+        byte[] content = TransactionSerializer.serialize(serializer, tylooTransaction);
 
         try {
 
@@ -184,16 +184,16 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
         }
     }
 
-    private void writeFile(Transaction transaction) {
+    private void writeFile(TylooTransaction tylooTransaction) {
 
         makeDirIfNecessary();
 
-        String filePath = getFullFileName(transaction.getXid());
+        String filePath = getFullFileName(tylooTransaction.getXid());
 
         FileChannel channel = null;
         RandomAccessFile raf = null;
 
-        byte[] content = TransactionSerializer.serialize(serializer, transaction);
+        byte[] content = TransactionSerializer.serialize(serializer, tylooTransaction);
 
         try {
 
@@ -222,7 +222,7 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
         }
     }
 
-    private Transaction readTransaction(File file) {
+    private TylooTransaction readTransaction(File file) {
 
         FileInputStream fis = null;
         try {
