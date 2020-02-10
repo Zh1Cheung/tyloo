@@ -8,18 +8,18 @@
     <!-- @Aspect注解不能被Spring自动识别并注册为Bean,因此要通过xml的bean配置,或通过@Compenent注解标识其为Spring管理Bean -->
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
-    <bean id="springBeanFactory" class="io.tyloo.tcctransaction.spring.support.SpringBeanFactory"/>
+    <bean id="springBeanFactory" class="io.tyloo.spring.support.SpringBeanFactory"/>
 
     <!-- TCC事务配置器 -->
-    <bean id="transactionConfigurator" class="io.tyloo.tcctransaction.spring.support.SpringTransactionConfigurator"
+    <bean id="transactionConfigurator" class="io.tyloo.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
     <!-- 可补偿事务拦截器 -->
-    <bean id="TylooAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableTransactionAspect"
+    <bean id="TylooAspect" class="io.tyloo.spring.aspect.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 资源协调拦截器 -->
-    <bean id="TylooCoordinatorAspect" class="io.tyloo.tcctransaction.spring.aspect.ConfigurableCoordinatorAspect"
+    <bean id="TylooCoordinatorAspect" class="io.tyloo.spring.aspect.ConfigurableCoordinatorAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
@@ -27,13 +27,13 @@
     <task:annotation-driven/>
 
     <!-- 事务恢复 -->
-    <bean id="transactionRecovery" class="io.tyloo.tcctransaction.recover.Recovery">
+    <bean id="transactionRecovery" class="io.tyloo.core.recover.Recovery">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 事务恢复任务调度器 -->
     <bean id="recoverScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
     <!-- 事务恢复调度任务，初始化方法：init -->
-    <bean id="recoverScheduledJob" class="io.tyloo.tcctransaction.spring.recover.RecoverScheduledJob"
+    <bean id="recoverScheduledJob" class="io.tyloo.spring.recover.RecoverScheduledJob"
           init-method="init">
         <property name="transactionRecovery" ref="transactionRecovery"/>
         <property name="transactionConfigurator" ref="transactionConfigurator"/>

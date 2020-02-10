@@ -1,6 +1,6 @@
 package io.tyloo.api.Context;
 
-import io.tyloo.api.TylooTransactionXid;
+import io.tyloo.api.common.TylooTransactionXid;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class TylooContext implements Serializable {
         this.xid = xid;
     }
 
-    public TylooTransactionXid getXid() {
+    public io.tyloo.api.common.TylooTransactionXid getXid() {
         return xid.clone();
     }
 

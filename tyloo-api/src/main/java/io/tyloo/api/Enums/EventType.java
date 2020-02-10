@@ -1,5 +1,5 @@
 package io.tyloo.api.Enums;
-import io.tyloo.tcctransaction.exception.TylooRuntimeException;
+import io.tyloo.core.exception.TylooRuntimeException;
 import lombok.Getter;
 
 import lombok.RequiredArgsConstructor;
