@@ -3,13 +3,13 @@
 <mapper namespace="io.tyloo.tcctransaction.sample.order.infrastructure.dao.OrderDao">
 
     <resultMap id="result"
-               type="io.tyloo.tcctransaction.sample.order.domain.entity.Order">
+               transactionType="io.tyloo.tcctransaction.sample.order.domain.entity.Order">
         <id property="id" javaType="java.lang.Long" column="ORDER_ID"/>
         <result property="payerUserId" column="PAYER_USER_ID"/>
         <result property="payeeUserId" column="PAYEE_USER_ID"/>
         <result property="redPacketPayAmount" column="RED_PACKET_PAY_AMOUNT"/>
         <result property="capitalPayAmount" column="CAPITAL_PAY_AMOUNT"/>
-        <result property="status" column="STATUS"/>
+        <result property="transactionStatus" column="STATUS"/>
         <result property="merchantOrderNo" column="MERCHANT_ORDER_NO"/>
         <result property="version" column="VERSION"/>
     </resultMap>
@@ -60,7 +60,7 @@
             #{payeeUserId},
             #{redPacketPayAmount},
             #{capitalPayAmount},
-            #{status},
+            #{transactionStatus},
             #{merchantOrderNo},
             #{version}
             )
@@ -70,7 +70,7 @@
         UPDATE
         ORD_ORDER
         SET
-        STATUS = #{status},
+        STATUS = #{transactionStatus},
         RED_PACKET_PAY_AMOUNT = #{redPacketPayAmount},
         CAPITAL_PAY_AMOUNT = #{capitalPayAmount},
         VERSION = #{version}

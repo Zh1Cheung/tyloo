@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.sample.order.domain.factory;
 
-import org.apache.commons.lang3.tuple.Pair;
+import javafx.util.Pair;
 import io.tyloo.tcctransaction.sample.order.domain.entity.Order;
 import io.tyloo.tcctransaction.sample.order.domain.entity.OrderLine;
 import io.tyloo.tcctransaction.sample.order.domain.repository.ProductRepository;
@@ -26,8 +26,8 @@ public class OrderFactory {
         Order order = new Order(payerUserId, payeeUserId);
 
         for (Pair<Long, Integer> pair : productQuantities) {
-            long productId = pair.getLeft();
-            order.addOrderLine(new OrderLine(productId, pair.getRight(), productRepository.findById(productId).getPrice()));
+            long productId = pair.getKey();
+            order.addOrderLine(new OrderLine(productId, pair.getValue(), productRepository.findById(productId).getPrice()));
         }
 
         return order;

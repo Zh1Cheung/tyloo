@@ -3,7 +3,7 @@
 <mapper namespace="io.tyloo.tcctransaction.sample.redpacket.infrastructure.dao.RedPacketAccountDao">
 
     <resultMap id="result"
-               type="io.tyloo.tcctransaction.sample.redpacket.domain.entity.RedPacketAccount">
+               transactionType="io.tyloo.tcctransaction.sample.redpacket.domain.entity.RedPacketAccount">
         <id property="id" javaType="java.lang.Long" column="RED_PACKET_ACCOUNT_ID"/>
         <result property="balanceAmount" column="BALANCE_AMOUNT"/>
         <result property="userId" column="USER_ID"/>

@@ -1,7 +1,7 @@
 package io.tyloo.tcctransaction.sample.order.domain.service;
 
 import io.tyloo.tcctransaction.sample.order.domain.factory.OrderFactory;
-import org.apache.commons.lang3.tuple.Pair;
+import javafx.util.Pair;
 import io.tyloo.tcctransaction.sample.order.domain.entity.Order;
 import io.tyloo.tcctransaction.sample.order.domain.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;

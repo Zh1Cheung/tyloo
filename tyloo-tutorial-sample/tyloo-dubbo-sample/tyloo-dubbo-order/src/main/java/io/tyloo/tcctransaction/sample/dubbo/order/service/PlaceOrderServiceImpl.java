@@ -1,12 +1,13 @@
 package io.tyloo.tcctransaction.sample.dubbo.order.service;
 
-import io.tyloo.tcctransaction.exception.CancellingException;
-import io.tyloo.tcctransaction.exception.ConfirmingException;
+
+import io.tyloo.core.exception.CancellingException;
+import io.tyloo.core.exception.ConfirmingException;
 import io.tyloo.tcctransaction.sample.order.domain.entity.Order;
 import io.tyloo.tcctransaction.sample.order.domain.entity.Shop;
 import io.tyloo.tcctransaction.sample.order.domain.repository.ShopRepository;
 import io.tyloo.tcctransaction.sample.order.domain.service.OrderServiceImpl;
-import org.apache.commons.lang3.tuple.Pair;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +36,7 @@ public class PlaceOrderServiceImpl {
 
     /**
      * 下订单。
-     *
-     * @param payerUserId        付款者ID.
+     *  @param payerUserId        付款者ID.
      * @param shopId             店铺ID.
      * @param productQuantities  产品数量
      * @param redPacketPayAmount 红包支付金额。

@@ -5,7 +5,7 @@ import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.proxy.InvokerInvocationHandler;
 import io.tyloo.api.Enums.Propagation;
 import io.tyloo.api.Annotation.Tyloo;
-import io.tyloo.dubbo.context.DubboTransactionContextLoader;
+import io.tyloo.dubbo.context.DubboTransactionTransactionContextLoader;
 import io.tyloo.core.interceptor.TylooCoordinatorAspect;
 import io.tyloo.core.support.FactoryBuilder;
 import io.tyloo.core.utils.ReflectionUtils;
@@ -44,14 +44,14 @@ public class TccInvokerInvocationHandler extends InvokerInvocationHandler {
             if (StringUtils.isEmpty(tyloo.confirmMethod())) {
                 ReflectionUtils.changeAnnotationValue(tyloo, "confirmMethod", method.getName());
                 ReflectionUtils.changeAnnotationValue(tyloo, "cancelMethod", method.getName());
-                ReflectionUtils.changeAnnotationValue(tyloo, "tylooContextLoader", DubboTransactionContextLoader.class);
+                ReflectionUtils.changeAnnotationValue(tyloo, "tylooContextLoader", DubboTransactionTransactionContextLoader.class);
                 ReflectionUtils.changeAnnotationValue(tyloo, "propagation", Propagation.SUPPORTS);
             }
 
             /**
              * 生成方法切面
              * 调用 TylooCoordinatorAspect#interceptTransactionContextMethod 方法，对方法切面拦截处理。
-             * 为什么无需调用 TylooAspect 切面？
+             * 为什么无需调用 TylooTransactionAspect 切面？
              * 因为传播级别为 Propagation.SUPPORTS，不会发起事务。
              */
             ProceedingJoinPoint pjp = new MethodProceedingJoinPoint(proxy, target, method, args);

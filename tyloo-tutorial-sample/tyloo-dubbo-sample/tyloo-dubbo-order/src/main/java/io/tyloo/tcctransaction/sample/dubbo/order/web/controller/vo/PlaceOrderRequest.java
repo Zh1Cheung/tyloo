@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.sample.dubbo.order.web.controller.vo;
 
-import org.apache.commons.lang3.tuple.Pair;
+import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

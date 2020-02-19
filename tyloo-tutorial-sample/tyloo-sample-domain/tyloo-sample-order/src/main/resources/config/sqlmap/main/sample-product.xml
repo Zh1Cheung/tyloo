@@ -3,7 +3,7 @@
 <mapper namespace="io.tyloo.tcctransaction.sample.order.infrastructure.dao.ProductDao">
 
     <resultMap id="result"
-               type="io.tyloo.tcctransaction.sample.order.domain.entity.Product">
+               transactionType="io.tyloo.tcctransaction.sample.order.domain.entity.Product">
         <id property="productId" javaType="java.lang.Long" column="PRODUCT_ID"/>
         <result property="shopId" column="SHOP_ID"/>
         <result property="productName" column="PRODUCT_NAME"/>

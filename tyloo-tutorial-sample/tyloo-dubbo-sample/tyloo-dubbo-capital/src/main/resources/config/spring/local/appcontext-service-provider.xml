@@ -8,7 +8,7 @@
     <dubbo:application name="sample-dubbo-capital"/>
     <!-- 读入配置属性文件 -->
     <context:property-placeholder location="classpath:sample-dubbo-capital.properties"
-                                  ignore-unresolvable="true"/>
+                                  />
     <!-- 使用zookeeper注册中心暴露服务地址 -->
     <!--<dubbo:registry id="capitalRpcZk" address="multicast://224.5.6.7:1234?unicast=false"/>-->
     <dubbo:registry id="capitalRpcZk" protocol="zookeeper" register="true" subscribe="false"

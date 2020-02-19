@@ -3,13 +3,13 @@
 <mapper namespace="io.tyloo.tcctransaction.sample.capital.infrastructure.dao.TradeOrderDao">
 
     <resultMap id="result"
-               type="io.tyloo.tcctransaction.sample.capital.domain.entity.TradeOrder">
+               transactionType="io.tyloo.tcctransaction.sample.capital.domain.entity.TradeOrder">
         <id property="id" javaType="java.lang.Long" column="ID"/>
         <result property="selfUserId" column="SELF_USER_ID"/>
         <result property="oppositeUserId" column="OPPOSITE_USER_ID"/>
         <result property="merchantOrderNo" column="MERCHANT_ORDER_NO"/>
         <result property="amount" column="AMOUNT"/>
-        <result property="status" column="STATUS"/>
+        <result property="transactionStatus" column="STATUS"/>
         <result property="version" column="VERSION"/>
     </resultMap>
 
@@ -48,7 +48,7 @@
         #{oppositeUserId},
         #{merchantOrderNo},
         #{amount},
-        #{status},
+        #{transactionStatus},
         #{version}
         )
     </insert>
@@ -57,7 +57,7 @@
         UPDATE
         CAP_TRADE_ORDER
         SET
-        STATUS = #{status},
+        STATUS = #{transactionStatus},
         VERSION = #{version}
         WHERE ID = #{id} AND VERSION = #{version}-1
     </update>

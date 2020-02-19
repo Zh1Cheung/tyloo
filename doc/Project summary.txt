@@ -1,0 +1,457 @@
+项目名称：Tyloo
+
+-----
+
+开发时间： 三个月
+
+-----
+
+需求分析	：	微服务架构的流行，让分布式问题日益突出
+
+-----
+
+
+构思：
+	1.  TCC事务 为了解决在事务运行过程中大颗粒度资源锁定的问题，业界提出一种新的事务模型，它是基于业务层面的事务定义。
+		锁粒度完全由业务自己控制。它本质是一种补偿的思路。它把事务运行过程分成 Try、Confirm / Cancel 两个阶段。
+		在每个阶段的逻辑由业务代码控制。这样就事务的锁粒度可以完全自由控制。业务可以在牺牲隔离性的情况下，获取更高的性能。
+
+	2. 一个完整的业务活动由一个主业务服务与若干从业务服务组成
+		主业务服务负责发起并完成整个业务活动
+		从业务服务提供TCC型业务操作
+		业务活动管理器控制业务活动的一致性，它登记业务活动中的操作， 并在业务活动提交时确认所有的TCC型操作的confirm操作，在业务活动取消时调用所有TCC型操作的cancel操作
+
+	3.	Try:
+			尝试执行业务 完成所有业务检查(一致性) 预留必须业务资源(准隔离性)
+		Confirm:
+			确认执行业务 真正执行业务 不作任何业务检查 只使用Try阶段预留的业务资源 Confirm操作要满足幂等性
+		Cancel: 
+			取消执行业务 释放Try阶段预留的业务资源 Cancel操作要满足幂等性
+
+
+-----
+
+
+使用的技术：
+		Dubbo Service Proxy 提供了两种生成方式：
+			JavassistProxyFactory，基于 Javassist 方式
+				Javassist 是一个开源的分析、编辑和创建 Java 字节码的类库。通过使用Javassist 对字节码操作可以实现动态 ”AOP” 框架。
+				Javassist 的主要的优点，在于简单，而且快速，直接使用 Java 编码的形式，而不需要了解虚拟机指令，就能动态改变类的结构，或者动态生成类。
+			JdkProxyFactory，基于 JDK 动态代理机制
+
+
+		Spring AOP
+
+
+-----
+
+
+项目架构 
+	1. 隐式传参：
+		支持隐式传参情况下将事务上下文参数TylooTransactionContext以隐式传参方式进行传递，目前支持rpc框架为dubbo时的隐式传参方式传递
+		声明远程调用时，增加了参数 TylooTylooTransactionContext
+		Tyloo 通过 Dubbo Proxy 的机制，实现 @Tyloo 属性自动生成，增加开发体验，也避免出错
+		1.1 具体细节：
+			Dubbo 事务上下文编辑器
+			通过 Dubbo 的隐式传参的方式，避免在 Dubbo Service 接口上声明 TylooTylooTransactionContext 参数，对接口产生一定的入侵
+				get方法
+				{
+					Object obj = RpcContext.getContext().getAttachments();
+					获取客户端隐式传入的参数，用于框架集成
+				}
+				set方法
+				{	
+					RpcContext.getContext().setAttachment("index", "1"); // 隐式传参，后面的远程调用都会隐式将这些参数发送到服务器端，类似cookie
+				}
+		1.2 原理：
+			dubbo的服务提供者接受到netty请求，会把参数封装成一个Request对象。该对象有一个属性是Object mData。
+			实际调用的时候，可能会是DecodeableRpcInvocation，该类继承自RpcInvocation
+
+		在RpcInvocation中有两个属性。Object[]arguments和Map<String, String>attachments这里的arguments就是函数参数，而attachments就是隐式参数。
+
+		在dubbo内部函数调用链路中，都是用Invocation在作为函数参数传递
+
+		而实际上RpcContext.getContext()是跟着线程绑定的。
+
+
+	2. 动态代理
+		将 Dubbo Service 方法上的注解 @Tyloo ，自动生成注解的 confirmMethod、cancelMethod、TylooTylooTransactionContextLoader 属性
+
+
+
+		此如果是使用动态代理的方式实现aop(默认方式）,则confirmMethod和cancelMethod需在接口类中声明，
+		如果使用动态字节码技术实现aop（如指定aspectj-autoproxy的proxy-target-class属性为true,在1.2.1版本中，默认已设置为true),则无需在接口类中声明。
+
+		2.1 具体细节：
+			1. 
+			TccJavassistProxyFactory：TCC Javassist 代理工厂
+			项目启动时，调用 TccJavassistProxyFactory#getProxy(...) 方法，生成 Dubbo Service 调用 Proxy。
+			最终创建了基于DemoService接口的代理对象
+
+			TccProxy & TccClassGenerator
+				TCC Proxy 工厂，生成 Dubbo Service 调用 Proxy
+				TCC 类代码生成器，基于 Javassist 实现。
+
+			一个 Dubbo Service，TccProxy 会动态生成两个类：
+				Dubbo Service 调用 Proxy
+				Dubbo Service 调用 ProxyFactory，生成对应的 Dubbo Service Proxy ，newInstance的时候返回一个proxy
+			
+				调用 TccProxy#getProxy(...) 方法，获得 TCC Proxy 工厂
+					获得 Proxy 对应的 ClassLoader
+					调用 TccClassGenerator#newInstance(loader) 方法， 创建生成 Dubbo Service 调用 Proxy 的代码生成器
+					调用 TccClassGenerator#newInstance(loader) 方法， 创建生成 Dubbo Service 调用 Proxy 工厂 的代码生成器。
+				调用 TccProxy#newInstance() 方法，创建 Proxy 
+
+			以上三个类参考了 Dubbo 自带的实现：
+			com.alibaba.dubbo.common.bytecode.Proxy
+			com.alibaba.dubbo.common.bytecode.ClassGenerator
+			com.alibaba.dubbo.common.bytecode.Wrapper
+
+
+			ClassGenerator是dubbo提供的基于javassist之上的封装，方便dubbo用于生成字节码操作，ClassGenerator主要用来收集java的类信息如接口，字段，方法，构造器等等信息，
+			Wrapper：抽象类定义了Class类中的常用的获取类信息的一些方法， Wrapper包装了一个接口或者一个类，可以通过Wrapper对实例对象进行赋值取值以及指定方法调用， 如果对spring原理有了解的话spring中对bean的操作都是通过BeanWrapper这个包装器进行了的， Dubbo的Wrapper的功能与它类似。
+
+			2.
+			JdkProxyFactory
+
+			TccJdkProxyFactory，TCC JDK 代理工厂
+				项目启动时，调用 TccJavassistProxyFactory#getProxy(...) 方法，生成 Dubbo Service 调用 Proxy。
+					调用 Proxy#newProxyInstance(...) 方法，创建调用 Dubbo Service 服务的Proxy。
+		
+
+			TccInvokerInvocationHandler：TCC 调用处理器
+				设置带有 @Tyloo 属性的默认属性。
+				生成方法切面  ProceedingJoinPoint pjp = new MethodProceedingJoinPoint(proxy, target, method, args);
+					该类参考 org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint 实现。
+					在切面处理完成后，调用 #proceed(...) 方法，进行远程 Dubbo Service 服务调用。
+					在调用 Dubbo Service 服务时，使用 ResourceCoordinatorInterceptor 拦截处理。
+
+	3. 事务恢复
+
+	延迟取消异常集合
+		delayCancelExceptions表示系统发生了设置的异常时，主事务不立即rollback，而是由恢复job来执行事务恢复。通常需要将超时异常设置为delayCancelExceptions，这样可以避免因为服务调用时发生了超时异常，主事务如果立刻rollback, 但是从事务还没执行完，从而造成主事务rollback失败。
+			
+			在 DefaultRecoverConfig 构造方法里，预先添加了 OptimisticLockException
+			针对 OptimisticLockException ：事务恢复间隔时间小于 Socket 超时时间，此时事务恢复调用远程参与者取消回滚事务，
+			远程参与者下次更新事务时，会因为乐观锁更新失败，抛出 OptimisticLockException。
+			如果 CompensableTylooTransactionInterceptor 此时立刻回滚，可能会和定时任务的回滚冲突，因此统一交给定时任务处理。 
+				不立即回滚，主要考虑是被调用服务方存在一直在正常执行的可能，只是执行的慢，
+				导致了调用方超时，此时如果立即回滚，在被调用方执行cancel操作的同时，被调用方的try方法还在执行，
+				甚至cancel操作执行完了，try方法还没结束，这种情况下业务数据存在不一致的可能。
+				目前解决办法是这类异常不立即回滚，而是由恢复job执行回滚，恢复job会在一段时间后再去调用该被调用方的cancel方法，这个时间可在RecoverConfig中设置，默认120s。
+		
+	事务重试定时任务
+		RecoverScheduledJob，事务恢复定时任务，基于 Quartz 实现调度，不断不断不断执行事务恢复。
+			事务在重试时会乐观锁更新，同时只有一个应用节点能更新成功。
+
+
+	异常事务恢复
+		恢复异常事务集合
+			当单个事务超过最大重试次数时，不再重试，只打印异常，此时需要人工介入解决。可以接入 ELK 收集日志监控报警。
+			当分支事务超过最大可重试时间时，不再重试。实际分支事务对应的应用服务器也可以重试分支事务，不是必须根事务发起重试，从而一起重试分支事务。这点要注意下。
+			当事务处于 TransactionStatus.CONFIRMING 状态时，提交事务，逻辑和 TylooTransactionManager#commit() 类似。
+			当事务处于 TransactionStatus.CONFIRMING 状态，或者事务类型为根事务，回滚事务，逻辑和 TylooTransactionManager#rollback() 类似。这里加判断的事务类型为根事务，用于处理延迟回滚异常的事务的回滚。
+
+	4. 事务存储器 
+		实际业务场景中，将事务信息只放在应用内存中是远远不够可靠的
+			应用进程异常崩溃，未完成的事务信息将丢失。
+			应用进程集群，当提供远程服务调用时，事务信息需要集群内共享。
+			发起事务的应用需要重启部署新版本，因为各种原因，有未完成的事务。
+		
+		Tyloo 将事务信息添加到内存中的同时，会使用外部存储进行持久化
+
+		TylooTransaction 是一个比较复杂的对象，内嵌 Participant 数组，而 Participant 本身也是复杂的对象，内嵌了更多的其他对象，
+		因此，存储器在持久化 TylooTransaction 时，需要序列化后才能存储。		
+
+
+		TylooTylooTransactionRepository，事务存储器接口
+			不同的存储器通过实现该接口，提供事务的增删改查功能。
+
+CachableTylooTylooTransactionRepository，可缓存的事务存储器抽象类，实现增删改查事务时，同时缓存事务信息。
+	使用 Guava Cache 内存缓存事务信息，设置最大缓存个数为 1000 个，缓存过期时间为最后访问时间 120 秒
+	
+	若更新成功后，调用 #putToCache(...) 方法，添加事务到缓存。
+	若更新失败后，抛出 OptimisticLockException 异常。
+		有两种情况会导致更新失败：
+		(1) 该事务已经被提交，被删除；
+		(2) 乐观锁更新时，缓存的事务的版本号( TylooTransaction.version )和存储器里的事务的版本号不同，更新失败。
+		更新失败，意味着缓存已经不不一致，调用 #removeFromCache(...) 方法，移除事务从缓存中。
+
+	doupdate（）：
+	sql脚本是有对当前的version做判断的，如果version不匹配是，update不成功的，这个就是版本控制的逻辑。
+
+RedisTylooTylooTransactionRepository，Redis 事务存储器
+	RedisTylooTransactionRepository extends CachableTylooTylooTransactionRepository
+
+	添加和更新 TylooTransaction 时，使用 Redis HSETNX，不存在当前版本的值时，进行设置，重而实现类似乐观锁的更新。
+	读取 TylooTransaction 时，使用 Redis HGETALL，将 TylooTransaction 所有 version 对应的值读取到内存后，取 version 值最大的对应的值。
+
+
+
+---
+
+项目架构；
+
+	1. 事务与参与者
+		在 TCC 里，一个事务( TylooTransaction ) 可以有多个参与者( Participant )参与业务活动本质上，TCC 通过多个参与者的 try / confirm / cancel 方法，实现事务的最终一致性。
+		Tyloo 将每个业务操作抽象成事务参与者，每个事务可以包含多个参与者。
+
+	2. 事务管理器
+		提供事务的获取、发起、提交、回滚，参与者的新增等等方法。
+
+	3. 拦截器
+	Tyloo 有两个拦截器，通过对 @Tyloo AOP 切面( 参与者 try 方法 )进行拦截，透明化对参与者confirm / cancel 方法调用，从而实现 TCC 。
+
+	第一个拦截器，可补偿事务拦截器，实现如下功能：
+		在 Try 阶段，对事务的发起、传播。
+		在 Confirm / Cancel 阶段，对事务提交或回滚。
+		为什么会有对事务的传播呢？在远程调用服务的参与者时，会通过"参数"( 需要序列化 )的形式传递事务给远程参与者。
+
+		通过 @Pointcut + @Around 注解，配置对 @Tyloo 注解的方法进行拦截，调用CompensableTylooTransactionInterceptor#interceptCompensableMethod(...) 方法进行处理。
+		远程服务 TCC confirm / cancel 阶段，调用相同方法进行事务的提交或回滚。远程服务的CompensableTylooTransactionInterceptor 会根据事务的状态是 CONFIRMING / CANCELLING 来调用对应方法。
+
+	第二个拦截器，资源协调者拦截器，实现如下功能：
+		在 Try 阶段，添加参与者到事务中。当事务上下文不存在时，进行创建。
+
+		调用 ResourceCoordinatorAspect#interceptTylooTransactionContextMethod(...)`方法，对方法切面拦截处理。
+
+
+		拦截器具体方法：
+			发起根事务 
+				提供 begin() 方法，发起根事务。该方法在调用方法类型为 MethodType.ROOT 并且 事务处于 Try 阶段被调用
+			传播发起分支事务
+				该方法在调用方法类型为MethodType.PROVIDER 并且 事务处于 Try 阶段被调用
+			传播获取分支事务
+				该方法在调用方法类型为MethodType.PROVIDER 并且 事务处于 Confirm / Cancel 阶段被调用
+			提交事务
+				该方法在事务处于 Confirm / Cancel 阶段被调用。
+			回滚事务
+				该方法在事务处于 Confirm / Cancel 阶段被调用。
+			添加参与者到事务
+				该方法在事务处于 Try 阶段被调用
+
+
+
+
+
+-----
+
+
+
+生命周期：
+	1. 整体流程：
+			方法调用开始->进入Tyloo拦截器->开启事务并创建事务记录
+			定时调用失败的方法进行事务恢复，如果重试次数小于最大重试次数，则判断是否为CONFIRMING状态，如果是执行commit方法，不是则执行cancel方法
+
+	2. 具体流程：
+
+		先执行所有的TRY
+
+			- 1.首先创建在当前环境(主服务 -> Order的PlaceOrderServiceImpl)创建根分布式事务
+			- 2.接着在根分布式事务中创建ROOT参与者，也就是主服务的参与者，这里是Order
+			- 3.执行主服务的业务，操作数据库，但未提交，相当于Try
+			- 4.添加到根分布式事务中第一个CONSUMER参与者(Capital)
+			- 5.在对应的分布模块中创建分支分布式事务，这个事务关联着根分布式事务，接在在这个事务中添加PROVIDER参与者,也当前服务的提供,这里就是Capital
+			- 6.执行分支服务的业务，相当于Capital的Try操作
+			- 7.同理，在根分布式事务中创建RedPacket参与者
+			- 8.在对于的分布模块创建分支分布式事务，添加参与者
+			- 9.RedPacket的Try操作
+
+		再执行所有的CONFIRM
+
+			TRY阶段完成后，事务就一定会执行，因为try能完成，就证明资源时可操作的(事实上，在tcc中，try过后，资源已经被操作了)根分布式事务中的所有参与者依次进行提交操作
+
+		若TRY阶段有一个失败，则执行整体执行回滚，并利用定时器一直定时观察保持数据最终一致
+
+		如果TRY的阶段出现了异常
+			此时错误会被抛回到TylooAspect的 returnValue = pjp.proceed(); 位置，此时后面的catch捕获到,执行 roolback()方法
+			在 rollback 方法中，类似 commit 方法，拿到当前事务的所有参与者，调用所有参与者 cancelMethod 方法，程序 运行到参与者的根分布式事务环境时，也会去遍历本地参与者执行cancleMethod方法，最后回到根事务，删除根事务，数据回滚完毕
+		如果是COMMIT阶段出现了异常
+			只要TRY通过了，那么数据一定可以操作，所以就一定会执行confifirm，所以confifirm不会出现操作数据库异常，那么 这里的异常就有可能是服务器宕机，此时有对应的定时器来管理，confifirm方法要实现幂等
+		如果rollback异常
+			有对应的定时机制处理
+
+
+	3. 项目发布： 
+			1. 配置tyloo
+				1. 引用tyloo：在服务调用方和提供方项目中需要引用tyloo-spring。jar包
+				2. 加载tyloo.xml配置：将tyloo-spring.jar中的tyloo.xml加入到classpath中设置TylooTylooTransactionRepository
+				3. 设置恢复策略：当Tcc事务异常后，恢复Job将会定期恢复事务。在Spring配置文件中配置RecoverConfig类型的Bean来设置恢复策略
+			2. 发布Tcc服务（在tyloo-http-capital中发布Tcc服务示例，在tyloo-http-redpacket中发布Tcc服务示例）
+				1. 在服务提供方的实现方法上加上@Tyloo注解，并设置注解的属性
+				2. 服务方法的入参能被序列化
+				3. try方法、confirm方法和cancel方法入参类型须一样
+			3. 调用远程Tcc服务（在tyloo-http-order中调用远程Tcc服务示例）
+				1. 调用远程Tcc服务，将远程Tcc服务参与到本地Tcc事务中，本地的服务方法也需要声明为Tcc服务
+				2. 与发布Tcc服务不同的是本地Tcc服务Tyloo注解属性tylooContextLoader可以不用设置。
+
+
+
+	4. 源码分析
+		因为刚刚运行demo的时候，是直接访问暴露的接口，tomcat收到请求后就会找到资源路径像的web.xml,刚刚运行demo的时候，是访问tyloo-dubbo-order模块的，所以先进order模块的web.xml，在这里，发现其引进了一些配置文件
+
+		tyloo.xml是将事务的相关配置引入，这个xml是放在tyloo-spring模块的，也就是这个xml将一些配置类以bean的形式交给Spring管理
+			 <!-- 开启Spring对@AspectJ风格切面的支持(因为下面用到自定义的TCC补偿切面类) -->
+
+	5. 业务逻辑：
+		Tyloo-http-order ：商城服务，提供商品和商品订单逻辑。
+		Tyloo-http-capital ：资金服务，提供账户余额逻辑。
+		Tyloo-http-redpacket ：红包服务，提供红包余额逻辑。
+
+			商城服务
+				业务逻辑：
+					下单时，插入订单状态为 "DRAFT" 的订单( Order )记录，并插入购买的商品订单明细( OrderLine )记录。支付时，更新订单状态为 "PAYING" 。
+
+					订单支付成功，更新订单状态为 "CONFIRMED" 。
+					订单支付失败，更新订单状体为 "PAY_FAILED" 。
+
+			资金服务
+				业务逻辑：
+					订单支付支付中，插入交易订单状态为 "DRAFT" 的订单( TradeOrder )记录，并更新减少下单用户的资金账户余额。
+
+					订单支付成功，更新交易订单状态为"CONFIRM"，并更新增加商店拥有用户的资金账户余额。
+					订单支付失败，更新交易订单状态为 "CANCEL" ，并更新增加( 恢复 )下单用户的资金账户余额。
+
+			红包服务
+
+				业务逻辑：
+					和资金服务 99.99% 相同
+
+
+	6. 注解：
+		设置方法注解 @Tyloo
+			事务传播级别 Propagation.REQUIRED ( 默认值 )
+			设置 confirmMethod / cancelMethod 方法名
+			事务上下文编辑类 DefaultTylooTylooTransactionContextLoader ( 默认值 )
+
+		设置方法注解 @Tyloo，保证方法操作原子性
+
+		makePayment 方法业务贴有@Tyloo标签，由本地事务控制，也就是Order模块真正确认数据提交是
+		执行完该方法
+
+
+
+
+---
+
+技术点(按照业务流程)：
+
+进入Order的Record方法：
+1. 切入点
+
+	第一个切面
+	switch (methodType)
+		创建根环境的全局事务管理器
+		TylooTransactionConfigurator这个字段,这个字段是在tcc-TylooTransaction.xml中通过set方法注入的，
+		根据TylooTransactionConfigurator创建了一个新的事务管理器TylooTylooTransactionManager对象并返回
+		TylooTylooTransactionRepository对象通过注入的方式获得，
+
+
+	第二个切面
+	switch (methodType)
+		private Participant generateAndEnlistRootParticipant 添加根环境参与者
+			封装InvocationContext，把confirmMethod和cancelMethod需要通过反射进行调用的信息存储起来，
+			后期通过 反射的方式去调用confirmMethod，实际上就可以看做是Method
+			定义事务参与者，在TylooTransaction添加参与者
+			TylooTransaction更新到数据库中
+		这时的TylooTransaction对象已经添加了根环境(Order)的参与者
+
+
+
+2. 创建根事务/分支事务、添加参与者，执行try方法
+
+	1. 创建当前主环境(Order)的其他消费参与者
+		此时正常执行业务逻辑
+			执行 record 方法时，会被切面切到
+			此时获得的methodType为CONSUMER
+		capitalTradeOrderService和redPacketTradeOrderService是dubbo动态代理出来本地代理类
+
+		在 makePayment 方法中执行完==capitalTradeOrderService.record()方法后便创建完了一个capital消费参与者先不
+		管其后续操作，那么在执行完redPacketTradeOrderService.record()==就会创建完redpacket的消费参与者
+
+
+	2. 在Capital模块创建分支TylooTransaction对象
+		此时程序通过远程调用来到了Capital模块的CapitalTradeOrderServiceImpl实现类调用 record 方法，因为这是一个
+		请求来到Capital模块，所以在Capital中这是一个新的线程
+		因为贴有@Tyloo注解，所以在执行方法前会被切面切入
+		switch (methodType)
+
+		在Captial分支事务中添加Capital参与者
+		执行Capital的Try操作
+		Redpacket同理
+
+3. 执行Confirm方法
+
+	执行Confirm操作
+		执行完 makePayment 方法后，程序会回到之前所在点，继续执行rootMethodProceed方法
+			假如一切正常，则会调用当前TylooTylooTransactionManager对象的commit方法提交
+			最终执行到terminator对象的 invoke 方法执行confirmMethod指定的方法
+
+	Order的Confirm操作
+
+	Capital和RedPacket的Confirm操作
+		接着执行到根事务中Capital的参与者，此时的target对象CapitalTradeOrderService的动态代理对象，因为之前存在
+		这个参与者中的方法是 record 方法，所以执行的也是CapitalTradeOrderService动态代理对象的 record 方法。
+		贴有@Tyloo标签
+
+
+	因为贴有@Tyloo标签，所以由本地事务管理，因为tradeOrderDto和transferFromAccount是同一个数据库
+	的数据，也就是连接池一样，这里可以保证tradeOrderDto(之前的数据)和transferFromAccount(修改后的数据)一致
+	的保存在数据库中
+
+
+---
+
+
+测试：
+
+	数据为执行三次，每次调用一千万次代理方法的结果
+	 PC机测试结果：Linux 2.6.9-42.ELsmp(32bit), 2 Cores CPU(Intel Pentium4 3.06GHz) 
+	JAVAASSIST字节码生成方式是JDK方式的10倍
+
+
+
+	Run JDK Proxy: 2169 ms, 650,099 t/s  
+	Run JAVAASSIST Bytecode Proxy: 202 ms, 6,980,521 t/s 
+
+
+---
+
+
+
+
+
+服务调用
+
+
+
+-----
+
+
+
+项目职责
+
+
+-----
+
+
+亮点：
+
+-----
+
+
+体会：
+
+1. TCC的主要优点有
+	因为Try阶段检查并预留了资源，所以confirm阶段一般都可以执行成功。
+
+	资源锁定都是在业务代码中完成，不会block住DB，可以做到对db性能无影响。
+
+	TCC的实时性较高，所有的DB写操作都集中在confirm中，写操作的结果实时返回（失败时因为定时程序执行时间的关系，略有延迟）。
+
+2. TCC的主要缺点有
+	从源码分析中可以看到，因为事务状态管理，将产生多次DB操作，这将损耗一定的性能，并使得整个TCC事务时间拉长。
+
+	事务涉及方越多，Try、Confirm、Cancel中的代码就越复杂，可复用性就越底（这一点主要是相对最终一致性方案而言的）。另外涉及方越多，这几个阶段的处理时间越长，失败的可能性也越高。
+
+

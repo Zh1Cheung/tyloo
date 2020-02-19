@@ -3,7 +3,7 @@
 <mapper namespace="io.tyloo.tcctransaction.sample.capital.infrastructure.dao.CapitalAccountDao">
 
     <resultMap id="result"
-               type="io.tyloo.tcctransaction.sample.capital.domain.entity.CapitalAccount">
+               transactionType="io.tyloo.tcctransaction.sample.capital.domain.entity.CapitalAccount">
         <id property="id" javaType="java.lang.Long" column="CAPITAL_ACCOUNT_ID"/>
         <result property="balanceAmount" column="BALANCE_AMOUNT"/>
         <result property="userId" column="USER_ID"/>

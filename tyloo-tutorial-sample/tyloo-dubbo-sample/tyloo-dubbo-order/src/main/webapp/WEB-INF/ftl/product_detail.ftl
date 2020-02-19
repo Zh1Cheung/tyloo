@@ -15,12 +15,12 @@
     <p>可用红包余额: ${redPacketAmount?string("0.00")}元</p>
 
     <form action="/placeorder" method="post">
-        红包金额:&nbsp;&nbsp;&nbsp;<input type="text" style="width: 220px" name="redPacketPayAmount" value="" placeholder="请输入期望使用的红包金额"/>
-        <input type="hidden" name="shopId" value="${shopId}" />
-        <input type="hidden" name="productId" value="${product.productId}"/>
-        <input type="hidden" name="payerUserId" value="${userId}"/>
+        红包金额:&nbsp;&nbsp;&nbsp;<input transactionType="text" style="width: 220px" name="redPacketPayAmount" value="" placeholder="请输入期望使用的红包金额"/>
+        <input transactionType="hidden" name="shopId" value="${shopId}" />
+        <input transactionType="hidden" name="productId" value="${product.productId}"/>
+        <input transactionType="hidden" name="payerUserId" value="${userId}"/>
 
-        <input type="submit" value="支付"/>
+        <input transactionType="submit" value="支付"/>
     </form>
 </div>
 </body>

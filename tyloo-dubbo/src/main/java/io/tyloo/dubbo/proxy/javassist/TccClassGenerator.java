@@ -366,7 +366,7 @@ public final class TccClassGenerator {
                             annot.addMemberValue("confirmMethod", new StringMemberValue(ctMethod.getName(), constpool));
                             annot.addMemberValue("cancelMethod", new StringMemberValue(ctMethod.getName(), constpool));
 
-                            ClassMemberValue classMemberValue = new ClassMemberValue("DubboTransactionContextLoader", constpool);
+                            ClassMemberValue classMemberValue = new ClassMemberValue("DubboTransactionTransactionContextLoader", constpool);
                             annot.addMemberValue("tylooContextLoader", classMemberValue);
 
                             attr.addAnnotation(annot);
