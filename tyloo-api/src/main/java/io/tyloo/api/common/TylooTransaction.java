@@ -1,9 +1,9 @@
 package io.tyloo.api.common;
 
 
-import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Enums.Status;
-import io.tyloo.api.Enums.Type;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Enums.TransactionStatus;
+import io.tyloo.api.Enums.TransactionType;
 
 import javax.transaction.xa.Xid;
 import java.io.Serializable;
@@ -31,11 +31,11 @@ public class TylooTransaction implements Serializable {
     /**
      * 事务状态
      */
-    private Status status;
+    private TransactionStatus transactionStatus;
     /**
      * 事务类型
      */
-    private Type type;
+    private TransactionType transactionType;
     /**
      * 重试次数
      */
@@ -68,36 +68,36 @@ public class TylooTransaction implements Serializable {
     /**
      * 创建分支事务
      *
-     * @param tylooContext 事务上下文
+     * @param tylooTransactionContext 事务上下文
      */
-    public TylooTransaction(TylooContext tylooContext) {
-        this.xid = tylooContext.getXid();
-        this.status = Status.TRYING;
-        this.type = Type.BRANCH;
+    public TylooTransaction(TylooTransactionContext tylooTransactionContext) {
+        this.xid = tylooTransactionContext.getXid();
+        this.transactionStatus = TransactionStatus.TRYING;
+        this.transactionType = TransactionType.BRANCH;
     }
 
     /**
      * 创建指定类型的事务
      *
-     * @param type 事务类型
+     * @param transactionType 事务类型
      */
-    public TylooTransaction(Type type) {
+    public TylooTransaction(TransactionType transactionType) {
         this.xid = new TylooTransactionXid();
-        this.status = Status.TRYING;
-        this.type = type;
+        this.transactionStatus = TransactionStatus.TRYING;
+        this.transactionType = transactionType;
     }
 
     /**
      * 创建指定类型和制定Xid的事务
      *
      * @param uniqueIdentity
-     * @param type
+     * @param transactionType
      */
-    public TylooTransaction(Object uniqueIdentity, Type type) {
+    public TylooTransaction(Object uniqueIdentity, TransactionType transactionType) {
 
         this.xid = new TylooTransactionXid(uniqueIdentity);
-        this.status = Status.TRYING;
-        this.type = type;
+        this.transactionStatus = TransactionStatus.TRYING;
+        this.transactionType = transactionType;
     }
 
     /**
@@ -114,8 +114,8 @@ public class TylooTransaction implements Serializable {
         return xid.clone();
     }
 
-    public Status getStatus() {
-        return status;
+    public TransactionStatus getTransactionStatus() {
+        return transactionStatus;
     }
 
 
@@ -123,12 +123,12 @@ public class TylooTransaction implements Serializable {
         return participants;
     }
 
-    public Type getType() {
-        return type;
+    public TransactionType getTransactionType() {
+        return transactionType;
     }
 
-    public void changeStatus(Status status) {
-        this.status = status;
+    public void changeStatus(TransactionStatus transactionStatus) {
+        this.transactionStatus = transactionStatus;
     }
 
     /**

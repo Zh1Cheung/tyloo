@@ -1,8 +1,8 @@
 package io.tyloo.api.common;
 
 
-import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Context.TylooContextLoader;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.api.Context.InvocationContext;
 import io.tyloo.core.exception.SystemException;
 import io.tyloo.core.support.FactoryBuilder;
@@ -35,7 +35,7 @@ public class Terminator implements Serializable {
      * @return
      */
 
-    public Object invoke(TylooContext tylooContext, InvocationContext invocationContext, Class<? extends TylooContextLoader> tylooContextLoaderClass) {
+    public Object invoke(TylooTransactionContext tylooTransactionContext, InvocationContext invocationContext, Class<? extends TylooTransactionContextLoader> tylooContextLoaderClass) {
 
 
         if (StringUtils.isNotEmpty(invocationContext.getMethodName())) {
@@ -49,10 +49,10 @@ public class Terminator implements Serializable {
                 method = target.getClass().getMethod(invocationContext.getMethodName(), invocationContext.getParameterTypes());
 
                 //注入事务上下文
-                TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tylooContextLoaderClass).getInstance();
-                instance.set(tylooContext, target, method, invocationContext.getArgs());
+                TylooTransactionContextLoader instance = (TylooTransactionContextLoader) FactoryBuilder.factoryOf(tylooContextLoaderClass).getInstance();
+                instance.set(tylooTransactionContext, target, method, invocationContext.getArgs());
 
-                // 调用服务方法，被再次被TccTransactionContextAspect和ResourceCoordinatorInterceptor拦截，但因为事务状态已经不再是TRYING了，所以直接执行远程服务
+                // 调用服务方法，被再次被TylooAspect和TylooCoordinatorAspect拦截，但因为事务状态已经不再是TRYING了，所以直接执行远程服务
                 return method.invoke(target, invocationContext.getArgs());
 
             } catch (Exception e) {

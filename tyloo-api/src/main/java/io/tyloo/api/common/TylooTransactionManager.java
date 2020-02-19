@@ -1,14 +1,14 @@
 package io.tyloo.api.common;
 
-import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Enums.TransactionStatus;
+import io.tyloo.api.Enums.TransactionType;
 import io.tyloo.core.exception.CancellingException;
 import io.tyloo.core.exception.ConfirmingException;
 import io.tyloo.core.exception.NoExistedTransactionException;
 import io.tyloo.core.exception.SystemException;
 import io.tyloo.core.repository.TransactionRepository;
 import org.apache.log4j.Logger;
-import io.tyloo.api.Enums.Status;
-import io.tyloo.api.Enums.Type;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -58,7 +58,7 @@ public class TylooTransactionManager {
      * @return
      */
     public TylooTransaction begin(Object uniqueIdentify) {
-        TylooTransaction tylooTransaction = new TylooTransaction(uniqueIdentify, Type.ROOT);
+        TylooTransaction tylooTransaction = new TylooTransaction(uniqueIdentify, TransactionType.ROOT);
         transactionRepository.create(tylooTransaction);
         registerTransaction(tylooTransaction);
         return tylooTransaction;
@@ -70,7 +70,7 @@ public class TylooTransactionManager {
      * @return 事务
      */
     public TylooTransaction begin() {
-        TylooTransaction tylooTransaction = new TylooTransaction(Type.ROOT);
+        TylooTransaction tylooTransaction = new TylooTransaction(TransactionType.ROOT);
         transactionRepository.create(tylooTransaction);
         registerTransaction(tylooTransaction);
         return tylooTransaction;
@@ -79,12 +79,12 @@ public class TylooTransactionManager {
     /**
      * 传播发起分支事务
      *
-     * @param tylooContext 事务上下文
+     * @param tylooTransactionContext 事务上下文
      * @return 分支事务
      */
-    public TylooTransaction propagationNewBegin(TylooContext tylooContext) {
+    public TylooTransaction propagationNewBegin(TylooTransactionContext tylooTransactionContext) {
 
-        TylooTransaction tylooTransaction = new TylooTransaction(tylooContext);
+        TylooTransaction tylooTransaction = new TylooTransaction(tylooTransactionContext);
         transactionRepository.create(tylooTransaction);
 
         registerTransaction(tylooTransaction);
@@ -94,17 +94,17 @@ public class TylooTransactionManager {
     /**
      * 传播获取分支事务
      *
-     * @param tylooContext 事务上下文
+     * @param tylooTransactionContext 事务上下文
      * @return 分支事务
      * @throws NoExistedTransactionException 当事务不存在时
      */
-    public TylooTransaction propagationExistBegin(TylooContext tylooContext) throws NoExistedTransactionException {
+    public TylooTransaction propagationExistBegin(TylooTransactionContext tylooTransactionContext) throws NoExistedTransactionException {
         // 查询 事务
-        TylooTransaction tylooTransaction = transactionRepository.findByXid(tylooContext.getXid());
+        TylooTransaction tylooTransaction = transactionRepository.findByXid(tylooTransactionContext.getXid());
 
         if (tylooTransaction != null) {
             // 设置 事务 状态
-            tylooTransaction.changeStatus(Status.valueOf(tylooContext.getStatus()));
+            tylooTransaction.changeStatus(TransactionStatus.valueOf(tylooTransactionContext.getStatus()));
             // 注册 事务
             registerTransaction(tylooTransaction);
             return tylooTransaction;
@@ -120,7 +120,7 @@ public class TylooTransactionManager {
         // 获取 事务
         final TylooTransaction tylooTransaction = getCurrentTransaction();
         // 设置 事务状态 为 CONFIRMING
-        tylooTransaction.changeStatus(Status.CONFIRMING);
+        tylooTransaction.changeStatus(TransactionStatus.CONFIRMING);
         // 更新 事务
         transactionRepository.update(tylooTransaction);
 
@@ -150,7 +150,7 @@ public class TylooTransactionManager {
     public void rollback(boolean asyncRollback) {
 
         final TylooTransaction tylooTransaction = getCurrentTransaction();
-        tylooTransaction.changeStatus(Status.CANCELLING);
+        tylooTransaction.changeStatus(TransactionStatus.CANCELLING);
 
         transactionRepository.update(tylooTransaction);
 

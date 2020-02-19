@@ -1,7 +1,7 @@
 package io.tyloo.api.Annotation;
 
-import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Context.TylooContextLoader;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.api.Enums.Propagation;
 
 import java.lang.annotation.ElementType;
@@ -44,7 +44,7 @@ public @interface Tyloo {
     /**
      * 事务上下文编辑
      */
-    public Class<? extends TylooContextLoader> tylooContextLoader() default DefaultTylooContextLoader.class;
+    public Class<? extends TylooTransactionContextLoader> tylooContextLoader() default DefaultTylooTransactionContextLoader.class;
 
     /**
      * 超时异常
@@ -60,39 +60,39 @@ public @interface Tyloo {
     public boolean asyncCancel() default false;
 
     //无事务上下文编辑器实现
-    class NullableTylooContextLoader implements TylooContextLoader {
+    class NullableTylooTransactionContextLoader implements TylooTransactionContextLoader {
 
         @Override
-        public TylooContext get(Object target, Method method, Object[] args) {
+        public TylooTransactionContext get(Object target, Method method, Object[] args) {
             return null;
         }
 
         @Override
-        public void set(TylooContext tylooContext, Object target, Method method, Object[] args) {
+        public void set(TylooTransactionContext tylooTransactionContext, Object target, Method method, Object[] args) {
 
         }
     }
 
     //默认事务上下文编辑器实现
-    class DefaultTylooContextLoader implements TylooContextLoader {
+    class DefaultTylooTransactionContextLoader implements TylooTransactionContextLoader {
 
         @Override
-        public TylooContext get(Object target, Method method, Object[] args) {
+        public TylooTransactionContext get(Object target, Method method, Object[] args) {
             int position = getTransactionContextParamPosition(method.getParameterTypes());
 
             if (position >= 0) {
-                return (TylooContext) args[position];
+                return (TylooTransactionContext) args[position];
             }
 
             return null;
         }
 
         @Override
-        public void set(TylooContext tylooContext, Object target, Method method, Object[] args) {
+        public void set(TylooTransactionContext tylooTransactionContext, Object target, Method method, Object[] args) {
 
             int position = getTransactionContextParamPosition(method.getParameterTypes());
             if (position >= 0) {
-                args[position] = tylooContext;
+                args[position] = tylooTransactionContext;
             }
         }
 
@@ -107,7 +107,7 @@ public @interface Tyloo {
             int position = -1;
 
             for (int i = 0; i < parameterTypes.length; i++) {
-                if (parameterTypes[i].equals(TylooContext.class)) {
+                if (parameterTypes[i].equals(TylooTransactionContext.class)) {
                     position = i;
                     break;
                 }
@@ -119,18 +119,18 @@ public @interface Tyloo {
          * @param args 参数列表
          * @return 获取TransactionContext对象
          */
-        public static TylooContext getTransactionContextFromArgs(Object[] args) {
+        public static TylooTransactionContext getTransactionContextFromArgs(Object[] args) {
 
-            TylooContext tylooContext = null;
+            TylooTransactionContext tylooTransactionContext = null;
 
             for (Object arg : args) {
-                if (arg != null && TylooContext.class.isAssignableFrom(arg.getClass())) {
+                if (arg != null && TylooTransactionContext.class.isAssignableFrom(arg.getClass())) {
 
-                    tylooContext = (TylooContext) arg;
+                    tylooTransactionContext = (TylooTransactionContext) arg;
                 }
             }
 
-            return tylooContext;
+            return tylooTransactionContext;
         }
 
     }
