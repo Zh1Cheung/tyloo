@@ -2,8 +2,8 @@ package io.tyloo.core.interceptor;
 
 import io.tyloo.api.Annotation.Tyloo;
 import io.tyloo.api.Annotation.UniqueIdentity;
-import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Context.TylooContextLoader;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.api.Enums.Propagation;
 import io.tyloo.api.Enums.Role;
 import io.tyloo.core.support.FactoryBuilder;
@@ -45,15 +45,15 @@ public class TylooMethodContext {
     /**
      * 事务上下文
      */
-    TylooContext tylooContext = null;
+    TylooTransactionContext tylooTransactionContext = null;
 
     public TylooMethodContext(ProceedingJoinPoint pjp) {
         this.pjp = pjp;
         this.method = getTylooMethod();
         this.tyloo = method.getAnnotation(Tyloo.class);
         this.propagation = tyloo.propagation();
-        TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tyloo.tylooContextLoader()).getInstance();
-        this.tylooContext = instance.get(pjp.getTarget(), method, pjp.getArgs());
+        TylooTransactionContextLoader instance = (TylooTransactionContextLoader) FactoryBuilder.factoryOf(tyloo.tylooContextLoader()).getInstance();
+        this.tylooTransactionContext = instance.get(pjp.getTarget(), method, pjp.getArgs());
 
     }
 
@@ -65,8 +65,8 @@ public class TylooMethodContext {
         return propagation;
     }
 
-    public TylooContext getTylooContext() {
-        return tylooContext;
+    public TylooTransactionContext getTylooTransactionContext() {
+        return tylooTransactionContext;
     }
 
     public Method getMethod() {
@@ -121,10 +121,10 @@ public class TylooMethodContext {
      * @return
      */
     public Role getMethodRole(boolean isTransactionActive) {
-        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooContext == null) ||
+        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooTransactionContext == null) ||
                 propagation.equals(Propagation.REQUIRES_NEW)) {
             return Role.ROOT;
-        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && tylooContext != null) {
+        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && tylooTransactionContext != null) {
             return Role.PROVIDER;
         } else {
             return Role.NORMAL;

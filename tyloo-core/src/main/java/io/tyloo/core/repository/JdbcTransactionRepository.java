@@ -7,7 +7,7 @@ import io.tyloo.core.serializer.KryoPoolSerializer;
 import io.tyloo.core.serializer.ObjectSerializer;
 import io.tyloo.core.utils.CollectionUtils;
 import io.tyloo.core.utils.StringUtils;
-import io.tyloo.api.Enums.Status;
+import io.tyloo.api.Enums.TransactionStatus;
 
 import javax.sql.DataSource;
 import javax.transaction.xa.Xid;
@@ -85,9 +85,9 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
             stmt.setBytes(1, tylooTransaction.getXid().getGlobalTransactionId());
             stmt.setBytes(2, tylooTransaction.getXid().getBranchQualifier());
-            stmt.setInt(3, tylooTransaction.getType().getId());
+            stmt.setInt(3, tylooTransaction.getTransactionType().getId());
             stmt.setBytes(4, serializer.serialize(tylooTransaction));
-            stmt.setInt(5, tylooTransaction.getStatus().getId());
+            stmt.setInt(5, tylooTransaction.getTransactionStatus().getId());
             stmt.setInt(6, tylooTransaction.getRetriedCount());
             stmt.setTimestamp(7, new java.sql.Timestamp(tylooTransaction.getCreateTime().getTime()));
             stmt.setTimestamp(8, new java.sql.Timestamp(tylooTransaction.getLastUpdateTime().getTime()));
@@ -141,7 +141,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
             stmt = connection.prepareStatement(builder.toString());
 
             stmt.setBytes(1, serializer.serialize(tylooTransaction));
-            stmt.setInt(2, tylooTransaction.getStatus().getId());
+            stmt.setInt(2, tylooTransaction.getTransactionStatus().getId());
             stmt.setTimestamp(3, new Timestamp(tylooTransaction.getLastUpdateTime().getTime()));
 
             stmt.setInt(4, tylooTransaction.getRetriedCount());
@@ -332,7 +332,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         while (resultSet.next()) {
             byte[] transactionBytes = resultSet.getBytes(3);
             TylooTransaction tylooTransaction = (TylooTransaction) serializer.deserialize(transactionBytes);
-            tylooTransaction.changeStatus(Status.valueOf(resultSet.getInt(4)));
+            tylooTransaction.changeStatus(TransactionStatus.valueOf(resultSet.getInt(4)));
             tylooTransaction.setLastUpdateTime(resultSet.getDate(7));
             tylooTransaction.setVersion(resultSet.getLong(9));
             tylooTransaction.resetRetriedCount(resultSet.getInt(8));

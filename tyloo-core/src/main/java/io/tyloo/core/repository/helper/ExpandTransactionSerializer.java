@@ -1,12 +1,12 @@
 package io.tyloo.core.repository.helper;
 
 import com.alibaba.fastjson.JSON;
+import io.tyloo.api.Enums.TransactionStatus;
 import io.tyloo.api.common.TylooTransaction;
 import io.tyloo.core.exception.SystemException;
 import io.tyloo.core.utils.ByteUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import io.tyloo.api.Enums.Status;
 import io.tyloo.core.serializer.ObjectSerializer;
 
 import java.text.ParseException;
@@ -29,8 +29,8 @@ public class ExpandTransactionSerializer {
 
         map.put("GLOBAL_TX_ID".getBytes(), tylooTransaction.getXid().getGlobalTransactionId());
         map.put("BRANCH_QUALIFIER".getBytes(), tylooTransaction.getXid().getBranchQualifier());
-        map.put("STATUS".getBytes(), ByteUtils.intToBytes(tylooTransaction.getStatus().getId()));
-        map.put("TRANSACTION_TYPE".getBytes(), ByteUtils.intToBytes(tylooTransaction.getType().getId()));
+        map.put("STATUS".getBytes(), ByteUtils.intToBytes(tylooTransaction.getTransactionStatus().getId()));
+        map.put("TRANSACTION_TYPE".getBytes(), ByteUtils.intToBytes(tylooTransaction.getTransactionType().getId()));
         map.put("RETRIED_COUNT".getBytes(), ByteUtils.intToBytes(tylooTransaction.getRetriedCount()));
         map.put("CREATE_TIME".getBytes(), DateFormatUtils.format(tylooTransaction.getCreateTime(), "yyyy-MM-dd HH:mm:ss").getBytes());
         map.put("LAST_UPDATE_TIME".getBytes(), DateFormatUtils.format(tylooTransaction.getLastUpdateTime(), "yyyy-MM-dd HH:mm:ss").getBytes());
@@ -50,7 +50,7 @@ public class ExpandTransactionSerializer {
 
         byte[] content = propertyMap.get("CONTENT");
         TylooTransaction tylooTransaction = (TylooTransaction) serializer.deserialize(content);
-        tylooTransaction.changeStatus(Status.valueOf(ByteUtils.bytesToInt(propertyMap.get("STATUS"))));
+        tylooTransaction.changeStatus(TransactionStatus.valueOf(ByteUtils.bytesToInt(propertyMap.get("STATUS"))));
         tylooTransaction.resetRetriedCount(ByteUtils.bytesToInt(propertyMap.get("RETRIED_COUNT")));
 
         try {

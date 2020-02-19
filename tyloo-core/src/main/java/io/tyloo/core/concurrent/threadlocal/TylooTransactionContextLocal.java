@@ -1,7 +1,7 @@
 
 package io.tyloo.core.concurrent.threadlocal;
 
-import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Context.TylooTransactionContext;
 
 
 /*
@@ -15,7 +15,7 @@ import io.tyloo.api.Context.TylooContext;
 
 public final class TylooTransactionContextLocal {
 
-    private static final ThreadLocal<TylooContext> CURRENT_LOCAL = new ThreadLocal<>();
+    private static final ThreadLocal<TylooTransactionContext> CURRENT_LOCAL = new ThreadLocal<>();
 
     private static final TylooTransactionContextLocal TRANSACTION_CONTEXT_LOCAL = new TylooTransactionContextLocal();
 
@@ -37,7 +37,7 @@ public final class TylooTransactionContextLocal {
      *
      * @param context context
      */
-    public void set(final TylooContext context) {
+    public void set(final TylooTransactionContext context) {
         CURRENT_LOCAL.set(context);
     }
 
@@ -46,7 +46,7 @@ public final class TylooTransactionContextLocal {
      *
      * @return TccTransactionContext
      */
-    public TylooContext get() {
+    public TylooTransactionContext get() {
         return CURRENT_LOCAL.get();
     }
 

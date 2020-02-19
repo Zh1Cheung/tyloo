@@ -1,6 +1,7 @@
 package io.tyloo.core.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import io.tyloo.api.Enums.TransactionStatus;
 import io.tyloo.api.common.TylooTransaction;
 import io.tyloo.api.common.TylooTransactionManager;
 import io.tyloo.core.exception.NoExistedTransactionException;
@@ -10,7 +11,6 @@ import io.tyloo.core.utils.TransactionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
-import io.tyloo.api.Enums.Status;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -144,15 +144,15 @@ public class TylooInterceptor {
 
         try {
 
-            switch (Status.valueOf(tylooMethodContext.getTylooContext().getStatus())) {
+            switch (TransactionStatus.valueOf(tylooMethodContext.getTylooTransactionContext().getStatus())) {
                 case TRYING:
                     // 基于全局事务ID扩展创建新的分支事务，并存于当前线程的事务局部变量中.
-                    tylooTransaction = tylooTransactionManager.propagationNewBegin(tylooMethodContext.getTylooContext());
+                    tylooTransaction = tylooTransactionManager.propagationNewBegin(tylooMethodContext.getTylooTransactionContext());
                     return tylooMethodContext.proceed();
                 case CONFIRMING:
                     try {
                         // 找出存在的事务并处理.
-                        tylooTransaction = tylooTransactionManager.propagationExistBegin(tylooMethodContext.getTylooContext());
+                        tylooTransaction = tylooTransactionManager.propagationExistBegin(tylooMethodContext.getTylooTransactionContext());
                         // 提交
                         tylooTransactionManager.commit(asyncConfirm);
                     } catch (NoExistedTransactionException excepton) {
@@ -162,7 +162,7 @@ public class TylooInterceptor {
                 case CANCELLING:
 
                     try {
-                        tylooTransaction = tylooTransactionManager.propagationExistBegin(tylooMethodContext.getTylooContext());
+                        tylooTransaction = tylooTransactionManager.propagationExistBegin(tylooMethodContext.getTylooTransactionContext());
                         // 回滚
                         tylooTransactionManager.rollback(asyncCancel);
                     } catch (NoExistedTransactionException exception) {

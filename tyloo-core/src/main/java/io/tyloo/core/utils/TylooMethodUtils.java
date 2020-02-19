@@ -1,6 +1,6 @@
 package io.tyloo.core.utils;
 
-import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.api.Enums.Role;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -44,22 +44,22 @@ public class TylooMethodUtils {
     /**
      * 计算方法类型
      *
-     * @param propagation         传播级别
-     * @param isTransactionActive 是否事务开启
-     * @param tylooContext  事务上下文
+     * @param propagation             传播级别
+     * @param isTransactionActive     是否事务开启
+     * @param tylooTransactionContext 事务上下文
      * @return 方法类型
      */
-    public static Role calculateMethodType(Propagation propagation, boolean isTransactionActive, TylooContext tylooContext) {
+    public static Role calculateMethodType(Propagation propagation, boolean isTransactionActive, TylooTransactionContext tylooTransactionContext) {
         // Propagation.REQUIRED：支持当前事务，当前没有事务，就新建一个事务。
-        return getMethodRole(propagation, isTransactionActive, tylooContext);
+        return getMethodRole(propagation, isTransactionActive, tylooTransactionContext);
     }
 
-    public static Role getMethodRole(Propagation propagation, boolean isTransactionActive, TylooContext tylooContext) {
-        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooContext == null) ||
+    public static Role getMethodRole(Propagation propagation, boolean isTransactionActive, TylooTransactionContext tylooTransactionContext) {
+        if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooTransactionContext == null) ||
                 propagation.equals(Propagation.REQUIRES_NEW)) {
             // Propagation.REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起。
             return Role.ROOT;
-        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && tylooContext != null) {
+        } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && tylooTransactionContext != null) {
             // Propagation.REQUIRED：支持当前事务
             return Role.PROVIDER;
         } else {
@@ -73,7 +73,7 @@ public class TylooMethodUtils {
         int position = -1;
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (parameterTypes[i].equals(TylooContext.class)) {
+            if (parameterTypes[i].equals(TylooTransactionContext.class)) {
                 position = i;
                 break;
             }

@@ -22,8 +22,8 @@ public class TransactionSerializer {
 
         map.put("GLOBAL_TX_ID", tylooTransaction.getXid().getGlobalTransactionId());
         map.put("BRANCH_QUALIFIER", tylooTransaction.getXid().getBranchQualifier());
-        map.put("STATUS", tylooTransaction.getStatus().getId());
-        map.put("TRANSACTION_TYPE", tylooTransaction.getType().getId());
+        map.put("STATUS", tylooTransaction.getTransactionStatus().getId());
+        map.put("TRANSACTION_TYPE", tylooTransaction.getTransactionType().getId());
         map.put("RETRIED_COUNT", tylooTransaction.getRetriedCount());
         map.put("CREATE_TIME", tylooTransaction.getCreateTime());
         map.put("LAST_UPDATE_TIME", tylooTransaction.getLastUpdateTime());

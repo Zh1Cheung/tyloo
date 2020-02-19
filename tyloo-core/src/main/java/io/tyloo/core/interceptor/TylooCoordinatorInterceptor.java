@@ -1,9 +1,9 @@
 package io.tyloo.core.interceptor;
 
 import io.tyloo.api.Annotation.Tyloo;
-import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Context.TylooContextLoader;
-import io.tyloo.api.Enums.Status;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Context.TylooTransactionContextLoader;
+import io.tyloo.api.Enums.TransactionStatus;
 import io.tyloo.api.Context.InvocationContext;
 import io.tyloo.api.common.Participant;
 import io.tyloo.api.common.TylooTransaction;
@@ -51,7 +51,7 @@ public class TylooCoordinatorInterceptor {
         // Trying(判断是否Try阶段的事务)
         if (tylooTransaction != null) {
 
-            switch (tylooTransaction.getStatus()) {
+            switch (tylooTransaction.getTransactionStatus()) {
                 case TRYING:
                     enlistParticipant(pjp);
                     break;
@@ -90,9 +90,9 @@ public class TylooCoordinatorInterceptor {
         // 创建 事务编号
         TylooTransactionXid xid = new TylooTransactionXid(tylooTransaction.getXid().getGlobalTransactionId());
         //如果该注解的单例类的参数中没有事务上下文 便新建一个事务上下文
-        TylooContextLoader instance = (TylooContextLoader) FactoryBuilder.factoryOf(tyloo.tylooContextLoader()).getInstance();
+        TylooTransactionContextLoader instance = (TylooTransactionContextLoader) FactoryBuilder.factoryOf(tyloo.tylooContextLoader()).getInstance();
         if (instance.get(pjp.getTarget(), method, pjp.getArgs()) == null) {
-            instance.set(new TylooContext(xid, Status.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
+            instance.set(new TylooTransactionContext(xid, TransactionStatus.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
         }
 
         // 获得类
