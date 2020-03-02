@@ -23,15 +23,15 @@
     <!--<dubbo:consumer proxy="javassist" />-->
     <!-- Dubbo服务接口引用 -->
     <dubbo:reference id="capitalTradeOrderService"
-                     interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalTradeOrderService" timeout="5000"/>
+                     interface="io.tyloo.sample.dubbo.capital.api.CapitalTradeOrderService" timeout="5000"/>
 
     <dubbo:reference id="redPacketTradeOrderService"
-                     interface="io.tyloo.tcctransaction.sample.dubbo.redpacket.api.RedPacketTradeOrderService" timeout="5000"/>
+                     interface="io.tyloo.sample.dubbo.redpacket.api.RedPacketTradeOrderService" timeout="5000"/>
 
     <dubbo:reference id="redPacketAccountService"
-                     interface="io.tyloo.tcctransaction.sample.dubbo.redpacket.api.RedPacketAccountService" timeout="5000"/>
+                     interface="io.tyloo.sample.dubbo.redpacket.api.RedPacketAccountService" timeout="5000"/>
 
     <dubbo:reference id="capitalAccountService"
-                     interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalAccountService" timeout="5000"/>
+                     interface="io.tyloo.sample.dubbo.capital.api.CapitalAccountService" timeout="5000"/>
 
 </beans>

@@ -26,11 +26,11 @@
 
     <dubbo:protocol name="dubbo" port="${dubbo.port}" payload="52428800"/>
 
-    <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.redpacket.api.RedPacketTradeOrderService"
+    <dubbo:service interface="io.tyloo.sample.dubbo.redpacket.api.RedPacketTradeOrderService"
                    registry="redPacketRpcZk"
                    ref="redPacketTradeOrderService" timeout="60000" retries="0"/>
 
-    <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.redpacket.api.RedPacketAccountService"
+    <dubbo:service interface="io.tyloo.sample.dubbo.redpacket.api.RedPacketAccountService"
                    registry="redPacketRpcZk"
                    ref="redPacketAccountService" timeout="60000" retries="0"/>
     <!--<bean id="redPacketTradeOrderService"-->

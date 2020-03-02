@@ -29,28 +29,28 @@
     <bean id="captialTradeOrderService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
         <property name="serviceUrl" value="http://localhost:8081/remoting/CapitalTradeOrderService"/>
         <property name="serviceInterface"
-                  value="io.tyloo.tcctransaction.sample.http.capital.api.CapitalTradeOrderService"/>
+                  value="io.tyloo.sample.http.capital.api.CapitalTradeOrderService"/>
         <property name="httpInvokerRequestExecutor" ref="httpInvokerRequestExecutor"/>
     </bean>
 
     <bean id="capitalAccountService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
         <property name="serviceUrl" value="http://localhost:8081/remoting/CapitalAccountService"/>
         <property name="serviceInterface"
-                  value="io.tyloo.tcctransaction.sample.http.capital.api.CapitalAccountService"/>
+                  value="io.tyloo.sample.http.capital.api.CapitalAccountService"/>
         <property name="httpInvokerRequestExecutor" ref="httpInvokerRequestExecutor"/>
     </bean>
 
     <bean id="redPacketAccountService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
         <property name="serviceUrl" value="http://localhost:8082/remoting/RedPacketAccountService"/>
         <property name="serviceInterface"
-                  value="io.tyloo.tcctransaction.sample.http.redpacket.api.RedPacketAccountService"/>
+                  value="io.tyloo.sample.http.redpacket.api.RedPacketAccountService"/>
         <property name="httpInvokerRequestExecutor" ref="httpInvokerRequestExecutor"/>
     </bean>
 
     <bean id="redPacketTradeOrderService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
         <property name="serviceUrl" value="http://localhost:8082/remoting/RedPacketTradeOrderService"/>
         <property name="serviceInterface"
-                  value="io.tyloo.tcctransaction.sample.http.redpacket.api.RedPacketTradeOrderService"/>
+                  value="io.tyloo.sample.http.redpacket.api.RedPacketTradeOrderService"/>
         <property name="httpInvokerRequestExecutor" ref="httpInvokerRequestExecutor"/>
     </bean>
 

@@ -13,13 +13,13 @@
 
     <bean id="redPacketAccountDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.redpacket.infrastructure.dao.RedPacketAccountDao"></property>
+                  value="io.tyloo.sample.redpacket.infrastructure.dao.RedPacketAccountDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
     </bean>
 
     <bean id="tradeOrderDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.redpacket.infrastructure.dao.TradeOrderDao"/>
+                  value="io.tyloo.sample.redpacket.infrastructure.dao.TradeOrderDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 

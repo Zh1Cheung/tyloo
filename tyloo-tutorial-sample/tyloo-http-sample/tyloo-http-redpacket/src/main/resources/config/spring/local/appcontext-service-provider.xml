@@ -4,23 +4,23 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean name="redPacketAccountService"
-          class="io.tyloo.tcctransaction.sample.http.redpacket.service.RedPacketAccountServiceImpl"/>
+          class="io.tyloo.sample.http.redpacket.service.RedPacketAccountServiceImpl"/>
 
     <bean name="redPacketTradeOrderService"
-          class="io.tyloo.tcctransaction.sample.http.redpacket.service.RedPacketTradeOrderServiceImpl"/>
+          class="io.tyloo.sample.http.redpacket.service.RedPacketTradeOrderServiceImpl"/>
 
     <bean name="redPacketAccountServiceExporter"
           class="org.springframework.remoting.httpinvoker.SimpleHttpInvokerServiceExporter">
         <property name="service" ref="redPacketAccountService"/>
         <property name="serviceInterface"
-                  value="io.tyloo.tcctransaction.sample.http.redpacket.api.RedPacketAccountService"/>
+                  value="io.tyloo.sample.http.redpacket.api.RedPacketAccountService"/>
     </bean>
 
     <bean name="redPacketTradeOrderServiceExporter"
           class="org.springframework.remoting.httpinvoker.SimpleHttpInvokerServiceExporter">
         <property name="service" ref="redPacketTradeOrderService"/>
         <property name="serviceInterface"
-                  value="io.tyloo.tcctransaction.sample.http.redpacket.api.RedPacketTradeOrderService"/>
+                  value="io.tyloo.sample.http.redpacket.api.RedPacketTradeOrderService"/>
     </bean>
 
     <bean id="httpServer"

@@ -13,25 +13,25 @@
 
     <bean id="orderDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.order.infrastructure.dao.OrderDao"></property>
+                  value="io.tyloo.sample.order.infrastructure.dao.OrderDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
     </bean>
 
     <bean id="orderLineDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.order.infrastructure.dao.OrderLineDao"></property>
+                  value="io.tyloo.sample.order.infrastructure.dao.OrderLineDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
     </bean>
 
     <bean id="shopDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.order.infrastructure.dao.ShopDao"></property>
+                  value="io.tyloo.sample.order.infrastructure.dao.ShopDao"></property>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
     </bean>
 
     <bean id="productDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
         <property name="mapperInterface"
-                  value="io.tyloo.tcctransaction.sample.order.infrastructure.dao.ProductDao"/>
+                  value="io.tyloo.sample.order.infrastructure.dao.ProductDao"/>
         <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
 

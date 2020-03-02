@@ -25,10 +25,10 @@
 
     <dubbo:protocol name="dubbo" port="${dubbo.port}" payload="52428800"/>
     <!-- 声明需要暴露的服务接口 -->
-    <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalTradeOrderService"
+    <dubbo:service interface="io.tyloo.sample.dubbo.capital.api.CapitalTradeOrderService"
                    registry="capitalRpcZk"
                    ref="capitalTradeOrderService" timeout="60000" retries="0"/>
-    <dubbo:service interface="io.tyloo.tcctransaction.sample.dubbo.capital.api.CapitalAccountService"
+    <dubbo:service interface="io.tyloo.sample.dubbo.capital.api.CapitalAccountService"
                    registry="capitalRpcZk"
                    ref="capitalAccountService" timeout="60000" retries="0"/>
 
