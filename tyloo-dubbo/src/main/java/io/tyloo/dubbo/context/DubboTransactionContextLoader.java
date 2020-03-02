@@ -3,8 +3,8 @@ package io.tyloo.dubbo.context;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.fastjson.JSON;
-import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Context.TylooContextLoader;
+import io.tyloo.api.Context.TylooTransactionContext;
+import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.dubbo.constants.TransactionContextConstants;
 
 import java.lang.reflect.Method;
@@ -20,22 +20,22 @@ import java.lang.reflect.Method;
  * @Date: 15:32 2019/12/4
  *
  */
-public class DubboTransactionContextLoader implements TylooContextLoader {
+public class DubboTransactionContextLoader implements TylooTransactionContextLoader {
     @Override
-    public TylooContext get(Object target, Method method, Object[] args) {
+    public TylooTransactionContext get(Object target, Method method, Object[] args) {
 
         //Dubbo隐式传参方式
         String context = RpcContext.getContext().getAttachment(TransactionContextConstants.TRANSACTION_CONTEXT);
 
         if (StringUtils.isNotEmpty(context)) {
-            return JSON.parseObject(context, TylooContext.class);
+            return JSON.parseObject(context, TylooTransactionContext.class);
         }
 
         return null;
     }
 
     @Override
-    public void set(TylooContext transactionContext, Object target, Method method, Object[] args) {
+    public void set(TylooTransactionContext transactionContext, Object target, Method method, Object[] args) {
 
         //Dubbo隐式传参方式
         RpcContext.getContext().setAttachment(TransactionContextConstants.TRANSACTION_CONTEXT, JSON.toJSONString(transactionContext));

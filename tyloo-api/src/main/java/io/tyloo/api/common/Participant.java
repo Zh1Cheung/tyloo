@@ -3,7 +3,6 @@ package io.tyloo.api.common;
 import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.api.Enums.TransactionStatus;
-import io.tyloo.api.Context.InvocationContext;
 
 import java.io.Serializable;
 

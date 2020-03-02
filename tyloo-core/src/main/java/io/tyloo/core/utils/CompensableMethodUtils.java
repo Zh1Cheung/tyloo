@@ -1,6 +1,7 @@
 package io.tyloo.core.utils;
 
 import io.tyloo.api.Context.TylooContext;
+import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.api.Enums.MethodRole;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -49,12 +50,12 @@ public class CompensableMethodUtils {
      * @param tylooContext  事务上下文
      * @return 方法类型
      */
-    public static MethodRole calculateMethodType(Propagation propagation, boolean isTransactionActive, TylooContext tylooContext) {
+    public static MethodRole calculateMethodType(Propagation propagation, boolean isTransactionActive, TylooTransactionContext tylooContext) {
         // Propagation.REQUIRED：支持当前事务，当前没有事务，就新建一个事务。
         return getMethodRole(propagation, isTransactionActive, tylooContext);
     }
 
-    public static MethodRole getMethodRole(Propagation propagation, boolean isTransactionActive, TylooContext tylooContext) {
+    public static MethodRole getMethodRole(Propagation propagation, boolean isTransactionActive, TylooTransactionContext tylooContext) {
         if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooContext == null) ||
                 propagation.equals(Propagation.REQUIRES_NEW)) {
             // Propagation.REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起。
@@ -73,7 +74,7 @@ public class CompensableMethodUtils {
         int position = -1;
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (parameterTypes[i].equals(TylooContext.class)) {
+            if (parameterTypes[i].equals(TylooTransactionContext.class)) {
                 position = i;
                 break;
             }

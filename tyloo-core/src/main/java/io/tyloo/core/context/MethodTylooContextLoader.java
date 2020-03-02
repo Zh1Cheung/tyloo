@@ -1,7 +1,7 @@
 package io.tyloo.core.context;
 
 import io.tyloo.api.Context.TylooContext;
-import io.tyloo.api.Context.TylooContextLoader;
+import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.core.utils.TylooMethodUtils;
 
 import java.lang.reflect.Method;
@@ -15,21 +15,21 @@ import java.lang.reflect.Method;
  *
  */
 @Deprecated
-public class MethodTylooContextLoader implements TylooContextLoader {
+public class MethodTylooContextLoader implements TylooTransactionContextLoader {
 
     @Override
-    public TylooContext get(Object target, Method method, Object[] args) {
+    public TylooTransactionContext get(Object target, Method method, Object[] args) {
         int position = TylooMethodUtils.getTransactionContextParamPosition(method.getParameterTypes());
 
         if (position >= 0) {
-            return (TylooContext) args[position];
+            return (TylooTransactionContext) args[position];
         }
         
         return null;
     }
 
     @Override
-    public void set(TylooContext tylooContext, Object target, Method method, Object[] args) {
+    public void set(TylooTransactionContext tylooContext, Object target, Method method, Object[] args) {
 
         int position = TylooMethodUtils.getTransactionContextParamPosition(method.getParameterTypes());
         if (position >= 0) {
