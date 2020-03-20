@@ -32,7 +32,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
     private DataSource dataSource;
 
-    private ObjectSerializer serializer = new KryoPoolSerializer();
+    private ObjectSerializer<TylooTransaction> serializer = new KryoPoolSerializer<>();
 
     public String getDomain() {
         return domain;
@@ -50,7 +50,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         this.tbSuffix = tbSuffix;
     }
 
-    public void setSerializer(ObjectSerializer serializer) {
+    public void setSerializer(ObjectSerializer<TylooTransaction> serializer) {
         this.serializer = serializer;
     }
 
@@ -58,7 +58,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         this.dataSource = dataSource;
     }
 
-    public DataSource getDataSource() {
+    protected DataSource getDataSource() {
         return dataSource;
     }
 
@@ -76,12 +76,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         try {
             connection = this.getConnection();
 
-            StringBuilder builder = new StringBuilder();
-            builder.append("INSERT INTO " + getTableName() +
-                    "(GLOBAL_TX_ID,BRANCH_QUALIFIER,TRANSACTION_TYPE,CONTENT,STATUS,RETRIED_COUNT,CREATE_TIME,LAST_UPDATE_TIME,VERSION");
-            builder.append(StringUtils.isNotEmpty(domain) ? ",DOMAIN ) VALUES (?,?,?,?,?,?,?,?,?,?)" : ") VALUES (?,?,?,?,?,?,?,?,?)");
-
-            stmt = connection.prepareStatement(builder.toString());
+            String builder = ("INSERT INTO " + getTableName() +
+                    "(GLOBAL_TX_ID,BRANCH_QUALIFIER,TRANSACTION_TYPE,CONTENT,STATUS,RETRIED_COUNT,CREATE_TIME,LAST_UPDATE_TIME,VERSION") +
+                    (StringUtils.isNotEmpty(domain) ? ",DOMAIN ) VALUES (?,?,?,?,?,?,?,?,?,?)" : ") VALUES (?,?,?,?,?,?,?,?,?)");
+            stmt = connection.prepareStatement(builder);
 
             stmt.setBytes(1, tylooTransaction.getXid().getGlobalTransactionId());
             stmt.setBytes(2, tylooTransaction.getXid().getBranchQualifier());
@@ -132,13 +130,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         try {
             connection = this.getConnection();
 
-            StringBuilder builder = new StringBuilder();
-            builder.append("UPDATE " + getTableName() + " SET " +
-                    "CONTENT = ?,STATUS = ?,LAST_UPDATE_TIME = ?, RETRIED_COUNT = ?,VERSION = VERSION+1 WHERE GLOBAL_TX_ID = ? AND BRANCH_QUALIFIER = ? AND VERSION = ?");
-
-            builder.append(StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
-
-            stmt = connection.prepareStatement(builder.toString());
+            String builder = ("UPDATE " + getTableName() + " SET " +
+                    "CONTENT = ?,STATUS = ?,LAST_UPDATE_TIME = ?, RETRIED_COUNT = ?,VERSION = VERSION+1 WHERE GLOBAL_TX_ID = ? AND BRANCH_QUALIFIER = ? AND VERSION = ?") +
+                    (StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
+            stmt = connection.prepareStatement(builder);
 
             stmt.setBytes(1, serializer.serialize(tylooTransaction));
             stmt.setInt(2, tylooTransaction.getTransactionStatus().getId());
@@ -153,9 +148,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
                 stmt.setString(8, domain);
             }
 
-            int result = stmt.executeUpdate();
-
-            return result;
+            return stmt.executeUpdate();
 
         } catch (Throwable e) {
             tylooTransaction.setLastUpdateTime(lastUpdateTime);
@@ -180,13 +173,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         try {
             connection = this.getConnection();
 
-            StringBuilder builder = new StringBuilder();
-            builder.append("DELETE FROM " + getTableName() +
-                    " WHERE GLOBAL_TX_ID = ? AND BRANCH_QUALIFIER = ?");
-
-            builder.append(StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
-
-            stmt = connection.prepareStatement(builder.toString());
+            String builder = ("DELETE FROM " + getTableName() +
+                    " WHERE GLOBAL_TX_ID = ? AND BRANCH_QUALIFIER = ?") +
+                    (StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
+            stmt = connection.prepareStatement(builder);
 
             stmt.setBytes(1, tylooTransaction.getXid().getGlobalTransactionId());
             stmt.setBytes(2, tylooTransaction.getXid().getBranchQualifier());
@@ -238,15 +228,12 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         try {
             connection = this.getConnection();
 
-            StringBuilder builder = new StringBuilder();
-
-            builder.append("SELECT GLOBAL_TX_ID, BRANCH_QUALIFIER, CONTENT,STATUS,TRANSACTION_TYPE,CREATE_TIME,LAST_UPDATE_TIME,RETRIED_COUNT,VERSION");
-            builder.append(StringUtils.isNotEmpty(domain) ? ",DOMAIN" : "");
-            builder.append("  FROM " + getTableName() + " WHERE LAST_UPDATE_TIME < ?");
-            builder.append(" AND IS_DELETE = 0 ");
-            builder.append(StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
-
-            stmt = connection.prepareStatement(builder.toString());
+            String builder = "SELECT GLOBAL_TX_ID, BRANCH_QUALIFIER, CONTENT,STATUS,TRANSACTION_TYPE,CREATE_TIME,LAST_UPDATE_TIME,RETRIED_COUNT,VERSION" +
+                    (StringUtils.isNotEmpty(domain) ? ",DOMAIN" : "") +
+                    "  FROM " + getTableName() + " WHERE LAST_UPDATE_TIME < ?" +
+                    " AND IS_DELETE = 0 " +
+                    (StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
+            stmt = connection.prepareStatement(builder);
 
             stmt.setTimestamp(1, new Timestamp(date.getTime()));
 
@@ -273,7 +260,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
      * @param xids
      * @return
      */
-    protected List<TylooTransaction> doFind(List<Xid> xids) {
+    private List<TylooTransaction> doFind(List<Xid> xids) {
 
         List<TylooTransaction> tylooTransactions = new ArrayList<TylooTransaction>();
 
@@ -290,7 +277,7 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
             StringBuilder builder = new StringBuilder();
             builder.append("SELECT GLOBAL_TX_ID, BRANCH_QUALIFIER, CONTENT,STATUS,TRANSACTION_TYPE,CREATE_TIME,LAST_UPDATE_TIME,RETRIED_COUNT,VERSION");
             builder.append(StringUtils.isNotEmpty(domain) ? ",DOMAIN" : "");
-            builder.append("  FROM " + getTableName() + " WHERE");
+            builder.append("  FROM ").append(getTableName()).append(" WHERE");
 
             if (!CollectionUtils.isEmpty(xids)) {
                 for (Xid xid : xids) {
@@ -328,10 +315,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         return tylooTransactions;
     }
 
-    protected void constructTransactions(ResultSet resultSet, List<TylooTransaction> tylooTransactions) throws SQLException {
+    private void constructTransactions(ResultSet resultSet, List<TylooTransaction> tylooTransactions) throws SQLException {
         while (resultSet.next()) {
             byte[] transactionBytes = resultSet.getBytes(3);
-            TylooTransaction tylooTransaction = (TylooTransaction) serializer.deserialize(transactionBytes);
+            TylooTransaction tylooTransaction = serializer.deserialize(transactionBytes);
             tylooTransaction.changeStatus(TransactionStatus.valueOf(resultSet.getInt(4)));
             tylooTransaction.setLastUpdateTime(resultSet.getDate(7));
             tylooTransaction.setVersion(resultSet.getLong(9));

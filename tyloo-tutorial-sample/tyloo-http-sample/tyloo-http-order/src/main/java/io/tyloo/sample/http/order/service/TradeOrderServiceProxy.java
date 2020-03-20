@@ -6,7 +6,7 @@ import io.tyloo.api.Tyloo;
 import io.tyloo.api.TylooContext;
 import io.tyloo.sample.http.redpacket.api.RedPacketTradeOrderService;
 import io.tyloo.sample.http.redpacket.api.dto.RedPacketTradeOrderDto;
-import io.tyloo.tcctransaction.context.MethodTylooContextLoader;
+import io.tyloo.context.MethodTylooContextLoader;
 import io.tyloo.sample.http.capital.api.CapitalTradeOrderService;
 import io.tyloo.sample.http.capital.api.dto.CapitalTradeOrderDto;
 import org.springframework.beans.factory.annotation.Autowired;

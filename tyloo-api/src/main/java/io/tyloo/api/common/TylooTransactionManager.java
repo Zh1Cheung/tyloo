@@ -104,7 +104,7 @@ public class TylooTransactionManager {
 
         if (tylooTransaction != null) {
             // 设置 事务 状态
-            tylooTransaction.changeStatus(TransactionStatus.valueOf(tylooTransactionContext.getStatus()));
+            tylooTransaction.setTransactionStatus(TransactionStatus.valueOf(tylooTransactionContext.getStatus()));
             // 注册 事务
             registerTransaction(tylooTransaction);
             return tylooTransaction;
@@ -120,7 +120,7 @@ public class TylooTransactionManager {
         // 获取 事务
         final TylooTransaction tylooTransaction = getCurrentTransaction();
         // 设置 事务状态 为 CONFIRMING
-        tylooTransaction.changeStatus(TransactionStatus.CONFIRMING);
+        tylooTransaction.setTransactionStatus(TransactionStatus.CONFIRMING);
         // 更新 事务
         transactionRepository.update(tylooTransaction);
 
@@ -150,7 +150,7 @@ public class TylooTransactionManager {
     public void rollback(boolean asyncRollback) {
 
         final TylooTransaction tylooTransaction = getCurrentTransaction();
-        tylooTransaction.changeStatus(TransactionStatus.CANCELLING);
+        tylooTransaction.setTransactionStatus(TransactionStatus.CANCELLING);
 
         transactionRepository.update(tylooTransaction);
 

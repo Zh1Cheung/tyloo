@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-capital" />
+    <file type="web" url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-order" />
+    <file type="web" url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-redpacket" />
+    <file type="web" url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-capital" />
+    <file type="web" url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-order" />
+    <file type="web" url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-redpacket" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>

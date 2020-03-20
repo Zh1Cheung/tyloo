@@ -29,22 +29,22 @@ public @interface Tyloo {
     /**
      * 传播级别
      */
-    public Propagation propagation() default Propagation.REQUIRED;
+    Propagation propagation() default Propagation.REQUIRED;
 
     /**
      * 确认执行业务方法
      */
-    public String confirmMethod() default "";
+    String confirmMethod() default "";
 
     /**
      * 取消执行业务方法
      */
-    public String cancelMethod() default "";
+    String cancelMethod() default "";
 
     /**
      * 事务上下文编辑
      */
-    public Class<? extends TylooTransactionContextLoader> tylooContextLoader() default DefaultTylooTransactionContextLoader.class;
+    Class<? extends TylooTransactionContextLoader> tylooContextLoader() default DefaultTylooTransactionContextLoader.class;
 
     /**
      * 超时异常
@@ -53,25 +53,11 @@ public @interface Tyloo {
      *
      * @return
      */
-    public Class<? extends Exception>[] delayCancelExceptions() default {};
+    Class<? extends Exception>[] delayCancelExceptions() default {};
 
-    public boolean asyncConfirm() default false;
+    boolean asyncConfirm() default false;
 
-    public boolean asyncCancel() default false;
-
-    //无事务上下文编辑器实现
-    class NullableTylooTransactionContextLoader implements TylooTransactionContextLoader {
-
-        @Override
-        public TylooTransactionContext get(Object target, Method method, Object[] args) {
-            return null;
-        }
-
-        @Override
-        public void set(TylooTransactionContext tylooTransactionContext, Object target, Method method, Object[] args) {
-
-        }
-    }
+    boolean asyncCancel() default false;
 
     //默认事务上下文编辑器实现
     class DefaultTylooTransactionContextLoader implements TylooTransactionContextLoader {

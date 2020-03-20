@@ -8,15 +8,11 @@ package io.tyloo.api.Enums;
  *
  */
 public enum Role {
+
     /**
      * 根
      */
     ROOT,
-
-    /**
-     * 消费者
-     */
-    CONSUMER,
 
     /**
      * 提供者

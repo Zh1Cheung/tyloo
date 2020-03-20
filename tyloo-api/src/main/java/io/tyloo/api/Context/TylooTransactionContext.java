@@ -50,7 +50,7 @@ public class TylooTransactionContext implements Serializable {
         this.xid = xid;
     }
 
-    public io.tyloo.api.common.TylooTransactionXid getXid() {
+    public TylooTransactionXid getXid() {
         return xid.clone();
     }
 

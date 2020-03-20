@@ -1,11 +1,15 @@
 package io.tyloo.api.common;
 
 
+import io.tyloo.api.Context.InvocationContext;
 import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.core.exception.SystemException;
 import io.tyloo.core.support.FactoryBuilder;
 import io.tyloo.core.utils.StringUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -18,14 +22,12 @@ import java.lang.reflect.Method;
  * @Date: 20:01 2019/12/4
  *
  */
-public class Terminator implements Serializable {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class Terminator implements Serializable {
 
     private static final long serialVersionUID = -164958655471605778L;
-
-
-    public Terminator() {
-
-    }
 
     /**
      * 根据调用上下文，获取目标方法并执行方法调用.

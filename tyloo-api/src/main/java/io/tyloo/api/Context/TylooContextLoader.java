@@ -23,7 +23,7 @@ public interface TylooContextLoader {
      * @return 事务上下文
      */
 
-    public TylooContext get(Object target, Method method, Object[] args);
+    public TylooTransactionContext get(Object target, Method method, Object[] args);
 
     /**
      * 设置事务上下文到参数中
@@ -33,6 +33,6 @@ public interface TylooContextLoader {
      * @param method             方法
      * @param args               参数
      */
-    public void set(TylooContext tylooContext, Object target, Method method, Object[] args);
+    public void set(TylooTransactionContext tylooContext, Object target, Method method, Object[] args);
 
 }

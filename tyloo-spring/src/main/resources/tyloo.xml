@@ -14,7 +14,7 @@
     <bean id="transactionConfigurator" class="io.tyloo.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
     <!-- 可补偿事务拦截器 -->
-    <bean id="TylooAspect" class="io.tyloo.spring.aspect.ConfigurableTransactionTransactionAspect"
+    <bean id="TylooAspect" class="io.tyloo.spring.aspect.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>

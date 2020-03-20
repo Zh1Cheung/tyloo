@@ -4,9 +4,9 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="io.tyloo.tcctransaction.sample.dubbo*"/>
+    <context:component-scan base-package="io.tyloo.sample.dubbo*"/>
 
-    <bean class="io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultRecoverConfig">
         <property name="maxRetryCount" value="30"/>
         <property name="recoverDuration" value="30"/>
         <property name="cronExpression" value="0/30 * * * * ?"/>
@@ -18,7 +18,7 @@
     </bean>
 
     <bean id="transactionRepository"
-          class="io.tyloo.tcctransaction.spring.repository.SpringJdbcTransactionRepository">
+          class="io.tyloo.spring.repository.SpringJdbcTransactionRepository">
         <property name="dataSource" ref="tccDataSource"/>
         <property name="domain" value="ORDER"/>
         <property name="tbSuffix" value="_ORD"/>

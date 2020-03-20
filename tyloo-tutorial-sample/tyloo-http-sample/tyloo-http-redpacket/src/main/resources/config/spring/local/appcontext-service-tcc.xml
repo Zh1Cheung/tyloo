@@ -5,11 +5,11 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <context:component-scan base-package="io.tyloo.tcctransaction.sample.http"/>
+    <context:component-scan base-package="io.tyloo.sample.http"/>
 
     <util:properties id="tccjdbc" location="classpath:tccjdbc.properties"/>
 
-    <bean class="io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultRecoverConfig">
         <property name="maxRetryCount" value="5"/>
         <property name="recoverDuration" value="60"/>
         <property name="cronExpression" value="0/30 * * * * ?"/>
@@ -17,7 +17,7 @@
 
 
     <bean id="transactionRepository"
-    class="io.tyloo.tcctransaction.spring.repository.SpringJdbcTransactionRepository">
+    class="io.tyloo.spring.repository.SpringJdbcTransactionRepository">
     <property name="dataSource" ref="tccDataSource"/>
     <property name="domain" value="REDPACKET"/>
     <property name="tbSuffix" value="_RED"/>
@@ -37,7 +37,7 @@
         <property name="checkoutTimeout" value="#{tccjdbc['c3p0.checkoutTimeout']}"/>
     </bean>
 
-    <bean id="kryoSerializer" class="io.tyloo.tcctransaction.serializer.KryoPoolSerializer"/>
+    <bean id="kryoSerializer" class="io.tyloo.serializer.KryoPoolSerializer"/>
 
 <!--     <bean id="transactionRepository" class="RedisTransactionRepository">
         <property name="keyPrefix" value="TCC:RED:"/>

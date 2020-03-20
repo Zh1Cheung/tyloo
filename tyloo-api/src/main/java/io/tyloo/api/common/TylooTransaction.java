@@ -4,6 +4,9 @@ package io.tyloo.api.common;
 import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.api.Enums.TransactionStatus;
 import io.tyloo.api.Enums.TransactionType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.transaction.xa.Xid;
 import java.io.Serializable;
@@ -21,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 20:02 2019/12/4
  *
  */
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TylooTransaction implements Serializable {
 
     private static final long serialVersionUID = 7291423944314337931L;
@@ -61,9 +68,7 @@ public class TylooTransaction implements Serializable {
      */
     private Map<String, Object> attachments = new ConcurrentHashMap<String, Object>();
 
-    public TylooTransaction() {
 
-    }
 
     /**
      * 创建分支事务
@@ -110,27 +115,6 @@ public class TylooTransaction implements Serializable {
     }
 
 
-    public Xid getXid() {
-        return xid.clone();
-    }
-
-    public TransactionStatus getTransactionStatus() {
-        return transactionStatus;
-    }
-
-
-    public List<Participant> getParticipants() {
-        return participants;
-    }
-
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
-
-    public void changeStatus(TransactionStatus transactionStatus) {
-        this.transactionStatus = transactionStatus;
-    }
-
     /**
      * 提交 TCC 事务
      */
@@ -148,50 +132,6 @@ public class TylooTransaction implements Serializable {
         for (Participant participant : participants) {
             participant.rollback();
         }
-    }
-
-    public int getRetriedCount() {
-        return retriedCount;
-    }
-
-    public void addRetriedCount() {
-        this.retriedCount++;
-    }
-
-    public void resetRetriedCount(int retriedCount) {
-        this.retriedCount = retriedCount;
-    }
-
-    public Map<String, Object> getAttachments() {
-        return attachments;
-    }
-
-    public long getVersion() {
-        return version;
-    }
-
-    public void updateVersion() {
-        this.version++;
-    }
-
-    public void setVersion(long version) {
-        this.version = version;
-    }
-
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
-    }
-
-    public void setLastUpdateTime(Date date) {
-        this.lastUpdateTime = date;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void updateTime() {
-        this.lastUpdateTime = new Date();
     }
 
 

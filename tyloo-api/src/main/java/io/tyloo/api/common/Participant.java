@@ -1,8 +1,12 @@
 package io.tyloo.api.common;
 
+import io.tyloo.api.Context.InvocationContext;
 import io.tyloo.api.Context.TylooTransactionContext;
 import io.tyloo.api.Context.TylooTransactionContextLoader;
 import io.tyloo.api.Enums.TransactionStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -14,6 +18,9 @@ import java.io.Serializable;
  * @Date: 20:00 2019/12/4
  *
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Participant implements Serializable {
 
     private static final long serialVersionUID = 4127729421281425247L;
@@ -39,10 +46,6 @@ public class Participant implements Serializable {
      */
     private Terminator terminator = new Terminator();
 
-
-    public Participant() {
-
-    }
 
     public Participant(TylooTransactionXid xid, InvocationContext confirmInvocationContext, InvocationContext cancelInvocationContext, Class<? extends TylooTransactionContextLoader> tylooContextLoaderClass) {
         this.xid = xid;
@@ -74,21 +77,4 @@ public class Participant implements Serializable {
     public void commit() {
         terminator.invoke(new TylooTransactionContext(xid, TransactionStatus.CONFIRMING.getId()), confirmInvocationContext, tylooContextLoaderClass);
     }
-
-    public Terminator getTerminator() {
-        return terminator;
-    }
-
-    public TylooTransactionXid getXid() {
-        return xid;
-    }
-
-    public InvocationContext getConfirmInvocationContext() {
-        return confirmInvocationContext;
-    }
-
-    public InvocationContext getCancelInvocationContext() {
-        return cancelInvocationContext;
-    }
-
 }

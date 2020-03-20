@@ -1,6 +1,6 @@
 package io.tyloo.tcctransaction.unit.test;
 
-import io.tyloo.tcctransaction.unittest.client.TransferService;
+import io.tyloo.unittest.client.TransferService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

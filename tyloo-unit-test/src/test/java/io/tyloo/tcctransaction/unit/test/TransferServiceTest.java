@@ -1,12 +1,12 @@
 package io.tyloo.tcctransaction.unit.test;
 
-import io.tyloo.tcctransaction.unittest.client.TransferService;
-import io.tyloo.tcctransaction.unittest.entity.AccountRecord;
-import io.tyloo.tcctransaction.unittest.entity.AccountStatus;
-import io.tyloo.tcctransaction.unittest.entity.SubAccount;
-import io.tyloo.tcctransaction.unittest.repository.AccountRecordRepository;
-import io.tyloo.tcctransaction.unittest.repository.SubAccountRepository;
-import io.tyloo.tcctransaction.unittest.utils.UnitTest;
+import io.tyloo.unittest.client.TransferService;
+import io.tyloo.unittest.entity.AccountRecord;
+import io.tyloo.unittest.entity.AccountStatus;
+import io.tyloo.unittest.entity.SubAccount;
+import io.tyloo.unittest.repository.AccountRecordRepository;
+import io.tyloo.unittest.repository.SubAccountRepository;
+import io.tyloo.unittest.utils.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
 import io.tyloo.tcctransaction.exception.SystemException;

@@ -28,7 +28,7 @@ public class TylooMethodUtils {
         return getMethod(pjp);
     }
 
-    public static Method getMethod(ProceedingJoinPoint pjp) {
+    private static Method getMethod(ProceedingJoinPoint pjp) {
         Method method = ((MethodSignature) (pjp.getSignature())).getMethod();
 
         if (method.getAnnotation(Tyloo.class) == null) {
@@ -55,6 +55,10 @@ public class TylooMethodUtils {
     }
 
     public static Role getMethodRole(Propagation propagation, boolean isTransactionActive, TylooTransactionContext tylooTransactionContext) {
+        return getRole(propagation, isTransactionActive, tylooTransactionContext);
+    }
+
+    static Role getRole(Propagation propagation, boolean isTransactionActive, TylooTransactionContext tylooTransactionContext) {
         if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && tylooTransactionContext == null) ||
                 propagation.equals(Propagation.REQUIRES_NEW)) {
             // Propagation.REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起。
