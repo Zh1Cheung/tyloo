@@ -1,8 +1,11 @@
 package io.tyloo.spring.recover;
 
 import io.tyloo.core.exception.SystemException;
-import io.tyloo.core.recover.Recovery;
+import io.tyloo.core.recover.TylooTransactionRecovery;
 import io.tyloo.core.support.TransactionConfigurator;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.quartz.Scheduler;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
@@ -16,12 +19,15 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
  * @Date: 20:15 2019/12/4
  *
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RecoverScheduledJob {
 
     /**
      * 事务恢复
      */
-    private Recovery transactionRecovery;
+    private TylooTransactionRecovery transactionTylooTransactionRecovery;
 
     /**
      * 注入的是TCC事务配置器.
@@ -42,7 +48,7 @@ public class RecoverScheduledJob {
             // MethodInvokingJobDetailFactoryBean 负责生成具体的任务，只需要指定某个对象的某个方法，在触发器触发时，即调用指定对象的指定方法
             MethodInvokingJobDetailFactoryBean jobDetail = new MethodInvokingJobDetailFactoryBean();
             // 指定该任务对应的调用对象，这个对象所属的类无需实现任何接口
-            jobDetail.setTargetObject(transactionRecovery);
+            jobDetail.setTargetObject(transactionTylooTransactionRecovery);
             // 指定在targetObject对象中某个的方法(此处调用TransactionRecovery中的startRecover方法)
             jobDetail.setTargetMethod("startRecover");
             // 设置任务名称
@@ -58,7 +64,7 @@ public class RecoverScheduledJob {
             // 设置触发器名称
             cronTrigger.setBeanName("transactionRecoveryCronTrigger");
             // 触发规则（这里通过事务配置器获取事务恢复定时任务规则）
-            cronTrigger.setCronExpression(transactionConfigurator.getRecoverConfig().getCronExpression());
+            cronTrigger.setCronExpression(transactionConfigurator.getTylooTransactionRecoverConfig().getCronExpression());
             cronTrigger.setJobDetail(jobDetail.getObject());
             cronTrigger.afterPropertiesSet();
 
@@ -73,19 +79,4 @@ public class RecoverScheduledJob {
         }
     }
 
-    public void setTransactionRecovery(Recovery transactionRecovery) {
-        this.transactionRecovery = transactionRecovery;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
-    public void setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
-
-    public void setTransactionConfigurator(TransactionConfigurator transactionConfigurator) {
-        this.transactionConfigurator = transactionConfigurator;
-    }
 }

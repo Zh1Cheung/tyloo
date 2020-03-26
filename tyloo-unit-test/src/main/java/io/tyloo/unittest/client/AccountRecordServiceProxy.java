@@ -1,6 +1,5 @@
 package io.tyloo.unittest.client;
 
-import io.tyloo.api.TransactionContext;
 import io.tyloo.unittest.thirdservice.AccountRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

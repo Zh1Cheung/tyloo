@@ -6,7 +6,7 @@
 
     <context:component-scan base-package="io.tyloo.sample.dubbo*"/>
 
-    <bean class="io.tyloo.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultTylooTransactionRecoverConfig">
         <property name="maxRetryCount" value="30"/>
         <property name="recoverDuration" value="30"/>
         <property name="cronExpression" value="0/30 * * * * ?"/>

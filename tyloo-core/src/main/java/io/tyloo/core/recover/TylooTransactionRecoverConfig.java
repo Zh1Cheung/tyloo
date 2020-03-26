@@ -9,7 +9,7 @@ import java.util.Set;
  * @Date: 18:50 2019/12/4
  *
  */
-public interface RecoverConfig {
+public interface TylooTransactionRecoverConfig {
 
     /**
      * 获取最大重试次数

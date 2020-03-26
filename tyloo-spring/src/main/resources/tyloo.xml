@@ -27,7 +27,7 @@
     <task:annotation-driven/>
 
     <!-- 事务恢复 -->
-    <bean id="transactionRecovery" class="io.tyloo.core.recover.Recovery">
+    <bean id="transactionTylooTransactionRecovery" class="io.tyloo.core.recover.TylooTransactionRecovery">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
     <!-- 事务恢复任务调度器 -->
@@ -35,7 +35,7 @@
     <!-- 事务恢复调度任务，初始化方法：init -->
     <bean id="recoverScheduledJob" class="io.tyloo.spring.recover.RecoverScheduledJob"
           init-method="init">
-        <property name="transactionRecovery" ref="transactionRecovery"/>
+        <property name="transactionTylooTransactionRecovery" ref="transactionTylooTransactionRecovery"/>
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
         <property name="scheduler" ref="recoverScheduler"/>
     </bean>

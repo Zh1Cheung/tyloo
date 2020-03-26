@@ -4,10 +4,10 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="io.tyloo.tcctransaction.unittest"/>
+    <context:component-scan base-package="io.tyloo.unittest"/>
 
 
-    <bean class="io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultTylooTransactionRecoverConfig">
         <property name="maxRetryCount" value="30"/>
         <property name="recoverDuration" value="5"/>
         <property name="cronExpression" value="0/5 * * * * ?"/>
@@ -20,7 +20,7 @@
         <!--<property name="tbSuffix" value="_UT"/>-->
     <!--</bean>-->
 
-    <bean id="transactionSerializer" class="io.tyloo.tcctransaction.serializer.JdkSerializationSerializer"/>
+    <bean id="transactionSerializer" class="io.tyloo.core.serializer.JdkSerializationSerializer"/>
 
 
     <!--<bean id="tccDataSource" class="org.apache.commons.dbcp.BasicDataSource"-->
@@ -44,7 +44,7 @@
       appendonly yes
       appendfsync always
       -->
-    <bean id="transactionRepository" class="io.tyloo.tcctransaction.repository.RedisTransactionRepository">
+    <bean id="transactionRepository" class="io.tyloo.core.repository.RedisTransactionRepository">
     <property name="keyPrefix" value="tcc_ut_"/>
     <property name="jedisPool" ref="jedisPool"/>
     </bean>

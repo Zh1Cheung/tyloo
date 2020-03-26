@@ -16,6 +16,7 @@
         <module>tyloo-spring</module>
         <module>tyloo-tutorial-sample</module>
         <module>tyloo-unit-test</module>
+        <module>tyloo-spring-boot-starter</module>
     </modules>
 
 </project>

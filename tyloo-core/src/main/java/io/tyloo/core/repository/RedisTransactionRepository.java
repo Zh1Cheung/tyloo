@@ -166,7 +166,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     protected TylooTransaction doFindOne(final Xid xid) {
 
         try {
-            Long startTime = System.currentTimeMillis();
+            long startTime = System.currentTimeMillis();
             Map<byte[], byte[]> content = RedisHelper.execute(jedisPool, new JedisCallback<Map<byte[], byte[]>>() {
                 @Override
                 public Map<byte[], byte[]> doInJedis(Jedis jedis) {

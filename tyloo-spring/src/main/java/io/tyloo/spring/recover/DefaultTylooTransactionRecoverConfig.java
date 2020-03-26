@@ -1,7 +1,7 @@
 package io.tyloo.spring.recover;
 
 import io.tyloo.core.exception.OptimisticLockException;
-import io.tyloo.core.recover.RecoverConfig;
+import io.tyloo.core.recover.TylooTransactionRecoverConfig;
 
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
@@ -15,9 +15,9 @@ import java.util.Set;
  * @Date: 20:14 2019/12/4
  *
  */
-public class DefaultRecoverConfig implements RecoverConfig {
+public class DefaultTylooTransactionRecoverConfig implements TylooTransactionRecoverConfig {
 
-    public static final RecoverConfig INSTANCE = new DefaultRecoverConfig();
+    public static final TylooTransactionRecoverConfig INSTANCE = new DefaultTylooTransactionRecoverConfig();
 
     /**
      * 一个事务最多尝试恢复次数（超过将不在自动恢复，需要人工干预，默认是30次）
@@ -44,7 +44,7 @@ public class DefaultRecoverConfig implements RecoverConfig {
      */
     private Set<Class<? extends Exception>> delayCancelExceptions = new HashSet<Class<? extends Exception>>();
 
-    public DefaultRecoverConfig() {
+    public DefaultTylooTransactionRecoverConfig() {
 
         /**
          * 还是 SocketTimeoutException 的情况，事务恢复间隔时间小于 Socket 超时时间，此时事务恢复调用远程参与者取消回滚事务，

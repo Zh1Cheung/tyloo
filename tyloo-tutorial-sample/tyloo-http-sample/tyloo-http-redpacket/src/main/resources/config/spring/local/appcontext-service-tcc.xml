@@ -9,7 +9,7 @@
 
     <util:properties id="tccjdbc" location="classpath:tccjdbc.properties"/>
 
-    <bean class="io.tyloo.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultTylooTransactionRecoverConfig">
         <property name="maxRetryCount" value="5"/>
         <property name="recoverDuration" value="60"/>
         <property name="cronExpression" value="0/30 * * * * ?"/>

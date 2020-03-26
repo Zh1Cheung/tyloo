@@ -30,7 +30,7 @@ public class ConfigurableTransactionAspect extends TylooAspect implements Ordere
 
         TylooInterceptor TylooTransactionInterceptor = new TylooInterceptor();
         TylooTransactionInterceptor.setTylooTransactionManager(tylooTransactionManager);
-        TylooTransactionInterceptor.setDelayCancelExceptions(transactionConfigurator.getRecoverConfig().getDelayCancelExceptions());
+        TylooTransactionInterceptor.setDelayCancelExceptions(transactionConfigurator.getTylooTransactionRecoverConfig().getDelayCancelExceptions());
 
         this.setTylooInterceptor(TylooTransactionInterceptor);
     }

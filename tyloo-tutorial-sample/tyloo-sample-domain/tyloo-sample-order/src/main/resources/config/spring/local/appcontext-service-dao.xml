@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans [
+        <!ELEMENT beans (context:component-scan|bean)*>
+        <!ATTLIST beans
+                xmlns CDATA #REQUIRED
+                xmlns:xsi CDATA #REQUIRED
+                xmlns:util CDATA #REQUIRED
+                xmlns:context CDATA #REQUIRED
+                xmlns:p CDATA #REQUIRED
+                xsi:schemaLocation CDATA #REQUIRED>
+        <!ELEMENT context:component-scan (#PCDATA)>
+        <!ATTLIST context:component-scan
+                base-package CDATA #REQUIRED>
+        <!ELEMENT bean (property)*>
+        <!ATTLIST bean
+                class CDATA #REQUIRED
+                id CDATA #REQUIRED>
+        <!ELEMENT property (#PCDATA)>
+        <!ATTLIST property
+                name CDATA #REQUIRED
+                ref CDATA #IMPLIED
+                value CDATA #IMPLIED>
+        ]>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:component-scan base-package="io.tyloo.sample"/>

@@ -1,11 +1,14 @@
 package io.tyloo.spring.support;
 
 import io.tyloo.api.common.TylooTransactionManager;
+import io.tyloo.core.recover.TylooTransactionRecoverConfig;
 import io.tyloo.core.repository.TransactionRepository;
-import io.tyloo.core.recover.RecoverConfig;
 import io.tyloo.core.repository.CachableTransactionRepository;
-import io.tyloo.spring.recover.DefaultRecoverConfig;
+import io.tyloo.spring.recover.DefaultTylooTransactionRecoverConfig;
 import io.tyloo.core.support.TransactionConfigurator;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.ExecutorService;
@@ -17,6 +20,9 @@ import java.util.concurrent.Executors;
  * @Date: 20:20 2019/12/4
  *
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SpringTransactionConfigurator implements TransactionConfigurator {
 
     private static volatile ExecutorService executorService = null;
@@ -30,7 +36,7 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
      * 事务恢复配置
      */
     @Autowired(required = false)
-    private RecoverConfig recoverConfig = DefaultRecoverConfig.INSTANCE;
+    private TylooTransactionRecoverConfig tylooTransactionRecoverConfig = DefaultTylooTransactionRecoverConfig.INSTANCE;
 
     /**
      * 根据事务配置器创建事务管理器.
@@ -46,8 +52,8 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
             synchronized (SpringTransactionConfigurator.class) {
 
                 if (executorService == null) {
-//                    executorService = new ThreadPoolExecutor(recoverConfig.getAsyncTerminateThreadPoolSize(),
-//                            recoverConfig.getAsyncTerminateThreadPoolSize(),
+//                    executorService = new ThreadPoolExecutor(tylooTransactionRecoverConfig.getAsyncTerminateThreadPoolSize(),
+//                            tylooTransactionRecoverConfig.getAsyncTerminateThreadPoolSize(),
 //                            0L, TimeUnit.SECONDS,
 //                            new SynchronousQueue<Runnable>());
                     executorService = Executors.newCachedThreadPool();
@@ -58,7 +64,7 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
         tylooTransactionManager.setExecutorService(executorService);
 
         if (transactionRepository instanceof CachableTransactionRepository) {
-            ((CachableTransactionRepository) transactionRepository).setExpireDuration(recoverConfig.getRecoverDuration());
+            ((CachableTransactionRepository) transactionRepository).setExpireDuration(tylooTransactionRecoverConfig.getRecoverDuration());
         }
     }
 
@@ -82,7 +88,7 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
      * 获取事务恢复配置.
      */
     @Override
-    public RecoverConfig getRecoverConfig() {
-        return recoverConfig;
+    public TylooTransactionRecoverConfig getTylooTransactionRecoverConfig() {
+        return tylooTransactionRecoverConfig;
     }
 }

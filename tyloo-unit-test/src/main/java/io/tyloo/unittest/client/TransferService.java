@@ -1,8 +1,7 @@
 package io.tyloo.unittest.client;
-
-import io.tyloo.api.Tyloo;
-import io.tyloo.api.Propagation;
-import io.tyloo.api.UniqueIdentity;
+import io.tyloo.api.Annotation.Tyloo;
+import io.tyloo.api.Annotation.UniqueIdentity;
+import io.tyloo.api.Enums.Propagation;
 import io.tyloo.unittest.repository.SubAccountRepository;
 import io.tyloo.unittest.entity.AccountStatus;
 import io.tyloo.unittest.entity.SubAccount;

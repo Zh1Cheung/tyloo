@@ -5,12 +5,12 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <context:component-scan base-package="io.tyloo.tcctransaction.sample.dubbo*"/>
+    <context:component-scan base-package="io.tyloo.sample.dubbo*"/>
 
     <util:properties id="tccJdbc" location="classpath:tccjdbc.properties"/>
 
     <!-- 设置恢复策略(可选） -->
-    <bean class="io.tyloo.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultTylooTransactionRecoverConfig">
         <!-- maxRetryCount表示一个事务最多尝试恢复次数，超过将不在自动恢复，需要人工干预，默认是30次 -->
         <property name="maxRetryCount" value="30"/>
         <!-- recoverDuration表示一个事务日志当超过一定时间间隔后没有更新就会被认为是发生了异常，需要恢复，

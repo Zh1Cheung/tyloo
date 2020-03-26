@@ -25,9 +25,9 @@ import java.util.List;
  * @Date: 18:51 2019/12/4
  *
  */
-public class Recovery {
+public class TylooTransactionRecovery {
 
-    static final Logger logger = Logger.getLogger(Recovery.class.getSimpleName());
+    static final Logger logger = Logger.getLogger(TylooTransactionRecovery.class.getSimpleName());
 
     /**
      * TCC事务配置器.
@@ -56,9 +56,9 @@ public class Recovery {
         // 获取事务库
         TransactionRepository transactionRepository = transactionConfigurator.getTransactionRepository();
         // 获取事务恢复配置
-        RecoverConfig recoverConfig = transactionConfigurator.getRecoverConfig();
+        TylooTransactionRecoverConfig tylooTransactionRecoverConfig = transactionConfigurator.getTylooTransactionRecoverConfig();
 
-        return transactionRepository.findAllUnmodifiedSince(new Date(currentTimeInMillis - recoverConfig.getRecoverDuration() * 1000));
+        return transactionRepository.findAllUnmodifiedSince(new Date(currentTimeInMillis - tylooTransactionRecoverConfig.getRecoverDuration() * 1000));
     }
 
     /**
@@ -71,7 +71,7 @@ public class Recovery {
 
         for (TylooTransaction tylooTransaction : tylooTransactions) {
             //比较重试次数，大于则跳过该事务
-            if (tylooTransaction.getRetriedCount() > transactionConfigurator.getRecoverConfig().getMaxRetryCount()) {
+            if (tylooTransaction.getRetriedCount() > transactionConfigurator.getTylooTransactionRecoverConfig().getMaxRetryCount()) {
 
                 logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,tylooTransaction content:%s", tylooTransaction.getXid(), tylooTransaction.getTransactionStatus().getId(), tylooTransaction.getRetriedCount(), JSON.toJSONString(tylooTransaction)));
                 continue;
@@ -80,8 +80,8 @@ public class Recovery {
             //当前事务是分支事务或超时，则跳过该事务
             if (tylooTransaction.getTransactionType().equals(TransactionType.BRANCH)
                     && (tylooTransaction.getCreateTime().getTime() +
-                    transactionConfigurator.getRecoverConfig().getMaxRetryCount() *
-                            transactionConfigurator.getRecoverConfig().getRecoverDuration() * 1000
+                    transactionConfigurator.getTylooTransactionRecoverConfig().getMaxRetryCount() *
+                            transactionConfigurator.getTylooTransactionRecoverConfig().getRecoverDuration() * 1000
                     > System.currentTimeMillis())) {
                 continue;
             }

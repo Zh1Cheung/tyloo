@@ -1,7 +1,7 @@
 package io.tyloo.core.support;
 
 import io.tyloo.api.common.TylooTransactionManager;
-import io.tyloo.core.recover.RecoverConfig;
+import io.tyloo.core.recover.TylooTransactionRecoverConfig;
 import io.tyloo.core.repository.TransactionRepository;
 
 /*
@@ -32,6 +32,6 @@ public interface TransactionConfigurator {
      *
      * @return
      */
-    public RecoverConfig getRecoverConfig();
+    public TylooTransactionRecoverConfig getTylooTransactionRecoverConfig();
 
 }

@@ -1,8 +1,8 @@
 package io.tyloo.unittest.service;
 
-import io.tyloo.api.Tyloo;
-import io.tyloo.api.Propagation;
-import io.tyloo.api.TylooContext;
+
+import io.tyloo.api.Annotation.Tyloo;
+import io.tyloo.api.Enums.Propagation;
 import io.tyloo.unittest.utils.UnitTest;
 import io.tyloo.unittest.client.AccountRecordServiceProxy;
 import io.tyloo.unittest.entity.AccountStatus;
