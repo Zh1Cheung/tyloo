@@ -33,10 +33,9 @@ class Terminator implements Serializable {
      * 根据调用上下文，获取目标方法并执行方法调用.
      *
      * @param invocationContext
-     * @return
      */
 
-    public Object invoke(TylooTransactionContext tylooTransactionContext, InvocationContext invocationContext, Class<? extends TylooTransactionContextLoader> tylooContextLoaderClass) {
+    public void invoke(TylooTransactionContext tylooTransactionContext, InvocationContext invocationContext, Class<? extends TylooTransactionContextLoader> tylooContextLoaderClass) {
 
 
         if (StringUtils.isNotEmpty(invocationContext.getMethodName())) {
@@ -54,12 +53,11 @@ class Terminator implements Serializable {
                 instance.set(tylooTransactionContext, target, method, invocationContext.getArgs());
 
                 // 调用服务方法，被再次被TylooAspect和TylooCoordinatorAspect拦截，但因为事务状态已经不再是TRYING了，所以直接执行远程服务
-                return method.invoke(target, invocationContext.getArgs());
+                method.invoke(target, invocationContext.getArgs());
 
             } catch (Exception e) {
                 throw new SystemException(e);
             }
         }
-        return null;
     }
 }

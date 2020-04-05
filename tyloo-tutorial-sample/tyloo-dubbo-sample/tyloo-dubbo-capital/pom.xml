@@ -49,11 +49,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.101tec</groupId>
-            <artifactId>zkclient</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
@@ -83,18 +78,26 @@
             <version>1.2.7</version>
             <scope>compile</scope>
         </dependency>
+
+        <!--<dependency>-->
+        <!--<groupId>com.101tec</groupId>-->
+        <!--<artifactId>zkclient</artifactId>-->
+        <!--</dependency>-->
+
+
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>2.5.6.SEC03</version>
-            <scope>compile</scope>
+            <artifactId>spring-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
-            <scope>compile</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
 
 
     </dependencies>

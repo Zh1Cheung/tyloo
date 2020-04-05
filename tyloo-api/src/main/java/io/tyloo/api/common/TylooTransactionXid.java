@@ -62,14 +62,10 @@ public class TylooTransactionXid implements Xid, Serializable {
     public TylooTransactionXid(Object uniqueIdentity) {
 
         if (uniqueIdentity == null) {
-
             globalTransactionId = uuidToByteArray(UUID.randomUUID());
             branchQualifier = uuidToByteArray(UUID.randomUUID());
-
         } else {
-
             this.globalTransactionId = CUSTOMIZED_TRANSACTION_ID;
-
             this.branchQualifier = uniqueIdentity.toString().getBytes();
         }
     }
@@ -129,6 +125,7 @@ public class TylooTransactionXid implements Xid, Serializable {
     /**
      * 克隆事务ID.
      */
+    @Override
     public TylooTransactionXid clone() {
 
         byte[] cloneGlobalTransactionId = null;
@@ -147,6 +144,7 @@ public class TylooTransactionXid implements Xid, Serializable {
         return new TylooTransactionXid(cloneGlobalTransactionId, cloneBranchQualifier);
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -156,6 +154,7 @@ public class TylooTransactionXid implements Xid, Serializable {
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

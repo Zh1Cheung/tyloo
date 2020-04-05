@@ -9,14 +9,14 @@
 
     <util:properties id="tccjdbc" location="classpath:tccjdbc.properties"/>
 
-    <bean class="io.tyloo.tcctransaction.spring.recover.DefaultRecoverConfig">
+    <bean class="io.tyloo.spring.recover.DefaultTylooTransactionRecoverConfig">
         <property name="maxRetryCount" value="5"/>
         <property name="recoverDuration" value="60"/>
         <property name="cronExpression" value="0/30 * * * * ?"/>
     </bean>
 
     <bean id="transactionRepository"
-    class="io.tyloo.tcctransaction.spring.repository.SpringJdbcTransactionRepository">
+    class="io.tyloo.spring.repository.SpringJdbcTransactionRepository">
     <property name="dataSource" ref="tccDataSource"/>
     <property name="domain" value="CAPITAL"/>
     <property name="tbSuffix" value="_CAP"/>
@@ -36,7 +36,7 @@
         <property name="checkoutTimeout" value="#{tccjdbc['c3p0.checkoutTimeout']}"/>
     </bean>
 
-    <bean id="kryoSerializer" class="io.tyloo.tcctransaction.serializer.KryoPoolSerializer"/>
+    <bean id="kryoSerializer" class="io.tyloo.core.serializer.KryoPoolSerializer"/>
 
 <!--     <bean id="transactionRepository" class="RedisTransactionRepository">
         <property name="keyPrefix" value="TCC:CAP:"/>

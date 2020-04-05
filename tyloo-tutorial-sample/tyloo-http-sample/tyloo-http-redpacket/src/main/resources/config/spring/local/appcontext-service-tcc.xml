@@ -37,7 +37,7 @@
         <property name="checkoutTimeout" value="#{tccjdbc['c3p0.checkoutTimeout']}"/>
     </bean>
 
-    <bean id="kryoSerializer" class="io.tyloo.serializer.KryoPoolSerializer"/>
+    <bean id="kryoSerializer" class="io.tyloo.core.serializer.KryoPoolSerializer"/>
 
 <!--     <bean id="transactionRepository" class="RedisTransactionRepository">
         <property name="keyPrefix" value="TCC:RED:"/>

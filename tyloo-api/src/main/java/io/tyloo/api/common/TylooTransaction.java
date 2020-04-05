@@ -62,7 +62,7 @@ public class TylooTransaction implements Serializable {
     /**
      * 参与者集合
      */
-    private List<Participant> participants = new ArrayList<Participant>();
+    private final List<Participant> participants = new ArrayList<Participant>();
     /**
      * 附带属性映射
      */
@@ -120,18 +120,14 @@ public class TylooTransaction implements Serializable {
      */
     public void commit() {
 
-        for (Participant participant : participants) {
-            participant.commit();
-        }
+        participants.forEach(Participant::commit);
     }
 
     /**
      * 回滚 TCC 事务
      */
     public void rollback() {
-        for (Participant participant : participants) {
-            participant.rollback();
-        }
+        participants.forEach(Participant::rollback);
     }
 
 

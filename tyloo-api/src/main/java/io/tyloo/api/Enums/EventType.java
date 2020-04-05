@@ -10,13 +10,19 @@ import java.util.Arrays;
 @Getter
 public enum EventType {
 
-
+    /*
+     * 保存类型
+     */
     SAVE(0, "保存"),
 
-
+    /*
+     * 删除类型
+     */
     DELETE(1, "删除"),
 
-
+    /*
+     * 更新类型
+     */
     UPDATE(2, "更新状态");
 
     private final int code;

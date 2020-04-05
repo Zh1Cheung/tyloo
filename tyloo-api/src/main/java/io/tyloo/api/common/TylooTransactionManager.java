@@ -124,7 +124,9 @@ public class TylooTransactionManager {
         // 更新 事务
         transactionRepository.update(tylooTransaction);
 
-        if (asyncCommit) {
+        if (!asyncCommit) {
+            commitTransaction(tylooTransaction);
+        } else {
             try {
                 Long statTime = System.currentTimeMillis();
 
@@ -139,8 +141,6 @@ public class TylooTransactionManager {
                 logger.warn("Tyloo tylooTransaction async submit confirm failed, recovery job will try to confirm later.", commitException);
                 throw new ConfirmingException(commitException);
             }
-        } else {
-            commitTransaction(tylooTransaction);
         }
     }
 
@@ -154,7 +154,9 @@ public class TylooTransactionManager {
 
         transactionRepository.update(tylooTransaction);
 
-        if (asyncRollback) {
+        if (!asyncRollback) {
+            rollbackTransaction(tylooTransaction);
+        } else {
 
             try {
                 executorService.submit(new Runnable() {
@@ -167,9 +169,6 @@ public class TylooTransactionManager {
                 logger.warn("Tyloo tylooTransaction async rollback failed, recovery job will try to rollback later.", rollbackException);
                 throw new CancellingException(rollbackException);
             }
-        } else {
-
-            rollbackTransaction(tylooTransaction);
         }
     }
 
