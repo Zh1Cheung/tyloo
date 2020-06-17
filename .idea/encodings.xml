@@ -3,8 +3,20 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$" charset="GBK" />
     <file url="file://$PROJECT_DIR$/tyloo-api" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/TransactionContext.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/api/TransactionContext.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/tyloo-core" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-dubbo/src/main/resources" charset="GBK" />
     <file url="file://$PROJECT_DIR$/tyloo-spring" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-spring/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-capital/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-order/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-redpacket/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-capital/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-order/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-redpacket/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-captial/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-order/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-redpacket/src/main/resources" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/tyloo-unit-test/src/main/resources" charset="GBK" />
   </component>
 </project>

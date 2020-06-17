@@ -42,6 +42,7 @@ public class TylooTransactionRecovery {
 
         recoverErrorTransactions(transactions);
     }
+
     /**
      * 找出所有执行错误的事务信息
      *
@@ -70,7 +71,6 @@ public class TylooTransactionRecovery {
 
             //比较重试次数，大于则跳过该事务
             if (transaction.getRetriedCount() > transactionConfigurator.getTylooRecoverConfiguration().getMaxRetryCount()) {
-
                 logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)));
                 continue;
             }
@@ -83,10 +83,9 @@ public class TylooTransactionRecovery {
                     > System.currentTimeMillis())) {
                 continue;
             }
-            
+
             try {
                 transaction.addRetriedCount();
-
                 // 如果是CONFIRMING(2)状态，则将事务往前执行
                 if (transaction.getStatus().equals(TransactionStatus.CONFIRMING)) {
 
@@ -97,7 +96,6 @@ public class TylooTransactionRecovery {
 
                 } else if (transaction.getStatus().equals(TransactionStatus.CANCELLING)
                         || transaction.getTransactionType().equals(TransactionType.ROOT)) {
-
                     // 其他情况，把事务状态改为CANCELLING(3)，然后执行回滚
                     transaction.changeStatus(TransactionStatus.CANCELLING);
                     transactionConfigurator.getTransactionRepository().update(transaction);
