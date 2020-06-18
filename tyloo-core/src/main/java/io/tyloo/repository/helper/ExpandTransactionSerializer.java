@@ -24,9 +24,9 @@ import java.util.Map;
 
 public class ExpandTransactionSerializer {
 
-    public static Map<byte[], byte[]> serialize(ObjectSerializer serializer, Transaction transaction) {
+    public static Map<byte[], byte[]> serialize(ObjectSerializer serializer, Transaction transaction) throws CloneNotSupportedException {
 
-        Map<byte[], byte[]> map = new HashMap<byte[], byte[]>();
+        Map<byte[], byte[]> map = new HashMap<>();
 
         map.put("GLOBAL_TX_ID".getBytes(), transaction.getXid().getGlobalTransactionId());
         map.put("BRANCH_QUALIFIER".getBytes(), transaction.getXid().getBranchQualifier());
@@ -43,7 +43,7 @@ public class ExpandTransactionSerializer {
 
     public static Transaction deserialize(ObjectSerializer serializer, Map<byte[], byte[]> map1) {
 
-        Map<String, byte[]> propertyMap = new HashMap<String, byte[]>();
+        Map<String, byte[]> propertyMap = new HashMap<>();
 
         for (Map.Entry<byte[], byte[]> entry : map1.entrySet()) {
             propertyMap.put(new String(entry.getKey()), entry.getValue());

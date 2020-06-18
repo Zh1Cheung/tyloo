@@ -22,18 +22,15 @@ import java.io.ByteArrayOutputStream;
 public class KryoPoolSerializer implements ObjectSerializer<Transaction> {
 
 
-    static KryoFactory factory = new KryoFactory() {
-        @Override
-        public Kryo create() {
-            Kryo kryo = new Kryo();
-            kryo.setReferences(true);
-            kryo.setRegistrationRequired(false);
-            //Fix the NPE bug when deserializing Collections.
-            ((Kryo.DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy())
-                    .setFallbackInstantiatorStrategy(new StdInstantiatorStrategy());
+    static KryoFactory factory = () -> {
+        Kryo kryo = new Kryo();
+        kryo.setReferences(true);
+        kryo.setRegistrationRequired(false);
+        //Fix the NPE bug when deserializing Collections.
+        ((Kryo.DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy())
+                .setFallbackInstantiatorStrategy(new StdInstantiatorStrategy());
 
-            return kryo;
-        }
+        return kryo;
     };
 
 
@@ -61,41 +58,30 @@ public class KryoPoolSerializer implements ObjectSerializer<Transaction> {
     @Override
     public byte[] serialize(final Transaction object) {
 
-        return pool.run(new KryoCallback<byte[]>() {
-            @Override
-            public byte[] execute(Kryo kryo) {
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                Output output = new Output(byteArrayOutputStream);
+        return pool.run(kryo -> {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            Output output = new Output(byteArrayOutputStream);
 
-                kryo.writeClassAndObject(output, object);
-                output.flush();
+            kryo.writeClassAndObject(output, object);
+            output.flush();
 
-                return byteArrayOutputStream.toByteArray();
-            }
+            return byteArrayOutputStream.toByteArray();
         });
     }
 
     @Override
     public Transaction deserialize(final byte[] bytes) {
 
-        return pool.run(new KryoCallback<Transaction>() {
-            @Override
-            public Transaction execute(Kryo kryo) {
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-                Input input = new Input(byteArrayInputStream);
+        return pool.run(kryo -> {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+            Input input = new Input(byteArrayInputStream);
 
-                return (Transaction) kryo.readClassAndObject(input);
-            }
+            return (Transaction) kryo.readClassAndObject(input);
         });
     }
 
     @Override
     public Transaction clone(final Transaction object) {
-        return pool.run(new KryoCallback<Transaction>() {
-            @Override
-            public Transaction execute(Kryo kryo) {
-                return kryo.copy(object);
-            }
-        });
+        return pool.run(kryo -> kryo.copy(object));
     }
 }

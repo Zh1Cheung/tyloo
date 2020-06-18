@@ -18,8 +18,8 @@ import java.util.Map;
 
 public class TransactionSerializer {
 
-    public static byte[] serialize(ObjectSerializer serializer, Transaction transaction) {
-        Map<String, Object> map = new HashMap<String, Object>();
+    public static byte[] serialize(ObjectSerializer serializer, Transaction transaction) throws CloneNotSupportedException {
+        Map<String, Object> map = new HashMap<>();
 
         map.put("GLOBAL_TX_ID", transaction.getXid().getGlobalTransactionId());
         map.put("BRANCH_QUALIFIER", transaction.getXid().getBranchQualifier());

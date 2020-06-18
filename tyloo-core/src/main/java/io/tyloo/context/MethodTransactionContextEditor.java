@@ -23,7 +23,7 @@ public class MethodTransactionContextEditor implements TransactionContextEditor 
         if (position >= 0) {
             return (TransactionContext) args[position];
         }
-        
+
         return null;
     }
 

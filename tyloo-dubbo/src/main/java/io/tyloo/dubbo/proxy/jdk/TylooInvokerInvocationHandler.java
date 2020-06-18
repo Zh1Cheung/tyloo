@@ -1,7 +1,7 @@
 package io.tyloo.dubbo.proxy.jdk;
 
-import io.tyloo.api.Tyloo;
 import io.tyloo.api.Propagation;
+import io.tyloo.api.Tyloo;
 import io.tyloo.dubbo.context.DubboTransactionContextEditor;
 import io.tyloo.interceptor.TylooCoordinatorAspect;
 import io.tyloo.support.FactoryBuilder;
@@ -23,15 +23,15 @@ import java.lang.reflect.Method;
  *
  */
 
-public class TccInvokerInvocationHandler extends InvokerInvocationHandler {
+public class TylooInvokerInvocationHandler extends InvokerInvocationHandler {
 
     private Object target;
 
-    public TccInvokerInvocationHandler(Invoker<?> handler) {
+    public TylooInvokerInvocationHandler(Invoker<?> handler) {
         super(handler);
     }
 
-    public <T> TccInvokerInvocationHandler(T target, Invoker<T> invoker) {
+    public <T> TylooInvokerInvocationHandler(T target, Invoker<T> invoker) {
         super(invoker);
         this.target = target;
     }

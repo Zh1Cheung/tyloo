@@ -1,2 +1,2 @@
-tccJavassist=TccJavassistProxyFactory
-tccJdk=TccJdkProxyFactory
+tylooJavassist=TylooJavassistProxyFactory
+tylooJdk=TylooJdkProxyFactory

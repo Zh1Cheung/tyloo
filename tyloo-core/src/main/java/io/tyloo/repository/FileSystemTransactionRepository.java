@@ -37,12 +37,12 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
     @Override
-    protected int doCreate(Transaction transaction) {
+    protected int doCreate(Transaction transaction) throws CloneNotSupportedException {
         return createFile(transaction);
     }
 
     @Override
-    protected int doUpdate(Transaction transaction) {
+    protected int doUpdate(Transaction transaction) throws CloneNotSupportedException {
 
         transaction.updateVersion();
         transaction.updateTime();
@@ -52,7 +52,7 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
     @Override
-    protected int doDelete(Transaction transaction) {
+    protected int doDelete(Transaction transaction) throws CloneNotSupportedException {
 
         String fullFileName = getFullFileName(transaction.getXid());
         File file = new File(fullFileName);
@@ -133,7 +133,7 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
     }
 
 
-    private int createFile(Transaction transaction) {
+    private int createFile(Transaction transaction) throws CloneNotSupportedException {
         makeDirIfNecessary();
 
         String filePath = getFullFileName(transaction.getXid());
@@ -183,7 +183,7 @@ public class FileSystemTransactionRepository extends CachableTransactionReposito
         }
     }
 
-    private void writeFile(Transaction transaction) {
+    private void writeFile(Transaction transaction) throws CloneNotSupportedException {
 
         makeDirIfNecessary();
 

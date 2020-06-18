@@ -6,10 +6,52 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="tyloo-spring" />
+        <module name="tyloo-sample-captial" />
+        <module name="tyloo-sample-redpacket" />
+        <module name="tyloo-sample-order" />
+        <module name="tyloo-http-capital-api" />
+        <module name="tyloo-dubbo-capital" />
+        <module name="tyloo-http-capital" />
+        <module name="tyloo-http-redpacket" />
+        <module name="tyloo-dubbo-redpacket" />
+        <module name="tyloo-dubbo" />
+        <module name="tyloo-http-redpacket-api" />
+        <module name="tyloo-dubbo-redpacket-api" />
         <module name="tyloo-api" />
+        <module name="tyloo-unit-test" />
+        <module name="tyloo-dubbo-capital-api" />
+        <module name="tyloo-spring" />
+        <module name="tyloo-sample-common" />
         <module name="tyloo-core" />
+        <module name="tyloo-dubbo-order" />
+        <module name="tyloo-http-order" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="tyloo" target="1.8" />
+      <module name="tyloo-api" target="1.8" />
+      <module name="tyloo-core" target="1.8" />
+      <module name="tyloo-dubbo" target="1.8" />
+      <module name="tyloo-dubbo-capital" target="1.8" />
+      <module name="tyloo-dubbo-capital-api" target="1.8" />
+      <module name="tyloo-dubbo-order" target="1.8" />
+      <module name="tyloo-dubbo-redpacket" target="1.8" />
+      <module name="tyloo-dubbo-redpacket-api" target="1.8" />
+      <module name="tyloo-dubbo-sample" target="1.8" />
+      <module name="tyloo-http-capital" target="1.8" />
+      <module name="tyloo-http-capital-api" target="1.8" />
+      <module name="tyloo-http-order" target="1.8" />
+      <module name="tyloo-http-redpacket" target="1.8" />
+      <module name="tyloo-http-redpacket-api" target="1.8" />
+      <module name="tyloo-http-sample" target="1.8" />
+      <module name="tyloo-sample-captial" target="1.8" />
+      <module name="tyloo-sample-common" target="1.8" />
+      <module name="tyloo-sample-domain" target="1.8" />
+      <module name="tyloo-sample-order" target="1.8" />
+      <module name="tyloo-sample-redpacket" target="1.8" />
+      <module name="tyloo-spring" target="1.8" />
+      <module name="tyloo-tutorial-sample" target="1.8" />
+      <module name="tyloo-unit-test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

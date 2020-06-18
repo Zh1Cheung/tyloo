@@ -4,10 +4,10 @@ import io.tyloo.InvocationContext;
 import io.tyloo.Participant;
 import io.tyloo.Transaction;
 import io.tyloo.TransactionManager;
-import io.tyloo.api.Tyloo;
 import io.tyloo.api.TransactionContext;
 import io.tyloo.api.TransactionStatus;
 import io.tyloo.api.TransactionXid;
+import io.tyloo.api.Tyloo;
 import io.tyloo.support.FactoryBuilder;
 import io.tyloo.utils.ReflectionUtils;
 import io.tyloo.utils.TylooMethodUtils;
@@ -29,7 +29,6 @@ public class TylooCoordinatorInterceptor {
 
     private TransactionManager transactionManager;
 
-
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
@@ -37,9 +36,7 @@ public class TylooCoordinatorInterceptor {
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
 
         Transaction transaction = transactionManager.getCurrentTransaction();
-
         if (transaction != null) {
-
             switch (transaction.getStatus()) {
                 case TRYING:
                     enlistParticipant(pjp);
@@ -63,7 +60,7 @@ public class TylooCoordinatorInterceptor {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    private void enlistParticipant(ProceedingJoinPoint pjp) throws IllegalAccessException, InstantiationException {
+    private void enlistParticipant(ProceedingJoinPoint pjp) throws IllegalAccessException, InstantiationException, CloneNotSupportedException {
 
         Method method = TylooMethodUtils.getTylooMethod(pjp);
         if (method == null) {
@@ -91,13 +88,11 @@ public class TylooCoordinatorInterceptor {
                 cancelMethodName,
                 method.getParameterTypes(), pjp.getArgs());
 
-        Participant participant =
-                new Participant(
-                        xid,
-                        confirmInvocation,
-                        cancelInvocation,
-                        tyloo.transactionContextEditor());
-
+        Participant participant = new Participant(
+                xid,
+                confirmInvocation,
+                cancelInvocation,
+                tyloo.transactionContextEditor());
         transactionManager.enlistParticipant(participant);
 
     }

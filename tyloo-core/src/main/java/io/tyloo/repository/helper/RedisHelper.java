@@ -23,37 +23,30 @@ public class RedisHelper {
     public static String SCAN_TEST_PATTERN = "*";
     public static String SCAN_INIT_CURSOR = "0";
 
-    private static Logger logger = Logger.getLogger(RedisHelper.class);
+    private static final Logger logger = Logger.getLogger(RedisHelper.class);
 
     public static byte[] getRedisKey(String keyPrefix, Xid xid) {
-        return new StringBuilder().append(keyPrefix).append(xid.toString()).toString().getBytes();
+        return (keyPrefix + xid.toString()).getBytes();
     }
 
     public static byte[] getRedisKey(String keyPrefix, String globalTransactionId, String branchQualifier) {
-
-        return new StringBuilder().append(keyPrefix)
-                .append(globalTransactionId).append(":")
-                .append(branchQualifier).toString().getBytes();
+        return (keyPrefix + globalTransactionId + ":" + branchQualifier).getBytes();
     }
 
     /**
      * 对JedisPool里的每个Jedis处理
-     *
+     *  @param <T>
      * @param jedisPool
      * @param callback
-     * @param <T>
      * @return
      */
     public static <T> T execute(JedisPool jedisPool, JedisCallback<T> callback) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
+        try (Jedis jedis = jedisPool.getResource()) {
             return callback.doInJedis(jedis);
-        } finally {
-            if (jedis != null) {
-                jedis.close();
-            }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     /**

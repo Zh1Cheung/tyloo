@@ -8,7 +8,6 @@
 
     <bean id="springBeanFactory" class="io.tyloo.spring.support.SpringBeanFactory"/>
 
-
     <bean id="transactionConfigurator" class="io.tyloo.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
 

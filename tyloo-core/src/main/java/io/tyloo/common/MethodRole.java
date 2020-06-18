@@ -22,5 +22,5 @@ public enum MethodRole {
     /**
      * ³£¹æ
      */
-    NORMAL;
+    NORMAL
 }

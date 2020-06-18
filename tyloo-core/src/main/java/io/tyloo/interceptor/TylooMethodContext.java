@@ -1,8 +1,8 @@
 package io.tyloo.interceptor;
 
-import io.tyloo.api.Tyloo;
 import io.tyloo.api.Propagation;
 import io.tyloo.api.TransactionContext;
+import io.tyloo.api.Tyloo;
 import io.tyloo.api.UniqueIdentity;
 import io.tyloo.common.MethodRole;
 import io.tyloo.support.FactoryBuilder;
@@ -112,7 +112,7 @@ public class TylooMethodContext {
         return method;
     }
 
-     /**
+    /**
      * 通过该方法事务传播级别获取方法类型
      *
      * @param isTransactionActive

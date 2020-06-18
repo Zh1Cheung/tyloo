@@ -1,5 +1,3 @@
-
-
 package io.tyloo.common;
 
 /*
@@ -28,10 +26,6 @@ public enum TransactionType {
         this.id = id;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public static TransactionType valueOf(int id) {
         switch (id) {
             case 1:
@@ -41,6 +35,10 @@ public enum TransactionType {
             default:
                 return null;
         }
+    }
+
+    public int getId() {
+        return id;
     }
 
 }

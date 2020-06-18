@@ -53,12 +53,12 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
         this.serializer = serializer;
     }
 
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     public DataSource getDataSource() {
         return dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -163,14 +163,10 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
 
         try {
             connection = this.getConnection();
-
-            StringBuilder builder = new StringBuilder();
-            builder.append("DELETE FROM " + getTableName() +
-                    " WHERE GLOBAL_TX_ID = ? AND BRANCH_QUALIFIER = ?");
-
-            builder.append(StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
-
-            stmt = connection.prepareStatement(builder.toString());
+            String builder = "DELETE FROM " + getTableName() +
+                    " WHERE GLOBAL_TX_ID = ? AND BRANCH_QUALIFIER = ?" +
+                    (StringUtils.isNotEmpty(domain) ? " AND DOMAIN = ?" : "");
+            stmt = connection.prepareStatement(builder);
 
             stmt.setBytes(1, transaction.getXid().getGlobalTransactionId());
             stmt.setBytes(2, transaction.getXid().getBranchQualifier());
@@ -178,7 +174,6 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
             if (StringUtils.isNotEmpty(domain)) {
                 stmt.setString(3, domain);
             }
-
             return stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -243,7 +238,6 @@ public class JdbcTransactionRepository extends CachableTransactionRepository {
     protected List<Transaction> doFind(List<Xid> xids) {
 
         List<Transaction> transactions = new ArrayList<Transaction>();
-
         if (CollectionUtils.isEmpty(xids)) {
             return transactions;
         }

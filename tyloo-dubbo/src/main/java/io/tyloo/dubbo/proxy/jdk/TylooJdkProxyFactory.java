@@ -16,7 +16,7 @@ import java.lang.reflect.Proxy;
  * @Date: 10:52 2019/9/29
  *
  */
-public class TccJdkProxyFactory extends JdkProxyFactory {
+public class TylooJdkProxyFactory extends JdkProxyFactory {
     /**
      * - 项目启动时，调用 `TccJavassistProxyFactory#getProxy(...)` 方法，生成 Dubbo Service 调用 Proxy。
      * - 第一次调用 `Proxy#newProxyInstance(...)` 方法，创建调用 Dubbo Service 服务的 Proxy。
@@ -31,9 +31,9 @@ public class TccJdkProxyFactory extends JdkProxyFactory {
     @SuppressWarnings("unchecked")
     public <T> T getProxy(Invoker<T> invoker, Class<?>[] interfaces) {
 
-        T proxy = (T)Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces, new InvokerInvocationHandler(invoker));
+        T proxy = (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces, new InvokerInvocationHandler(invoker));
 
-        T tccProxy = (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces, new TccInvokerInvocationHandler(proxy,invoker));
+        T tccProxy = (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces, new TylooInvokerInvocationHandler(proxy, invoker));
 
         return tccProxy;
     }

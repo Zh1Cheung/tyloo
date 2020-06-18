@@ -17,5 +17,5 @@ public interface JedisCallback<T> {
      * @param jedis
      * @return
      */
-    public T doInJedis(Jedis jedis);
+    public T doInJedis(Jedis jedis) throws CloneNotSupportedException;
 }

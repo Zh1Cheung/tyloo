@@ -40,7 +40,6 @@ public class RecoverScheduledJob {
     public void init() {
 
         try {
-
             // MethodInvokingJobDetailFactoryBean 负责生成具体的任务，只需要指定某个对象的某个方法，在触发器触发时，即调用指定对象的指定方法
             MethodInvokingJobDetailFactoryBean jobDetail = new MethodInvokingJobDetailFactoryBean();
 
