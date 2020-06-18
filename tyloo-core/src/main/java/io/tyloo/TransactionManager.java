@@ -53,7 +53,7 @@ public class TransactionManager {
      * @param uniqueIdentify
      * @return
      */
-    public Transaction begin(Object uniqueIdentify) {
+    public Transaction begin(Object uniqueIdentify) throws CloneNotSupportedException {
         Transaction transaction = new Transaction(uniqueIdentify, TransactionType.ROOT);
         transactionRepository.create(transaction);
         registerTransaction(transaction);
@@ -67,7 +67,7 @@ public class TransactionManager {
      * @param transactionContext 事务上下文
      * @return 分支事务
      */
-    public Transaction propagationNewBegin(TransactionContext transactionContext) {
+    public Transaction propagationNewBegin(TransactionContext transactionContext) throws CloneNotSupportedException {
 
         Transaction transaction = new Transaction(transactionContext);
         transactionRepository.create(transaction);

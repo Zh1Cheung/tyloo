@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="GROUP_BY_SEVERITY" value="true" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="cf428d0d-ddfb-43e2-93f0-9998655701a4" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -11,83 +14,16 @@
     <option name="testRunner" value="GRADLE" />
     <option name="delegatedBuild" value="true" />
   </component>
-  <component name="MavenImportPreferences">
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="importAutomatically" value="true" />
-      </MavenImportingSettings>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="398" />
-    <option name="y" value="1" />
-    <option name="width" value="1425" />
-    <option name="height" value="1040" />
-  </component>
   <component name="ProjectId" id="1dRATCGVAMXVMXQ5IIzc7A55aVf" />
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="tyloo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tyloo" type="462c0819:PsiDirectoryNode" />
-              <item name="tyloo-core" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-    </panes>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -100,61 +36,30 @@
       <option name="presentableId" value="Default" />
       <updated>1555742296952</updated>
       <workItem from="1555742302908" duration="2035000" />
+      <workItem from="1592377557271" duration="12563000" />
     </task>
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2035000" />
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
   </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/TransactionContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/TransactionStatus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="25" column="15" selection-start-line="25" selection-start-column="15" selection-end-line="25" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/TransactionContextEditor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/Tyloo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="19" column="18" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/Propagation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" column="12" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tyloo-api/src/main/java/io/tyloo/TransactionXid.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tyloo-core/src/main/java/io/tyloo/CancellingException.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+  <component name="WindowStateProjectService">
+    <state x="395" y="90" key="#Inspections" timestamp="1592384879204">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="395" y="90" key="#Inspections/0.0.1536.824@0.0.1536.824" timestamp="1592384879204" />
+    <state x="2" y="254" key="#SQL_Dialects" timestamp="1592381237364">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="2" y="254" key="#SQL_Dialects/0.0.1536.824@0.0.1536.824" timestamp="1592381237364" />
+    <state x="299" y="67" key="Maven.ArtifactSearchDialog" timestamp="1592386268187">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="299" y="67" key="Maven.ArtifactSearchDialog/0.0.1536.824@0.0.1536.824" timestamp="1592386268187" />
+    <state x="458" y="154" width="675" height="516" key="find.popup" timestamp="1592384084066">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="458" y="154" width="675" height="516" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1592384084066" />
   </component>
   <component name="masterDetails">
     <states>

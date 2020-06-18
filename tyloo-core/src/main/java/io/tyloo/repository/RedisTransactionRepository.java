@@ -34,12 +34,11 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     private boolean isSupportScan = true;
 
     private boolean isForbiddenKeys = false;
+    private ObjectSerializer serializer = new KryoPoolSerializer();
 
     public void setKeyPrefix(String keyPrefix) {
         this.keyPrefix = keyPrefix;
     }
-
-    private ObjectSerializer serializer = new KryoPoolSerializer();
 
     public void setSerializer(ObjectSerializer serializer) {
         this.serializer = serializer;
@@ -82,26 +81,20 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     @Override
     protected int doCreate(final Transaction transaction) {
 
-
         try {
-            Long statusCode = RedisHelper.execute(jedisPool, new JedisCallback<Long>() {
+            Long statusCode = RedisHelper.execute(jedisPool, jedis -> {
 
-                @Override
-                public Long doInJedis(Jedis jedis) {
+                List<byte[]> params = new ArrayList<>();
 
-
-                    List<byte[]> params = new ArrayList<byte[]>();
-
-                    for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, transaction).entrySet()) {
-                        params.add(entry.getKey());
-                        params.add(entry.getValue());
-                    }
-
-                    Object result = jedis.eval("if redis.call('exists', KEYS[1]) == 0 then redis.call('hmset', KEYS[1], unpack(ARGV)); return 1; end; return 0;".getBytes(),
-                            Arrays.asList(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())), params);
-
-                    return (Long) result;
+                for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, transaction).entrySet()) {
+                    params.add(entry.getKey());
+                    params.add(entry.getValue());
                 }
+
+                Object result = jedis.eval("if redis.call('exists', KEYS[1]) == 0 then redis.call('hmset', KEYS[1], unpack(ARGV)); return 1; end; return 0;".getBytes(),
+                        Arrays.asList(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())), params);
+
+                return (Long) result;
             });
             return statusCode.intValue();
 
@@ -114,27 +107,23 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     protected int doUpdate(final Transaction transaction) {
 
         try {
+            Long statusCode = RedisHelper.execute(jedisPool, jedis -> {
 
-            Long statusCode = RedisHelper.execute(jedisPool, new JedisCallback<Long>() {
-                @Override
-                public Long doInJedis(Jedis jedis) {
+                transaction.updateTime();
+                transaction.updateVersion();
 
-                    transaction.updateTime();
-                    transaction.updateVersion();
+                List<byte[]> params = new ArrayList<>();
 
-                    List<byte[]> params = new ArrayList<byte[]>();
-
-                    for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, transaction).entrySet()) {
-                        params.add(entry.getKey());
-                        params.add(entry.getValue());
-                    }
-
-                    Object result = jedis.eval(String.format("if redis.call('hget',KEYS[1],'VERSION') == '%s' then redis.call('hmset', KEYS[1], unpack(ARGV)); return 1; end; return 0;",
-                                    transaction.getVersion() - 1).getBytes(),
-                            Arrays.asList(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())), params);
-
-                    return (Long) result;
+                for (Map.Entry<byte[], byte[]> entry : ExpandTransactionSerializer.serialize(serializer, transaction).entrySet()) {
+                    params.add(entry.getKey());
+                    params.add(entry.getValue());
                 }
+
+                Object result = jedis.eval(String.format("if redis.call('hget',KEYS[1],'VERSION') == '%s' then redis.call('hmset', KEYS[1], unpack(ARGV)); return 1; end; return 0;",
+                        transaction.getVersion() - 1).getBytes(),
+                        Arrays.asList(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())), params);
+
+                return (Long) result;
             });
 
             return statusCode.intValue();
@@ -147,13 +136,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     protected int doDelete(final Transaction transaction) {
         try {
 
-            Long result = RedisHelper.execute(jedisPool, new JedisCallback<Long>() {
-                @Override
-                public Long doInJedis(Jedis jedis) {
-
-                    return jedis.del(RedisHelper.getRedisKey(keyPrefix, transaction.getXid()));
-                }
-            });
+            Long result = RedisHelper.execute(jedisPool, jedis -> jedis.del(RedisHelper.getRedisKey(keyPrefix, transaction.getXid())));
 
             return result.intValue();
         } catch (Exception e) {
@@ -166,12 +149,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
 
         try {
             Long startTime = System.currentTimeMillis();
-            Map<byte[], byte[]> content = RedisHelper.execute(jedisPool, new JedisCallback<Map<byte[], byte[]>>() {
-                @Override
-                public Map<byte[], byte[]> doInJedis(Jedis jedis) {
-                    return jedis.hgetAll(RedisHelper.getRedisKey(keyPrefix, xid));
-                }
-            });
+            Map<byte[], byte[]> content = RedisHelper.execute(jedisPool, jedis -> jedis.hgetAll(RedisHelper.getRedisKey(keyPrefix, xid)));
             logger.info("redis find cost time :" + (System.currentTimeMillis() - startTime));
 
             if (content != null && content.size() > 0) {
@@ -187,8 +165,7 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     protected List<Transaction> doFindAllUnmodifiedSince(Date date) {
 
         List<Transaction> allTransactions = doFindAll();
-
-        List<Transaction> allUnmodifiedSince = new ArrayList<Transaction>();
+        List<Transaction> allUnmodifiedSince = new ArrayList<>();
 
         for (Transaction transaction : allTransactions) {
             if (transaction.getLastUpdateTime().compareTo(date) < 0) {
@@ -203,59 +180,47 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
     protected List<Transaction> doFindAll() {
 
         try {
+            final Set<byte[]> keys = RedisHelper.execute(jedisPool, jedis -> {
+                if (isSupportScan) {
+                    List<String> allKeys = new ArrayList<>();
+                    String cursor = RedisHelper.SCAN_INIT_CURSOR;
+                    ScanParams scanParams = RedisHelper.buildDefaultScanParams(keyPrefix + "*", fetchKeySize);
+                    do {
+                        ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+                        allKeys.addAll(scanResult.getResult());
+                        cursor = scanResult.getStringCursor();
+                    } while (!cursor.equals(RedisHelper.SCAN_INIT_CURSOR));
 
-            final Set<byte[]> keys = RedisHelper.execute(jedisPool, new JedisCallback<Set<byte[]>>() {
-                @Override
-                public Set<byte[]> doInJedis(Jedis jedis) {
+                    Set<byte[]> allKeySet = new HashSet<>();
 
-                    if (isSupportScan) {
-                        List<String> allKeys = new ArrayList<String>();
-                        String cursor = RedisHelper.SCAN_INIT_CURSOR;
-                        ScanParams scanParams = RedisHelper.buildDefaultScanParams(keyPrefix + "*", fetchKeySize);
-                        do {
-                            ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
-                            allKeys.addAll(scanResult.getResult());
-                            cursor = scanResult.getStringCursor();
-                        } while (!cursor.equals(RedisHelper.SCAN_INIT_CURSOR));
-
-                        Set<byte[]> allKeySet = new HashSet<byte[]>();
-
-                        for (String key : allKeys) {
-                            allKeySet.add(key.getBytes());
-                        }
-                        logger.info(String.format("find all key by scan command with pattern:%s allKeySet.size()=%d", keyPrefix + "*", allKeySet.size()));
-                        return allKeySet;
-                    } else {
-                        return jedis.keys((keyPrefix + "*").getBytes());
+                    for (String key : allKeys) {
+                        allKeySet.add(key.getBytes());
                     }
-
+                    logger.info(String.format("find all key by scan command with pattern:%s allKeySet.size()=%d", keyPrefix + "*", allKeySet.size()));
+                    return allKeySet;
+                } else {
+                    return jedis.keys((keyPrefix + "*").getBytes());
                 }
+
             });
 
 
-            return RedisHelper.execute(jedisPool, new JedisCallback<List<Transaction>>() {
-                @Override
-                public List<Transaction> doInJedis(Jedis jedis) {
+            return RedisHelper.execute(jedisPool, jedis -> {
 
-                    Pipeline pipeline = jedis.pipelined();
+                Pipeline pipeline = jedis.pipelined();
 
-                    for (final byte[] key : keys) {
-                        pipeline.hgetAll(key);
-                    }
-                    List<Object> result = pipeline.syncAndReturnAll();
-
-                    List<Transaction> list = new ArrayList<Transaction>();
-                    for (Object data : result) {
-
-                        if (data != null && ((Map<byte[], byte[]>) data).size() > 0) {
-
-                            list.add(ExpandTransactionSerializer.deserialize(serializer, (Map<byte[], byte[]>) data));
-                        }
-
-                    }
-
-                    return list;
+                for (final byte[] key : keys) {
+                    pipeline.hgetAll(key);
                 }
+                List<Object> result = pipeline.syncAndReturnAll();
+
+                List<Transaction> list = new ArrayList<>();
+                for (Object data : result) {
+                    if (data != null && ((Map<byte[], byte[]>) data).size() > 0) {
+                        list.add(ExpandTransactionSerializer.deserialize(serializer, (Map<byte[], byte[]>) data));
+                    }
+                }
+                return list;
             });
 
         } catch (Exception e) {

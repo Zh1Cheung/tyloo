@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 
-public class Transaction implements Serializable {
+public class Transaction implements Serializable  {
 
     private static final long serialVersionUID = 7291423944314337931L;
 
@@ -70,9 +70,13 @@ public class Transaction implements Serializable {
         participants.add(participant);
     }
 
-
-    public Xid getXid() throws CloneNotSupportedException {
-        return xid.clone();
+    public Xid getXid() {
+        try {
+            return xid.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public TransactionStatus getStatus() {

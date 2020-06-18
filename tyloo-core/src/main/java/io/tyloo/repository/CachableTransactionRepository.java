@@ -31,13 +31,17 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     /**
      * 事务日志记录缓存<Xid, Transaction>
      */
-    private Cache<Xid, Transaction> transactionXidTylooTransactionCache;
+    private final Cache<Xid, Transaction> transactionXidTylooTransactionCache;
+
+    public CachableTransactionRepository() {
+        transactionXidTylooTransactionCache = CacheBuilder.newBuilder().expireAfterAccess(expireDuration, TimeUnit.SECONDS).maximumSize(1000).build();
+    }
 
     /**
      * 创建事务日志记录
      */
     @Override
-    public int create(Transaction transaction) {
+    public int create(Transaction transaction) throws CloneNotSupportedException {
         int result = doCreate(transaction);
         if (result > 0) {
             putToCache(transaction);
@@ -62,6 +66,8 @@ public abstract class CachableTransactionRepository implements TransactionReposi
             } else {
                 throw new OptimisticLockException();
             }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         } finally {
             if (result <= 0) {
                 removeFromCache(transaction);
@@ -81,6 +87,8 @@ public abstract class CachableTransactionRepository implements TransactionReposi
         try {
             result = doDelete(transaction);
 
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         } finally {
             removeFromCache(transaction);
         }
@@ -99,7 +107,6 @@ public abstract class CachableTransactionRepository implements TransactionReposi
 
         if (transaction == null) {
             transaction = doFindOne(transactionXid);
-
             if (transaction != null) {
                 putToCache(transaction);
             }
@@ -117,16 +124,10 @@ public abstract class CachableTransactionRepository implements TransactionReposi
     public List<Transaction> findAllUnmodifiedSince(Date date) {
 
         List<Transaction> transactions = doFindAllUnmodifiedSince(date);
-
         for (Transaction transaction : transactions) {
             putToCache(transaction);
         }
-
         return transactions;
-    }
-
-    public CachableTransactionRepository() {
-        transactionXidTylooTransactionCache = CacheBuilder.newBuilder().expireAfterAccess(expireDuration, TimeUnit.SECONDS).maximumSize(1000).build();
     }
 
     /**
@@ -167,11 +168,11 @@ public abstract class CachableTransactionRepository implements TransactionReposi
      * @param transaction
      * @return
      */
-    protected abstract int doCreate(Transaction transaction);
+    protected abstract int doCreate(Transaction transaction) throws CloneNotSupportedException;
 
-    protected abstract int doUpdate(Transaction transaction);
+    protected abstract int doUpdate(Transaction transaction) throws CloneNotSupportedException;
 
-    protected abstract int doDelete(Transaction transaction);
+    protected abstract int doDelete(Transaction transaction) throws CloneNotSupportedException;
 
     protected abstract Transaction doFindOne(Xid xid);
 

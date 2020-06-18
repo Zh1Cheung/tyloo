@@ -52,6 +52,7 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.9" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.12" level="project" />
     <orderEntry type="module" module-name="tyloo-sample-captial" />
     <orderEntry type="module" module-name="tyloo-sample-common" />
     <orderEntry type="library" name="Maven: com.mchange:c3p0:0.9.5.4" level="project" />

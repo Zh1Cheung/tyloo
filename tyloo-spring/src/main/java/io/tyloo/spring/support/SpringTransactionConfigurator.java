@@ -37,18 +37,15 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
         transactionManager.setTransactionRepository(transactionRepository);
 
         if (executorService == null) {
-
-
             Executors.defaultThreadFactory();
             synchronized (SpringTransactionConfigurator.class) {
-
                 if (executorService == null) {
                     executorService = new ThreadPoolExecutor(
                             tylooRecoverConfiguration.getAsyncTerminateThreadCorePoolSize(),
                             tylooRecoverConfiguration.getAsyncTerminateThreadMaxPoolSize(),
                             5L,
                             TimeUnit.SECONDS,
-                            new ArrayBlockingQueue<Runnable>(tylooRecoverConfiguration.getAsyncTerminateThreadWorkQueueSize()),
+                            new ArrayBlockingQueue<>(tylooRecoverConfiguration.getAsyncTerminateThreadWorkQueueSize()),
                             new ThreadFactory() {
 
                                 final AtomicInteger poolNumber = new AtomicInteger(1);

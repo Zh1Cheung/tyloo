@@ -28,13 +28,13 @@ import java.lang.reflect.Modifier;
 
 public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint.StaticPart {
 
-    private Object proxy;
+    private final Object proxy;
 
-    private Object target;
+    private final Object target;
 
-    private Method method;
+    private final Method method;
 
-    private Object[] args;
+    private final Object[] args;
 
     private Signature signature;
 
@@ -103,14 +103,17 @@ public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint
         }
     }
 
+    @Override
     public String toShortString() {
         return "execution(" + getSignature().toShortString() + ")";
     }
 
+    @Override
     public String toLongString() {
         return "execution(" + getSignature().toLongString() + ")";
     }
 
+    @Override
     public String toString() {
         return "execution(" + getSignature().toString() + ")";
     }
@@ -168,50 +171,62 @@ public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint
 
         private volatile String[] parameterNames;
 
+        @Override
         public String getName() {
             return method.getName();
         }
 
+        @Override
         public int getModifiers() {
             return method.getModifiers();
         }
 
+        @Override
         public Class getDeclaringType() {
             return method.getDeclaringClass();
         }
 
+        @Override
         public String getDeclaringTypeName() {
             return method.getDeclaringClass().getName();
         }
 
+        @Override
         public Class getReturnType() {
             return method.getReturnType();
         }
 
+        @Override
         public Method getMethod() {
             return method;
         }
 
+        @Override
         public Class[] getParameterTypes() {
             return method.getParameterTypes();
         }
 
+        @Override
         public String[] getParameterNames() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public Class[] getExceptionTypes() {
             return method.getExceptionTypes();
         }
 
+        @Override
         public String toShortString() {
             return toString(false, false, false, false);
         }
 
+        @Override
         public String toLongString() {
             return toString(true, true, true, true);
         }
 
+        @Override
         public String toString() {
             return toString(false, true, false, true);
         }
@@ -269,6 +284,7 @@ public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint
      */
     private class SourceLocationImpl implements SourceLocation {
 
+        @Override
         public Class getWithinType() {
             if (proxy == null) {
                 throw new UnsupportedOperationException("No source location joinpoint available: target is null");
@@ -276,14 +292,17 @@ public class MethodProceedingJoinPoint implements ProceedingJoinPoint, JoinPoint
             return proxy.getClass();
         }
 
+        @Override
         public String getFileName() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public int getLine() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public int getColumn() {
             throw new UnsupportedOperationException();
         }

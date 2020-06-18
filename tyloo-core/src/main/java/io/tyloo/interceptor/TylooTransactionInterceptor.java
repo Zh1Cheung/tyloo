@@ -81,7 +81,7 @@ public class TylooTransactionInterceptor {
         boolean asyncConfirm = tylooMethodContext.getAnnotation().asyncConfirm();
         boolean asyncCancel = tylooMethodContext.getAnnotation().asyncCancel();
 
-        Set<Class<? extends Exception>> allDelayCancelExceptions = new HashSet<Class<? extends Exception>>();
+        Set<Class<? extends Exception>> allDelayCancelExceptions = new HashSet<>();
         allDelayCancelExceptions.addAll(this.delayCancelExceptions);
         allDelayCancelExceptions.addAll(Arrays.asList(tylooMethodContext.getAnnotation().delayCancelExceptions()));
 

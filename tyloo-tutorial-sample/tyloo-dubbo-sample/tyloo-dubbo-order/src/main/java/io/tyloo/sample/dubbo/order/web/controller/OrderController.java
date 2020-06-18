@@ -112,8 +112,9 @@ public class OrderController {
 
     private PlaceOrderRequest buildRequest(String redPacketPayAmount, long shopId, long payerUserId, long productId) {
         BigDecimal redPacketPayAmountInBigDecimal = new BigDecimal(redPacketPayAmount);
-        if (redPacketPayAmountInBigDecimal.compareTo(BigDecimal.ZERO) < 0)
+        if (redPacketPayAmountInBigDecimal.compareTo(BigDecimal.ZERO) < 0) {
             throw new InvalidParameterException("invalid red packet amount :" + redPacketPayAmount);
+        }
 
         PlaceOrderRequest request = new PlaceOrderRequest();
         request.setPayerUserId(payerUserId);

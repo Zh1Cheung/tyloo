@@ -40,27 +40,24 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date: 9:34 2019/8/27
  *
  */
-public abstract class TccProxy {
-    private static final AtomicLong PROXY_CLASS_COUNTER = new AtomicLong(0);
-
-    private static final String PACKAGE_NAME = TccProxy.class.getPackage().getName();
-
+public abstract class TylooProxy {
     public static final InvocationHandler RETURN_NULL_INVOKER = new InvocationHandler() {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) {
             return null;
         }
     };
-
-    public static final InvocationHandler THROW_UNSUPPORTED_INVOKER = new InvocationHandler() {
-        public Object invoke(Object proxy, Method method, Object[] args) {
-            throw new UnsupportedOperationException("Method [" + ReflectUtils.getName(method) + "] unimplemented.");
-        }
+    public static final InvocationHandler THROW_UNSUPPORTED_INVOKER = (proxy, method, args) -> {
+        throw new UnsupportedOperationException("Method [" + ReflectUtils.getName(method) + "] unimplemented.");
     };
-
+    private static final AtomicLong PROXY_CLASS_COUNTER = new AtomicLong(0);
+    private static final String PACKAGE_NAME = TylooProxy.class.getPackage().getName();
     private static final Map<ClassLoader, Map<String, Object>> ProxyCacheMap = new WeakHashMap<ClassLoader, Map<String, Object>>();
 
     private static final Object PendingGenerationMarker = new Object();
+
+    protected TylooProxy() {
+    }
 
     /**
      * TCC Proxy 工厂
@@ -68,15 +65,15 @@ public abstract class TccProxy {
      * @param ics interface class array.
      * @return TccProxy instance.
      */
-    public static TccProxy getProxy(Class<?>... ics) {
-        return getProxy(ClassHelper.getCallerClassLoader(TccProxy.class), ics);
+    public static TylooProxy getProxy(Class<?>... ics) {
+        return getProxy(ClassHelper.getCallerClassLoader(TylooProxy.class), ics);
     }
 
     /**
      * 1. 校验接口
      * 2. 使用接口集合类名以 `;` 分隔拼接，作为 Proxy 的唯一标识
      * 3. 获得 Proxy 对应的 ClassLoader
-     * 4. 一直获得 TCC Proxy 工厂直到成功。
+     * 4. 一直获得 Tyloo Proxy 工厂直到成功。
      * 5. 生成 Dubbo Service 调用 ProxyFactory、Proxy 的代码生成器
      * 6. 生成 Dubbo Service 调用 Proxy 的代码。
      *
@@ -84,15 +81,17 @@ public abstract class TccProxy {
      * @param ics
      * @return
      */
-    public static TccProxy getProxy(ClassLoader cl, Class<?>... ics) {
-        if (ics.length > 65535)
+    public static TylooProxy getProxy(ClassLoader cl, Class<?>... ics) {
+        if (ics.length > 65535) {
             throw new IllegalArgumentException("interface limit exceeded");
+        }
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ics.length; i++) {
             String itf = ics[i].getName();
-            if (!ics[i].isInterface())
+            if (!ics[i].isInterface()) {
                 throw new RuntimeException(itf + " is not a interface.");
+            }
 
             Class<?> tmp = null;
             try {
@@ -100,8 +99,9 @@ public abstract class TccProxy {
             } catch (ClassNotFoundException e) {
             }
 
-            if (tmp != ics[i])
+            if (tmp != ics[i]) {
                 throw new IllegalArgumentException(ics[i] + " is not visible from class loader");
+            }
 
             sb.append(itf).append(';');
         }
@@ -119,14 +119,15 @@ public abstract class TccProxy {
             }
         }
 
-        TccProxy proxy = null;
+        TylooProxy proxy = null;
         synchronized (cache) {
             do {
                 Object value = cache.get(key);
                 if (value instanceof Reference<?>) {
-                    proxy = (TccProxy) ((Reference<?>) value).get();
-                    if (proxy != null)
+                    proxy = (TylooProxy) ((Reference<?>) value).get();
+                    if (proxy != null) {
                         return proxy;
+                    }
                 }
 
                 if (value == PendingGenerationMarker) {
@@ -147,9 +148,9 @@ public abstract class TccProxy {
          */
         long id = PROXY_CLASS_COUNTER.getAndIncrement();
         String pkg = null;
-        TccClassGenerator ccp = null, ccm = null;
+        TylooClassGenerator ccp = null, ccm = null;
         try {
-            ccp = TccClassGenerator.newInstance(cl);
+            ccp = TylooClassGenerator.newInstance(cl);
 
             Set<String> worked = new HashSet<String>();
             List<Method> methods = new ArrayList<Method>();
@@ -170,8 +171,9 @@ public abstract class TccProxy {
 
                 for (Method method : ics[i].getMethods()) {
                     String desc = ReflectUtils.getDesc(method);
-                    if (worked.contains(desc))
+                    if (worked.contains(desc)) {
                         continue;
+                    }
                     worked.add(desc);
 
                     int ix = methods.size();
@@ -179,11 +181,13 @@ public abstract class TccProxy {
                     Class<?>[] pts = method.getParameterTypes();
 
                     StringBuilder code = new StringBuilder("Object[] args = new Object[").append(pts.length).append("];");
-                    for (int j = 0; j < pts.length; j++)
+                    for (int j = 0; j < pts.length; j++) {
                         code.append(" args[").append(j).append("] = ($w)$").append(j + 1).append(";");
+                    }
                     code.append(" Object ret = handler.invoke(this, methods[" + ix + "], args);");
-                    if (!Void.TYPE.equals(rt))
+                    if (!Void.TYPE.equals(rt)) {
                         code.append(" return ").append(asArgument(rt, "ret")).append(";");
+                    }
 
                     methods.add(method);
 
@@ -191,16 +195,13 @@ public abstract class TccProxy {
 
                     Tyloo tyloo = method.getAnnotation(Tyloo.class);
 
-                    if (tyloo != null) {
-                        ccp.addMethod(true, method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());
-                    } else {
-                        ccp.addMethod(false, method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());
-                    }
+                    ccp.addMethod(tyloo != null, method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());
                 }
             }
 
-            if (pkg == null)
+            if (pkg == null) {
                 pkg = PACKAGE_NAME;
+            }
 
             // create ProxyInstance class.
             String pcn = pkg + ".proxy" + id;
@@ -213,33 +214,67 @@ public abstract class TccProxy {
             clazz.getField("methods").set(null, methods.toArray(new Method[0]));
 
             // create TccProxy class.
-            String fcn = TccProxy.class.getName() + id;
-            ccm = TccClassGenerator.newInstance(cl);
+            String fcn = TylooProxy.class.getName() + id;
+            ccm = TylooClassGenerator.newInstance(cl);
             ccm.setClassName(fcn);
             ccm.addDefaultConstructor();
-            ccm.setSuperClass(TccProxy.class);
+            ccm.setSuperClass(TylooProxy.class);
             ccm.addMethod("public Object newInstance(" + InvocationHandler.class.getName() + " h){ return new " + pcn + "($1); }");
             Class<?> pc = ccm.toClass();
-            proxy = (TccProxy) pc.newInstance();
+            proxy = (TylooProxy) pc.newInstance();
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             // release TccClassGenerator
-            if (ccp != null)
+            if (ccp != null) {
                 ccp.release();
-            if (ccm != null)
+            }
+            if (ccm != null) {
                 ccm.release();
+            }
             synchronized (cache) {
-                if (proxy == null)
+                if (proxy == null) {
                     cache.remove(key);
-                else
-                    cache.put(key, new WeakReference<TccProxy>(proxy));
+                } else {
+                    cache.put(key, new WeakReference<TylooProxy>(proxy));
+                }
                 cache.notifyAll();
             }
         }
         return proxy;
+    }
+
+    private static String asArgument(Class<?> cl, String name) {
+        if (cl.isPrimitive()) {
+            if (Boolean.TYPE == cl) {
+                return name + "==null?false:((Boolean)" + name + ").booleanValue()";
+            }
+            if (Byte.TYPE == cl) {
+                return name + "==null?(byte)0:((Byte)" + name + ").byteValue()";
+            }
+            if (Character.TYPE == cl) {
+                return name + "==null?(char)0:((Character)" + name + ").charValue()";
+            }
+            if (Double.TYPE == cl) {
+                return name + "==null?(double)0:((Double)" + name + ").doubleValue()";
+            }
+            if (Float.TYPE == cl) {
+                return name + "==null?(float)0:((Float)" + name + ").floatValue()";
+            }
+            if (Integer.TYPE == cl) {
+                return name + "==null?(int)0:((Integer)" + name + ").intValue()";
+            }
+            if (Long.TYPE == cl) {
+                return name + "==null?(long)0:((Long)" + name + ").longValue()";
+            }
+            if (Short.TYPE == cl) {
+                return name + "==null?(short)0:((Short)" + name + ").shortValue()";
+            }
+            throw new RuntimeException(name + " is unknown primitive type.");
+        }
+        return "(" + ReflectUtils.getName(cl) + ")" + name;
     }
 
     /**
@@ -257,30 +292,4 @@ public abstract class TccProxy {
      * @return instance.
      */
     abstract public Object newInstance(InvocationHandler handler);
-
-    protected TccProxy() {
-    }
-
-    private static String asArgument(Class<?> cl, String name) {
-        if (cl.isPrimitive()) {
-            if (Boolean.TYPE == cl)
-                return name + "==null?false:((Boolean)" + name + ").booleanValue()";
-            if (Byte.TYPE == cl)
-                return name + "==null?(byte)0:((Byte)" + name + ").byteValue()";
-            if (Character.TYPE == cl)
-                return name + "==null?(char)0:((Character)" + name + ").charValue()";
-            if (Double.TYPE == cl)
-                return name + "==null?(double)0:((Double)" + name + ").doubleValue()";
-            if (Float.TYPE == cl)
-                return name + "==null?(float)0:((Float)" + name + ").floatValue()";
-            if (Integer.TYPE == cl)
-                return name + "==null?(int)0:((Integer)" + name + ").intValue()";
-            if (Long.TYPE == cl)
-                return name + "==null?(long)0:((Long)" + name + ").longValue()";
-            if (Short.TYPE == cl)
-                return name + "==null?(short)0:((Short)" + name + ").shortValue()";
-            throw new RuntimeException(name + " is unknown primitive type.");
-        }
-        return "(" + ReflectUtils.getName(cl) + ")" + name;
-    }
 }

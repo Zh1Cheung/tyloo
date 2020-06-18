@@ -4,6 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd"
        xmlns:aop="http://www.springframework.org/schema/aop">
 
-       <dubbo:provider proxy="tccJavassist"/>
+       <dubbo:provider proxy="tylooJavassist"/>
     <aop:aspectj-autoproxy/>
 </beans>

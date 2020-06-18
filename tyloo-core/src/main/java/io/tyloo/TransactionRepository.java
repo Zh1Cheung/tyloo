@@ -19,7 +19,7 @@ import java.util.List;
 
 public interface TransactionRepository {
 
-    int create(Transaction transaction);
+    int create(Transaction transaction) throws CloneNotSupportedException;
 
     int update(Transaction transaction);
 

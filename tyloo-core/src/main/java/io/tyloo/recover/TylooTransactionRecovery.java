@@ -39,7 +39,6 @@ public class TylooTransactionRecovery {
     public void startRecover() throws CloneNotSupportedException {
 
         List<Transaction> transactions = loadErrorTransactions();
-
         recoverErrorTransactions(transactions);
     }
 
@@ -49,13 +48,9 @@ public class TylooTransactionRecovery {
      * @return
      */
     private List<Transaction> loadErrorTransactions() {
-
-
         long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
-
         TransactionRepository transactionRepository = transactionConfigurator.getTransactionRepository();
         TylooRecoverConfiguration tylooRecoverConfiguration = transactionConfigurator.getTylooRecoverConfiguration();
-
         return transactionRepository.findAllUnmodifiedSince(new Date(currentTimeInMillis - tylooRecoverConfiguration.getRecoverDuration() * 1000));
     }
 
@@ -66,9 +61,7 @@ public class TylooTransactionRecovery {
      */
     private void recoverErrorTransactions(List<Transaction> transactions) throws CloneNotSupportedException {
 
-
         for (Transaction transaction : transactions) {
-
             //比较重试次数，大于则跳过该事务
             if (transaction.getRetriedCount() > transactionConfigurator.getTylooRecoverConfiguration().getMaxRetryCount()) {
                 logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)));
@@ -88,7 +81,6 @@ public class TylooTransactionRecovery {
                 transaction.addRetriedCount();
                 // 如果是CONFIRMING(2)状态，则将事务往前执行
                 if (transaction.getStatus().equals(TransactionStatus.CONFIRMING)) {
-
                     transaction.changeStatus(TransactionStatus.CONFIRMING);
                     transactionConfigurator.getTransactionRepository().update(transaction);
                     transaction.commit();
@@ -105,7 +97,6 @@ public class TylooTransactionRecovery {
                 }
 
             } catch (Throwable throwable) {
-
                 if (throwable instanceof OptimisticLockException
                         || ExceptionUtils.getRootCause(throwable) instanceof OptimisticLockException) {
                     logger.warn(String.format("optimisticLockException happened while recover. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);

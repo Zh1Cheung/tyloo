@@ -1,9 +1,8 @@
-
 package io.tyloo.utils;
 
-import io.tyloo.api.Tyloo;
 import io.tyloo.api.Propagation;
 import io.tyloo.api.TransactionContext;
+import io.tyloo.api.Tyloo;
 import io.tyloo.common.MethodRole;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -19,8 +18,8 @@ import java.lang.reflect.Method;
 public class TylooMethodUtils {
 
     public static Method getTylooMethod(ProceedingJoinPoint pjp) {
-        Method method = ((MethodSignature) (pjp.getSignature())).getMethod();
 
+        Method method = ((MethodSignature) (pjp.getSignature())).getMethod();
         if (method.getAnnotation(Tyloo.class) == null) {
             try {
                 method = pjp.getTarget().getClass().getMethod(method.getName(), method.getParameterTypes());
@@ -46,9 +45,8 @@ public class TylooMethodUtils {
     public static int getTransactionContextParamPosition(Class<?>[] parameterTypes) {
 
         int position = -1;
-
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (parameterTypes[i].equals(io.tyloo.api.TransactionContext.class)) {
+            if (parameterTypes[i].equals(TransactionContext.class)) {
                 position = i;
                 break;
             }
