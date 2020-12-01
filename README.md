@@ -1,8 +1,6 @@
 # tyloo
 Distributed transaction framework——TCC
 
-![TYLOO - Liquipedia Counter-Strike Wiki]()
-
 
 
 ## 概念
