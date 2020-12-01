@@ -12,13 +12,13 @@
     </bean>
 
     <bean id="transactionRepository" class="io.tyloo.spring.repository.SpringJdbcTransactionRepository">
-    <property name="dataSource" ref="tccDataSource"/>
+    <property name="dataSource" ref="tylooTccDataSource"/>
     <property name="domain" value="ORDER"/>
     <property name="tbSuffix" value="_ORD"/>
     <property name="serializer" ref="objectSerializer"/>
     </bean>
 
-    <bean id="tccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+    <bean id="tylooTccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
     destroy-method="close" lazy-init="false">
     <property name="driverClass" value="#{tccjdbc['jdbc.driverClassName']}"/>
     <property name="jdbcUrl" value="#{tccjdbc['tcc.jdbc.url']}"/>

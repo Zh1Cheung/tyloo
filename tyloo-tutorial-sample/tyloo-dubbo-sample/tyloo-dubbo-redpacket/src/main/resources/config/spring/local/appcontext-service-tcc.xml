@@ -15,14 +15,14 @@
 
 
     <bean id="transactionRepository" class="io.tyloo.spring.repositorySpringJdbcTransactionRepository">
-        <property name="dataSource" ref="tccDataSource"/>
+        <property name="dataSource" ref="tylooTccDataSource"/>
         <property name="domain" value="REDPACKET"/>
         <property name="tbSuffix" value="_RED"/>
     </bean>
 
     <util:properties id="tccjdbc" location="classpath:tccjdbc.properties"/>
 
-    <bean id="tccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+    <bean id="tylooTccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close" lazy-init="false">
         <property name="driverClass" value="#{tccjdbc['jdbc.driverClassName']}"/>
         <property name="jdbcUrl" value="#{tccjdbc['tcc.jdbc.url']}"/>

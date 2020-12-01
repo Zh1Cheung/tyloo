@@ -16,12 +16,12 @@
     </bean>
 
     <bean id="transactionRepository" class="io.tyloo.spring.repository.SpringJdbcTransactionRepository">
-    <property name="dataSource" ref="tccDataSource"/>
+    <property name="dataSource" ref="tylooTccDataSource"/>
     <property name="domain" value="CAPITAL"/>
     <property name="tbSuffix" value="_CAP"/>
     </bean>
 
-    <bean id="tccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+    <bean id="tylooTccDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close" lazy-init="false">
         <property name="driverClass" value="#{tccjdbc['jdbc.driverClassName']}"/>
         <property name="jdbcUrl" value="#{tccjdbc['tcc.jdbc.url']}"/>

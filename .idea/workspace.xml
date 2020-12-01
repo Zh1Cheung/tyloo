@@ -3,16 +3,95 @@
   <component name="AnalysisUIOptions">
     <option name="GROUP_BY_SEVERITY" value="true" />
   </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="cf428d0d-ddfb-43e2-93f0-9998655701a4" name="Default Changelist" comment="" />
+    <list default="true" id="cf428d0d-ddfb-43e2-93f0-9998655701a4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-dubbo/tyloo-dubbo.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/src/dbscripts/create_db_cap.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/src/tylooSampledb/create_db_cap.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/src/dbscripts/create_db_ord.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/src/tylooSampledb/create_db_ord.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/src/dbscripts/create_db_red.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/src/tylooSampledb/create_db_red.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/src/dbscripts/create_db_tcc.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/src/tylooSampledb/create_db_tcc.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/dbscripts/create_db_cap.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/tylooSampledb/create_db_cap.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/dbscripts/create_db_ord.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/tylooSampledb/create_db_ord.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/dbscripts/create_db_red.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/tylooSampledb/create_db_red.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/dbscripts/create_db_tcc.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/src/main/tylooSampledb/create_db_tcc.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-capital-api/tyloo-dubbo-capital-api.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-capital/src/main/resources/config/spring/local/appcontext-service-tcc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-capital/src/main/resources/config/spring/local/appcontext-service-tcc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-capital/tyloo-dubbo-capital.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-order/src/main/resources/config/spring/local/appcontext-service-tcc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-order/src/main/resources/config/spring/local/appcontext-service-tcc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-order/tyloo-dubbo-order.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-redpacket-api/tyloo-dubbo-redpacket-api.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-redpacket/src/main/resources/config/spring/local/appcontext-service-tcc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-redpacket/src/main/resources/config/spring/local/appcontext-service-tcc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-redpacket/tyloo-dubbo-redpacket.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-dubbo-sample/tyloo-dubbo-sample.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-capital-api/tyloo-http-capital-api.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-capital/src/main/resources/config/spring/local/appcontext-service-tcc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-capital/src/main/resources/config/spring/local/appcontext-service-tcc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-capital/tyloo-http-capital.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-order/src/main/resources/config/spring/local/appcontext-service-tcc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-order/src/main/resources/config/spring/local/appcontext-service-tcc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-order/tyloo-http-order.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-redpacket-api/tyloo-http-redpacket-api.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-redpacket/src/main/resources/config/spring/local/appcontext-service-tcc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-redpacket/src/main/resources/config/spring/local/appcontext-service-tcc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-redpacket/tyloo-http-redpacket.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-http-sample/tyloo-http-sample.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-captial/tyloo-sample-captial.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-common/tyloo-sample-common.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-domain.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-order/tyloo-sample-order.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-sample-domain/tyloo-sample-redpacket/tyloo-sample-redpacket.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-tutorial-sample/tyloo-tutorial-sample.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-unit-test/src/main/resources/tyloo-unit-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tyloo-unit-test/src/main/resources/tyloo-unit-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tyloo-unit-test/tyloo-unit-test.iml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
   <component name="DefaultGradleProjectSettings">
     <option name="testRunner" value="GRADLE" />
     <option name="delegatedBuild" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="KubernetesApiPersistence">
+    <option name="context" value="docker-desktop" />
+    <option name="namespace" value="default" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$APPLICATION_HOME_DIR$/plugins/maven/lib/maven3" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="1" />
   </component>
   <component name="ProjectId" id="1dRATCGVAMXVMXQ5IIzc7A55aVf" />
   <component name="ProjectViewState">
@@ -20,11 +99,27 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -37,29 +132,37 @@
       <updated>1555742296952</updated>
       <workItem from="1555742302908" duration="2035000" />
       <workItem from="1592377557271" duration="12563000" />
+      <workItem from="1606820219584" duration="1092000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="395" y="90" key="#Inspections" timestamp="1592384879204">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="359" y="196" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606820840613">
+      <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state x="395" y="90" key="#Inspections/0.0.1536.824@0.0.1536.824" timestamp="1592384879204" />
-    <state x="2" y="254" key="#SQL_Dialects" timestamp="1592381237364">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="359" y="196" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1792.1025@0.23.1792.1025" timestamp="1606820840613" />
+    <state x="479" y="126" key="#com.intellij.openapi.keymap.impl.ui.EditKeymapsDialog" timestamp="1606820298291">
+      <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state x="2" y="254" key="#SQL_Dialects/0.0.1536.824@0.0.1536.824" timestamp="1592381237364" />
-    <state x="299" y="67" key="Maven.ArtifactSearchDialog" timestamp="1592386268187">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="479" y="126" key="#com.intellij.openapi.keymap.impl.ui.EditKeymapsDialog/0.23.1792.1025@0.23.1792.1025" timestamp="1606820298291" />
+    <state x="596" y="260" width="804" height="550" key="find.popup" timestamp="1606821327963">
+      <screen x="0" y="23" width="1792" height="1026" />
     </state>
-    <state x="299" y="67" key="Maven.ArtifactSearchDialog/0.0.1536.824@0.0.1536.824" timestamp="1592386268187" />
-    <state x="458" y="154" width="675" height="516" key="find.popup" timestamp="1592384084066">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="458" y="154" width="675" height="516" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1592384084066" />
+    <state x="596" y="260" width="804" height="550" key="find.popup/0.23.1792.1026@0.23.1792.1026" timestamp="1606821327963" />
   </component>
   <component name="masterDetails">
     <states>
